@@ -25,7 +25,7 @@ jobs:
       - name: 整理要發布的檔案（不含測試）
         run: |
           mkdir _site
-          cp -r index.html sw.js manifest.webmanifest icon.svg icon-192.png icon-512.png .nojekyll data vendor docs _site/
+          cp -r index.html sw.js manifest.webmanifest og-image.png icon.svg icon-192.png icon-512.png .nojekyll data vendor docs _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
