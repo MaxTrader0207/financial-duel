@@ -1,0 +1,5 @@
+tests/test.html
+tests/vendor/
+tests/shots/*.png
+__pycache__/
+.DS_Store
