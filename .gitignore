@@ -1,5 +1,7 @@
-tests/test.html
-tests/vendor/
-tests/shots/*.png
-__pycache__/
-.DS_Store
+node_modules/
+dist/
+dist-test/
+artifact/
+standalone/
+test-results/
+playwright-report/

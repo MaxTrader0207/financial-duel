@@ -1,34 +1,67 @@
-name: 部署到 GitHub Pages
-
+name: Test and deploy to GitHub Pages
+# Every push and pull request: unit tests (Vitest) and browser tests (Playwright, desktop + phone).
+# Pushes to main deploy to GitHub Pages only when both pass.
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Unit tests
+        run: npm test
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Single-file builds (for the file:// tests)
+        run: npm run build:all
+      - name: Browser tests
+        run: npm run e2e
+      - name: Keep the test report when something fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+  build:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - name: 整理要發布的檔案（不含測試）
-        run: |
-          mkdir _site
-          cp -r index.html sw.js manifest.webmanifest og-image.png icon.svg icon-192.png icon-512.png .nojekyll data vendor docs _site/
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4

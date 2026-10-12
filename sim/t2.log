@@ -1,0 +1,11 @@
+
+ RUN  v2.1.4 /tmp/claude-0/-home-claude/87364549-d6d3-5f38-b90e-8a78aca658a0/scratchpad/app
+
+ ✓ sim/balance.sim.js  (1 test) 52528ms
+   ✓ simulates 52527ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  22:58:42
+   Duration  56.96s (transform 1.27s, setup 2.06s, collect 106ms, tests 52.53s, environment 1.43s, prepare 262ms)
+
