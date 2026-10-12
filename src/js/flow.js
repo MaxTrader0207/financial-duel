@@ -12,7 +12,8 @@ import { CATS, MON } from './cards.js';
 import { COL, colSave, rewardOffer } from './collection.js';
 import { $, DIFFS, LP_MAX, esc, foeAtkOf, sleep } from './core.js';
 import { clearField, damage, floatText, log, lunge, placeField, shatter } from './fx.js';
-import { recordGame } from './records.js';
+import { RECS, recordGame } from './records.js';
+import { ensureAdvantage, tutorialFoeLp, setupTutorial, suggestCard, tutorialFoeMiss } from './tutorial-script.js';
 import { renderResult } from './result.js';
 import { WEAK_MULT, advOf, diffKeyOf } from './rules.js';
 import { clearSave, readSave } from './save.js';
@@ -28,6 +29,8 @@ import { Tutor } from './tutor.js';
 
 
 /* ---------- flow ---------- */
+const NUDGE_DUELS = 3;                 // idle hints (suggested card) during a player's first few finished duels
+
 /* saves from before the opponent profile existed simply get a new one */
 const okProf = p => !!p && ['strong', 'weak'].every(k => Array.isArray(p[k]) && p[k].length === 2 && p[k].every(c => CATS[c]));
 /* continue the saved duel exactly where it stopped (attack or defence phase) */
@@ -67,8 +70,10 @@ async function startDuel(opts = {}) {
   newGame();
   G.fsm.go('intro');
   G.bg = BG.pick(); BG.apply(G.bg);
-  Tutor.begin(!!opts.tutorial || !Tutor.done()); show('duel'); Sound.startBGM(); clearField('p'); clearField('c');
-  log('雙方洗牌完畢。'); setPhase('idle', '待機', ''); renderAll();
+  const tutorial = !!opts.tutorial || !Tutor.done();
+  if (tutorial) setupTutorial();
+  Tutor.begin(tutorial); show('duel'); Sound.startBGM(); clearField('p'); clearField('c');
+  log(tutorial ? `教學對戰：難度固定為簡易，只出初階題，對手資金 ${tutorialFoeLp()}。` : '雙方洗牌完畢。'); setPhase('idle', '待機', ''); renderAll();
   const g0 = G;
   await transition('對決開始', '雙方準備就緒', 'gold');
   if (stale(g0)) return;
@@ -88,10 +93,12 @@ async function playerTurn() {
   Sound.setMood('ally');
   await transition('我方回合', `第 ${G.turn} 回合 · 我方攻擊`, 'ally');
   if (stale(g0)) return;
-  Tutor.onPhase('attack');
+  await Tutor.onPhase('attack', { suggestUid: suggestCard('attack') });
+  if (stale(g0)) return;
   log('選一張手牌召喚，答對題目即可攻擊。' + (G.mods.myAtk ? ` 本次攻擊 ${G.mods.myAtk > 0 ? '+' : ''}${G.mods.myAtk}。` : ''));
   G.fsm.go('attack');
   setPhase('attack', '攻擊階段', '選擇要召喚的卡牌');
+  if (!Tutor.active && RECS.length < NUDGE_DUELS) Tutor.nudge(suggestCard('attack'), '不知道出哪張？攻擊力越高，答對時傷害越大；發光的這張是目前攻擊力最高的卡。', () => G === g0 && G.phase === 'attack' && !G.busy);
   if (matchMedia('(hover: none)').matches) Tutor.tip('longpress');
   if (G.weak && G.hand.p.some(i => MON[i.id].cat === G.weak)) Tutor.tip('weak');
 }
@@ -118,9 +125,11 @@ async function cpuTurn() {
   log(`對手召喚 <b>【${esc(m.name)}】</b>，攻擊力 ${atk}${G.diff.foeMult !== 1 ? `（卡面 ${m.atk} × ${G.diff.foeMult}）` : ''}${G.mods.foeAtk ? `（追繳 ${G.mods.foeAtk}）` : ''}！${SKILLS[m.id].hit ? ` 技能【${SKILLS[m.id].name}】：${SKILLS[m.id].text}` : ''}${G.weak === m.cat && diffKeyOf(G.diff) !== 'easy' ? ' 對手瞄準了你的弱項！' : ''}`);
   await sleep(500);
   if (!G.hand.p.length) draw('p');
+  const tutSuggest = ensureAdvantage(m);                 // tutorial: the first defence always has a 相剋 card
   G.fsm.go('defend');
   setPhase('defend', '防禦階段', `選一張卡抵擋 攻 ${atk} · 題目：${CATS[m.cat].name}`);
-  Tutor.onPhase('defend');
+  Tutor.onPhase('defend', { suggestUid: tutSuggest ?? suggestCard('defend') });
+  if (!Tutor.active && RECS.length < NUDGE_DUELS) Tutor.nudge(suggestCard('defend'), '不知道選哪張？選守備力高的卡；標著「相剋 ×1.5」的卡守備力更高。', () => G === g0 && G.phase === 'defend' && !G.busy);
   if (G.hand.p.some(i => advOf(MON[i.id].cat, m.cat) !== 1)) Tutor.tip('adv');
 }
 async function onPlay(uid) {
@@ -147,7 +156,8 @@ async function resolveAttack(m) {
   if (r.correct) {
     const out = attackHit(m, r);
     if (out.fired) await skillFX('p', m);
-    const blk = foeBlock(m, out.dmg);
+    let blk = foeBlock(m, out.dmg);
+    if (blk && tutorialFoeMiss() && blk.ok) { blk = { ...blk, ok: false, dmg: out.dmg }; G.foeStats.c--; }   // tutorial: the first block misses
     if (blk) {
       renderHands(); placeField('c', blk.card);
       const advTxt = blk.adv > 1 ? `，${CATS[blk.card.cat].name}剋${CATS[m.cat].name}，守備 ×${blk.adv}` : blk.adv < 1 ? `，被${CATS[m.cat].name}剋制，守備 ×${blk.adv}` : '';
@@ -214,14 +224,13 @@ async function resolveDefend(m, foe) {
     if (out.foeHeal) await heal('c', out.foeHeal);
   }
   await sleep(350); clearField('p'); clearField('c'); G.foeCard = null;
-  Tutor.onDefendDone();
   if (await checkEnd()) return;
   playerTurn();
 }
 async function checkEnd() {
   if (G.lp.c > 0 && G.lp.p > 0) return false;
   G.fsm.go('over');
-  G.over = true; const win = G.lp.c <= 0; G.win = win; G.endedAt = new Date(); clearSave(); Tutor.end(false);
+  G.over = true; const win = G.lp.c <= 0; G.win = win; G.endedAt = new Date(); clearSave(); Tutor.end();
   recordGame(false);
   if (win && !COL.pending) { COL.pending = rewardOffer(diffKeyOf(G.diff)); colSave(); }
   setPhase('idle', win ? '勝利' : '敗北', '');

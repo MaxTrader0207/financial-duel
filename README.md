@@ -83,6 +83,7 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
 | `report.js`、`result.js` | PDF／PNG 對戰報告、結算畫面 |
 | `scenes.js`、`ur-art.js` | 每屬性第 2、3 種卡面場景、32 張極稀有卡的專屬插圖 |
 | `perf.js`、`pwa.js` | 簡化特效、可安裝 App |
+| `tutor.js`、`tutorial-script.js` | 新手引導的 8 個步驟與前幾場的出牌提示／教學對戰的設定（難度、資金、對手第一次答錯、保證相剋卡） |
 | 其他 | 背景、音效、設定、遊玩時間、新手引導與小提示、事件綁定（`wiring.js`） |
 
 每個模組開頭第一行註解說明它負責什麼。模組最初是用 `tools/split.mjs` 從單一 HTML 自動拆出來的（工具留作紀錄）；之後已整理成上面的分層：跨模組修改變數的 `__set_X()` 改成有名字的函式（`setGame`、`setDeck`、`setDiffKey`、`clearRecords`…），互相引用改由 `game.js`、`actions.js`、`ui.js` 三個葉節點銜接。
@@ -115,10 +116,11 @@ Playwright（JavaScript），和單元測試放在同一套流程。`npm run e2e
 | `duel.spec.js` | 三種難易度各打完一場；狀態機沒有違規跳轉；結束後寫入學習紀錄、清除存檔 |
 | `save.spec.js` | 攻擊與防禦階段存檔後續戰完全一致；舊版存檔與 30 張牌組自動轉換；損毀存檔另存備份 |
 | `opponent.both.spec.js` | 對手當場作答（答對擋下／答錯顯示正解）、擅長屬性、結算畫面統計、手牌「對手不擅長」標示 |
-| `features.spec.js` | 錯題本與複習、新手引導、一次性小提示、進度匯出匯入（含錯誤檔案）、牌組編輯、學習紀錄 |
+| `features.spec.js` | 錯題本與複習、一次性小提示、進度匯出匯入（含錯誤檔案）、牌組編輯、學習紀錄 |
 | `cards.both.spec.js` | 圖鑑延遲繪製與各稀有度插圖、手機長按放大、卡面文字不溢出（含手機字體 150%） |
 | `app.both.spec.js` | 可安裝 App：manifest、圖示、斷網後仍能開啟並對戰；Google Fonts 被擋時標題字型；簡化特效設定與自動偵測 |
 | `report.spec.js` | 對戰報告 PNG／PDF 下載；30 分鐘提醒與 60 分鐘強制休息（重新整理也跳不過） |
+| `tutorial.both.spec.js` | 教學對戰從頭走到尾：8 個步驟依序出現、建議的卡、對手第一次固定答錯、保證有相剋卡、只出初階題、略過後不再出現 |
 | `builds.spec.js` | 兩種單檔版用 `file://` 開啟可以對戰、不會出現安裝功能 |
 
 - 檔名含 `.both` 的在桌面（1280×860）與手機（Pixel 7）各跑一次，`.phone` 只跑手機，其餘只跑桌面。

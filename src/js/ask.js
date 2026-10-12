@@ -86,12 +86,13 @@ function ask(m, mode, foe) {
       $('#q-verdict').innerHTML = (correct ? '正解！' : '不正解') + `<small>${tLabel}</small>`;
       $('#q-explain').textContent = q.explain || `正確答案：${q.options[q.answer]}`;
       showAsOf(q);
+      Tutor.onFeedback();
       resetReport(q);
       if (!(correct && !retried)) $('#q-explain').insertAdjacentHTML('beforeend', `<span class="nb-note">${nbBefore ? '錯題本：退回第 1 階，稍後再複習' : '已加入錯題本'}</span>`);
       else if (nbBefore) $('#q-explain').insertAdjacentHTML('beforeend', `<span class="nb-note ok">${NB[q.id].mastered ? '錯題本：已掌握！' : `錯題本：升到第 ${NB[q.id].box} 階`}</span>`);
       const cont = $('#q-continue'); cont.textContent = correct ? (mode === 'attack' ? '發動攻擊 ▶' : '展開防禦 ▶') : '繼續 ▶';
       cont.focus({ preventScroll: true });
-      setQuizState({ resolveNow: () => { $('#quiz').hidden = true; setQuizState(null); Sound.duck(false); resolve({ correct, time, left: limit - time, retried }); } });
+      setQuizState({ resolveNow: () => { $('#quiz').hidden = true; setQuizState(null); Tutor.onQuizClosed(); Sound.duck(false); resolve({ correct, time, left: limit - time, retried }); } });
     };
     $('#q-opts').onclick = e => { const b = e.target.closest('.q-opt'); if (b && !b.disabled) finish(Number(b.dataset.i)); };
     setQuizState({ pick: i => { const b = $('#q-opts').children[i]; if (b && !b.disabled) finish(i); }, cancel: () => { done = true; cancelAnimationFrame(raf); } });

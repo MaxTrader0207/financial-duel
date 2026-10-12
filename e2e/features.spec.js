@@ -20,18 +20,6 @@ test('wrong answers go to the notebook and can be reviewed', async ({ page, erro
   await expect(page.locator('#rv-fb')).toBeVisible();
 });
 
-test.describe('first-time player', () => {
-  test.use({ tutorialDone: false });
-  test('the tutorial walks through playing, answering and defending, and can be skipped', async ({ page, errors }) => {
-    await open(page); await page.click('#btn-start');
-    await expect(page.locator('#tutor')).toBeVisible();
-    await expect(page.locator('#tut-step')).toContainText('1');
-    await page.click('#tut-skip');
-    await expect(page.locator('#tutor')).toBeHidden();
-    expect(await page.evaluate(() => localStorage.getItem('soba-ketto.tutorial.v1'))).toBeTruthy();
-  });
-});
-
 test('tips appear once, and progress exports and imports (bad files are refused)', async ({ page, errors }, info) => {
   await open(page);
   await page.evaluate(() => localStorage.removeItem('soba-ketto.tips.v1')); await page.reload();

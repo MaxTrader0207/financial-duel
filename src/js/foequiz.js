@@ -3,6 +3,7 @@
 // (a wrong pick also shows the correct option, so the opponent's mistakes teach too). Tap the panel to skip ahead.
 import { $, KEYS, esc, shuffle, sleep } from './core.js';
 import { CATS } from './cards.js';
+import { Tutor } from './tutor.js';
 
 export async function showFoeAnswer(q, blk, m) {
   const el = $('#foe-quiz'); if (!el || !q) return;
@@ -23,6 +24,7 @@ export async function showFoeAnswer(q, blk, m) {
   li[pick].classList.add(blk.ok ? 'ok' : 'ng'); if (!blk.ok) li[right].classList.add('right');
   el.querySelector('.fq-foot').innerHTML = blk.ok ? '對手答對，派卡擋下攻擊。'
     : `對手答錯！正解是 <b>${esc(q.options[q.answer])}</b>`;
+  await Tutor.foeHold();                        // tutorial: the panel stays until the explanation is read
   skip = false; await wait(blk.ok ? 1300 : 2000);
   el.removeEventListener('click', tap); el.classList.remove('on'); el.hidden = true; el.innerHTML = '';
 }

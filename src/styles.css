@@ -636,3 +636,13 @@ html.fx-lite .verdict-big,html.fx-lite #trans.final .t-main{filter:none}
 .update-bar[hidden]{display:none}
 /* opened from the home screen: keep clear of the notch and the home indicator */
 html.standalone body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);box-sizing:border-box}
+/* ---------- 教學對戰: suggested card, centred summary, above every overlay it explains (incl. the phone foe panel) ---------- */
+#tutor{z-index:85}
+#tutor.center{background:#05071ab8}
+.tut-ring[hidden]{display:none}
+@keyframes tut-glow{0%,100%{box-shadow:0 0 0 2px var(--gold-hi),0 0 10px 2px #f3dc9566}50%{box-shadow:0 0 0 3px var(--gold-hi),0 0 22px 6px #f3dc95aa}}
+/* (.hand-card is already position:relative) */
+.tut-list{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:14px;line-height:1.5}
+.tut-list li{padding-left:1.5em;position:relative}
+.tut-list li::before{content:"✓";position:absolute;left:0;color:#2f7d4f;font-weight:700}
+.tut-next{margin:6px 0 0;font-size:13.5px;line-height:1.6;color:#4a3a1a}
