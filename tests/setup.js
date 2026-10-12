@@ -15,6 +15,7 @@ Object.defineProperty(navigator, 'userActivation', { value: { hasBeenActive: fal
 
 DATA.cards = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/data/cards.json'), 'utf8')).cards;
 DATA.questions = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/data/questions.json'), 'utf8'));
+DATA.knowledge = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/data/knowledge.json'), 'utf8'));
 DATA.daily = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/data/daily.json'), 'utf8')).scenarios;
 const { initAll } = await import('../src/js/app.js');
 initAll();

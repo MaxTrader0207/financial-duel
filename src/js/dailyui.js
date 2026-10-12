@@ -5,6 +5,8 @@ import { Actions } from './actions.js';
 import { COL, colSave, rewardOffer } from './collection.js';
 import { $, KEYS, esc, shuffle } from './core.js';
 import * as Daily from './daily.js';
+import * as K from './knowledge.js';
+import { kcardHTML, openKnow } from './knowledgeui.js';
 import { Sound } from './sound.js';
 import { show } from './view.js';
 
@@ -75,6 +77,7 @@ function pick(i) {
     <p>${esc(q.explain)}</p>
     <div class="dl-chips">${chips(res.reward)}${res.ok ? '' : '<span class="dl-chip soft">答錯也有獎勵，記住這個觀念就好</span>'}</div>
     <button class="btn small" id="dl-next" type="button">${last ? '看今日成果 ▶' : '下一題 ▶'}</button>`;
+  if (res.finished) { const k = K.onDailyFinished(s); res.finished.card = k ? k.card : null; if (k) res.finished.newTitles.push(...k.titles); }
   $('#dl-next').onclick = () => { if (last) { Sound.jingle(true); renderSummary(res.finished); } else { cur++; renderQuestion(); } };
   $('#dl-next').focus({ preventScroll: true });
   renderStreak();
@@ -94,6 +97,7 @@ function renderSummary(fin) {
     <div class="dl-take"><span>今日重點</span><b>${esc(s.takeaway)}</b></div>
     <div class="dl-chips big">${chips({ xp: day.xp, shards: day.shards })}${fin && fin.perfect ? '<span class="dl-chip soft">全對加碼已計入</span>' : ''}</div>
     ${titles.map(id => `<div class="dl-title-new"><span>解鎖稱號</span><b>${esc(Daily.titleName(id))}</b><small>${esc(Daily.TITLES.find(x => x.id === id).desc)}</small></div>`).join('')}
+    ${cardBlock(s, fin)}
     ${fin && fin.levelUp ? `<div class="dl-title-new lv"><span>升級</span><b>Lv.${fin.levelUp}</b></div>` : ''}
     <div class="dl-grid">
       <div class="dl-box"><h4>等級</h4><div class="dl-lv"><b>Lv.${lv.lv}</b><span>${lv.into} / ${lv.need} 經驗</span></div><div class="dl-bar"><i style="width:${Math.round(lv.into / lv.need * 100)}%"></i></div></div>
@@ -107,8 +111,16 @@ function renderSummary(fin) {
   $('#daily-home').onclick = leave;
   $('#daily-duel').onclick = () => Actions.startDuel();
   $('#dl-exchange').onclick = exchange;
+  const kc = $('#dl-kcard'); if (kc) kc.onclick = () => openKnow(kc.dataset.id);
   const sel = $('#dl-title-sel'); if (sel) sel.onchange = () => { Daily.setTitle(sel.value || null); };
   renderStreak();
+}
+/* the knowledge card linked to today's scenario: new today, or already in the collection */
+function cardBlock(s, fin) {
+  const c = s.card && K.byId(s.card); if (!c) return '';
+  const fresh = fin && fin.card && fin.card.id === c.id;
+  return `<button class="dl-kcard${fresh ? ' fresh' : ''}" id="dl-kcard" type="button" data-id="${c.id}">${kcardHTML(c)}
+    <span><small>${fresh ? '收集到新的知識卡！' : K.lv(c.id) ? '相關知識卡（已收集）' : '相關知識卡'}</small><b>${esc(c.name)}</b><em>${esc(c.summary)}</em><u>到知識圖鑑查看與升級 ▶</u></span></button>`;
 }
 function titleSelect(P) {
   if (!P.titles.length) return `<p class="dl-note">連續完成每日挑戰就能解鎖稱號，第一個在完成第一天時取得。</p>`;
@@ -128,6 +140,7 @@ function leave() { Actions.renderTitle(); show('title'); }
 
 export function init() {
   $('#daily-card').onclick = openDaily;
+  renderDailyCard();                                         // the title screen was drawn before the saved progress loaded
   document.addEventListener('keydown', e => {
     if ($('#scr-daily').hidden || e.altKey || e.ctrlKey || e.metaKey) return;
     const n = KEYS.indexOf(e.key) >= 0 ? KEYS.indexOf(e.key) : ['1', '2', '3', '4'].indexOf(e.key);

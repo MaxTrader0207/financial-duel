@@ -4,7 +4,7 @@
 
 **▶ 線上遊玩：https://maxtrader0207.github.io/financial-duel/**
 
-每天還有一則 3 分鐘的生活金融挑戰（信用卡、詐騙、保險、儲蓄…），完成可以拿經驗值、卡牌碎片和稱號。
+每天還有一則 3 分鐘的生活金融挑戰（信用卡、詐騙、保險、儲蓄…），完成可以拿經驗值、卡牌碎片和稱號；還有 32 張「金融知識卡」可以收集、升級，集成一套金融知識圖鑑。
 
 免安裝、免登入，電腦與手機都能玩。手機可以「安裝到主畫面」，像 App 一樣全螢幕開啟，離線也能玩。
 
@@ -46,7 +46,8 @@ npm run sim               # 平衡模擬：不開瀏覽器打上萬場，輸出 
 |---|---|
 | `public/data/cards.json` | 160 張卡：`id`、`name`、`cat`（tech fund deriv risk chips fx crypto etf）、`rank` 1–4、`atk`、`def`、`race`、`sigil`、`text` |
 | `public/data/questions.json` | 400 題，格式與遊戲內「題庫管理」的匯入格式相同 |
-| `public/data/daily.json` | 每日挑戰的生活金融情境（目前 30 個 × 3 題）：`id`、`theme`、`title`、`scene`、`questions`（`q`、4 個 `options`、`answer`、`explain`）、`takeaway`，有時效的數字可加 `asOf`／`reviewBy`。依日期輪替，30 天一輪；直接加情境就會排進輪替 |
+| `public/data/knowledge.json` | 32 張金融知識卡：`type`（stock 股票卡、defense 防禦卡、event 事件卡、trap 陷阱卡）、`name`、`sigil`、`summary`、`levels`（Lv1–Lv3 的說明：是什麼、實際例子、常見誤區）、`quiz`（升 Lv2、Lv3 的檢定題）；`starter` 是新玩家一開始擁有的卡 |
+| `public/data/daily.json` | 每日挑戰的生活金融情境（目前 30 個 × 3 題）：`id`、`theme`、`title`、`scene`、`questions`（`q`、4 個 `options`、`answer`、`explain`）、`takeaway`、`card`（完成這天會解鎖的知識卡），有時效的數字可加 `asOf`／`reviewBy`。依日期輪替，30 天一輪；直接加情境就會排進輪替 |
 
 GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要重新建置。
 
@@ -86,6 +87,7 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
 | `report.js`、`result.js` | PDF／PNG 對戰報告、結算畫面 |
 | `scenes.js`、`ur-art.js` | 每屬性第 2、3 種卡面場景、32 張極稀有卡的專屬插圖 |
 | `perf.js`、`pwa.js` | 簡化特效、可安裝 App |
+| `knowledge.js`、`knowledgeui.js` | 金融知識卡：收集（新手卡、每日挑戰、碎片）、檢定升級、收集稱號、對戰勝利碎片／知識圖鑑畫面與卡片詳情 |
 | `daily.js`、`dailyui.js` | 每日 3 分鐘金融挑戰：依日期選情境、經驗值與碎片、連續天數、稱號、等級／畫面與標題卡片 |
 | `tutor.js`、`tutorial-script.js` | 新手引導的 8 個步驟與前幾場的出牌提示／教學對戰的設定（難度、資金、對手第一次答錯、保證相剋卡） |
 | 其他 | 背景、音效、設定、遊玩時間、新手引導與小提示、事件綁定（`wiring.js`） |
@@ -124,6 +126,7 @@ Playwright（JavaScript），和單元測試放在同一套流程。`npm run e2e
 | `cards.both.spec.js` | 圖鑑延遲繪製與各稀有度插圖、手機長按放大、卡面文字不溢出（含手機字體 150%） |
 | `app.both.spec.js` | 可安裝 App：manifest、圖示、斷網後仍能開啟並對戰；Google Fonts 被擋時標題字型；簡化特效設定與自動偵測 |
 | `report.spec.js` | 對戰報告 PNG／PDF 下載；30 分鐘提醒與 60 分鐘強制休息（重新整理也跳不過） |
+| `knowledge.both.spec.js` | 知識圖鑑：新手卡、檢定升級（答錯不扣碎片、答對升級）、碎片解鎖、每日挑戰給卡、對戰勝利碎片 |
 | `daily.both.spec.js` | 每日挑戰：標題卡片、3 題即時解析與獎勵（答錯也有）、成果頁、同日再開、隔天連續天數、未完成的進度保留、碎片兌換選卡 |
 | `tutorial.both.spec.js` | 教學對戰從頭走到尾：8 個步驟依序出現、建議的卡、對手第一次固定答錯、保證有相剋卡、只出初階題、略過後不再出現 |
 | `builds.spec.js` | 兩種單檔版用 `file://` 開啟可以對戰、不會出現安裝功能 |

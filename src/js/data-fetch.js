@@ -6,7 +6,7 @@ async function fetchJSON(url) {
 }
 export async function loadSources() {
   const base = import.meta.env.BASE_URL;
-  const [cards, questions, daily] = await Promise.all([fetchJSON(base + 'data/cards.json'), fetchJSON(base + 'data/questions.json'),
-    fetchJSON(base + 'data/daily.json').catch(() => null)]);
-  return { cards, questions, daily };
+  const [cards, questions, daily, knowledge] = await Promise.all([fetchJSON(base + 'data/cards.json'), fetchJSON(base + 'data/questions.json'),
+    fetchJSON(base + 'data/daily.json').catch(() => null), fetchJSON(base + 'data/knowledge.json').catch(() => null)]);
+  return { cards, questions, daily, knowledge };
 }

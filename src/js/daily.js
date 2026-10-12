@@ -26,6 +26,12 @@ export const TITLES = [
   { id: 't30', name: '生活理財家', desc: '累計完成 30 天', test: s => s.total >= 30 },
   { id: 's30', name: '月度金融通', desc: '連續 30 天完成每日挑戰', test: s => s.best >= 30 },
   { id: 's100', name: '百日理財達人', desc: '連續 100 天完成每日挑戰', test: s => s.best >= 100 },
+  /* knowledge-card titles: k = knowledge.js stats, passed in by checkTitles() (absent when a daily challenge finishes) */
+  { id: 'k_stock', name: '選股入門', desc: '收集全部 8 張股票卡', test: (s, k) => !!k && k.byType.stock.owned >= k.byType.stock.total },
+  { id: 'k_defense', name: '穩健守護者', desc: '收集全部 8 張防禦卡', test: (s, k) => !!k && k.byType.defense.owned >= k.byType.defense.total },
+  { id: 'k_event', name: '景氣觀察家', desc: '收集全部 8 張事件卡', test: (s, k) => !!k && k.byType.event.owned >= k.byType.event.total },
+  { id: 'k_trap', name: '識破陷阱', desc: '收集全部 8 張陷阱卡', test: (s, k) => !!k && k.byType.trap.owned >= k.byType.trap.total },
+  { id: 'k_master', name: '金融百科', desc: '全部知識卡升到 Lv3（精通）', test: (s, k) => !!k && k.total > 0 && k.mastered >= k.total },
 ];
 
 /* ---------- dates: the player's local calendar day ---------- */
@@ -114,6 +120,13 @@ function finish(key, day, lvBefore) {
   return { perfect, bonus, streak: D.streak, newTitles, levelUp: lv > lvBefore ? lv : null, total: { xp: day.xp, shards: day.shards } };
 }
 
+/* other systems (knowledge cards, duel wins) share the same shards and titles */
+export function addShards(n) { P.shards += n; save(); }
+export function checkTitles(k) {
+  const ids = TITLES.filter(t => !P.titles.includes(t.id) && t.test(D, k)).map(t => t.id);
+  if (ids.length) { P.titles.push(...ids); if (!P.title) P.title = ids[ids.length - 1]; save(); }
+  return ids;
+}
 export function setTitle(id) { if (id === null || P.titles.includes(id)) { P.title = id; save(); return true; } return false; }
 export const titleName = id => (TITLES.find(t => t.id === id) || {}).name || '';
 

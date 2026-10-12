@@ -87,6 +87,7 @@
         <button class="btn ghost" id="btn-deck" type="button">牌組編輯</button>
         <button class="btn ghost" id="btn-nb" type="button">錯題本<span class="badge" id="nb-badge" hidden></span></button>
         <button class="btn ghost" id="btn-rec" type="button">學習紀錄</button>
+        <button class="btn ghost" id="btn-know" type="button">知識圖鑑<span class="badge" id="kn-badge" hidden></span></button>
         <button class="btn ghost" id="btn-dex" type="button">卡牌圖鑑</button>
         <button class="btn ghost" id="btn-bank" type="button">題庫管理</button>
         <button class="btn ghost" id="btn-install" type="button" hidden>安裝到主畫面</button>
@@ -180,6 +181,17 @@
     <div id="daily-body"></div>
   </div>
 </section>
+<section class="screen" id="scr-know" hidden>
+  <div class="page">
+    <div class="eyebrow">收集 · 升級 · 學會</div>
+    <h3 class="sec">金融知識圖鑑</h3>
+    <p class="lead">每張知識卡都是一個金融觀念：股票卡、防禦卡、事件卡、陷阱卡各 8 張。每升一級就解鎖下一段說明（是什麼 → 實際例子 → 常見誤區）；完成每日挑戰會得到相關的卡，碎片可以解鎖與升級。</p>
+    <div id="kn-sum"></div>
+    <div class="filters" id="kn-filter"></div>
+    <div class="kn-grid" id="kn-grid"></div>
+    <div class="btn-row"><button class="btn" id="btn-know-back" type="button">回標題</button></div>
+  </div>
+</section>
 <section class="screen" id="scr-record" hidden>
   <div class="page">
     <div class="eyebrow">長期學習數據</div>
@@ -268,6 +280,9 @@
 
 <!-- SETTINGS -->
 <div class="update-bar" id="update-bar" hidden role="status"><span>有新版本可以使用。對戰進度會自動記錄，重新載入後可以繼續。</span><button class="btn small" id="update-go" type="button">重新載入</button><button class="btn ghost small" id="update-later" type="button">稍後</button></div>
+<div id="kn-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-label="知識卡">
+  <div class="care-card kn-dlg-card"><button class="kn-x" id="kn-close" type="button" aria-label="關閉">×</button><div id="kn-card"></div></div>
+</div>
 <div id="settings" class="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="set-title">
   <div class="care-card">
     <div class="care-h"><div class="seal">設</div><h3 id="set-title">設定</h3></div>

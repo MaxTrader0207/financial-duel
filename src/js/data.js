@@ -3,13 +3,14 @@
 // or data-inline.js (single-file builds), chosen in vite.config.js.
 import { loadSources } from '@data-source';
 
-export const DATA = { cards: null, questions: null, daily: [] };
+export const DATA = { cards: null, questions: null, daily: [], knowledge: null };
 
 export async function loadData() {
   try {
-    const { cards, questions, daily } = await loadSources();
+    const { cards, questions, daily, knowledge } = await loadSources();
     DATA.cards = cards.cards; DATA.questions = questions;
     DATA.daily = daily && Array.isArray(daily.scenarios) ? daily.scenarios : [];      // optional: no daily.json → no 每日挑戰
+    DATA.knowledge = knowledge && Array.isArray(knowledge.cards) ? knowledge : { cards: [], types: {}, starter: [] };
     if (!Array.isArray(DATA.cards) || !DATA.cards.length) throw new Error('cards.json 沒有卡牌');
     if (!DATA.questions || !Array.isArray(DATA.questions.questions)) throw new Error('questions.json 格式不符');
   } catch (e) {

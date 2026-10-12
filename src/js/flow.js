@@ -13,6 +13,7 @@ import { COL, colSave, rewardOffer } from './collection.js';
 import { $, DIFFS, LP_MAX, esc, foeAtkOf, sleep } from './core.js';
 import { clearField, damage, floatText, log, lunge, placeField, shatter } from './fx.js';
 import { RECS, recordGame } from './records.js';
+import { onDuelWin } from './knowledge.js';
 import { ensureAdvantage, tutorialFoeLp, setupTutorial, suggestCard, tutorialFoeMiss } from './tutorial-script.js';
 import { renderResult } from './result.js';
 import { WEAK_MULT, advOf, diffKeyOf } from './rules.js';
@@ -232,6 +233,7 @@ async function checkEnd() {
   G.fsm.go('over');
   G.over = true; const win = G.lp.c <= 0; G.win = win; G.endedAt = new Date(); clearSave(); Tutor.end();
   recordGame(false);
+  if (win) G.shardsWon = onDuelWin();                     // shards for knowledge cards and reward picks
   if (win && !COL.pending) { COL.pending = rewardOffer(diffKeyOf(G.diff)); colSave(); }
   setPhase('idle', win ? '勝利' : '敗北', '');
   Sound.stopBGM();

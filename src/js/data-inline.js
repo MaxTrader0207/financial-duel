@@ -2,4 +2,5 @@
 import cards from '../../public/data/cards.json';
 import questions from '../../public/data/questions.json';
 import daily from '../../public/data/daily.json';
-export async function loadSources() { return { cards, questions, daily }; }
+import knowledge from '../../public/data/knowledge.json';
+export async function loadSources() { return { cards, questions, daily, knowledge }; }

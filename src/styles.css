@@ -728,3 +728,75 @@ html.standalone body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-ri
   .dl-qtext{font-size:17px}
   .dl-score b{font-size:44px}
 }
+/* ---------- 知識圖鑑: knowledge cards (股票 gold · 防禦 teal · 事件 indigo · 陷阱 magenta) ---------- */
+.kcard{--kc:#c39a3a;--kc2:#7a5a1a;position:relative;width:var(--kw,150px);aspect-ratio:59/86;box-sizing:border-box;display:flex;flex-direction:column;gap:.35em;padding:.55em;
+  font-size:calc(var(--kw,150px)*.075);color:#2a1a05;background:linear-gradient(160deg,color-mix(in oklab,var(--kc) 30%,#f4ead2),#f1e8d3 60%);
+  border:.35em solid var(--kc2);box-shadow:inset 0 0 0 .12em color-mix(in oklab,var(--kc) 70%,white),0 .3em .8em #0008;border-radius:.4em;overflow:hidden;text-align:left}
+.kcard.t-defense{--kc:#1f8f7a;--kc2:#0f5a4c}
+.kcard.t-event{--kc:#5b5fd6;--kc2:#2f3290}
+.kcard.t-trap{--kc:#b0306a;--kc2:#6e1240}
+.kc-head{display:flex;justify-content:space-between;align-items:center;gap:.3em;font-size:.8em}
+.kc-type{display:inline-flex;align-items:center;gap:.3em;font-weight:700;letter-spacing:.08em;color:var(--kc2)}
+.kc-type i{font-style:normal;display:grid;place-items:center;width:1.5em;height:1.5em;background:var(--kc2);color:#fff;font-family:var(--f-name);border-radius:.2em}
+.kc-lv{color:var(--kc2);letter-spacing:.05em;white-space:nowrap}
+.kc-art{flex:1;min-height:0;display:grid;place-items:center;border-radius:.25em;
+  background:radial-gradient(circle at 50% 45%,color-mix(in oklab,var(--kc) 55%,white) 0 30%,var(--kc) 31% 33%,color-mix(in oklab,var(--kc2) 85%,black) 34%);
+  box-shadow:inset 0 0 0 .1em #0004,inset 0 0 1em #0006}
+.kc-sigil{font-family:var(--f-name);font-weight:900;font-size:3em;line-height:1;color:#fff;text-shadow:0 .05em .2em #0009}
+.kc-name{font-family:var(--f-name);font-weight:700;font-size:1.15em;line-height:1.2;color:#1a1004;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kc-sum{font-size:.78em;line-height:1.45;color:#4a3a1a;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.3em}
+.kc-new{position:absolute;top:.4em;right:.4em;transform:translateY(1.9em);font-size:.75em;padding:.05em .45em;background:var(--shu);color:#fff;font-weight:700}
+.kcard.lv2{border-color:#8f96a8;box-shadow:inset 0 0 0 .12em #eef0f6,0 .3em .8em #0008}
+.kcard.lv3{border-color:#c99a3f;box-shadow:inset 0 0 0 .12em #fff1c2,0 0 1em #d8b25a88,0 .3em .8em #0008}
+.kcard.lv3::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,#ff2d6b30,#ffd24a30,#3bffb030,#3bb4ff30,#c03bff30);background-size:300% 300%;mix-blend-mode:color-dodge;animation:holo 8s linear infinite}
+.kcard.locked{filter:grayscale(.9) brightness(.7);}
+.kcard.locked .kc-art{background:repeating-linear-gradient(45deg,#2a2d44 0 .5em,#22253a .5em 1em)}
+.kcard.big{--kw:min(260px,70vw)}
+html.fx-lite .kcard.lv3::after{display:none}
+.kn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin:12px 0 18px;justify-items:center}
+.kn-cell{padding:0;border:0;background:none;cursor:pointer;transition:transform .15s}
+.kn-cell:hover{transform:translateY(-3px)}
+.kn-cell:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.kn-total{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.kn-total b{font-family:var(--f-name);font-size:30px;color:var(--gold-hi)}
+.kn-total b.m{margin-left:12px;color:var(--good)}
+.kn-total span{color:var(--muted);font-size:14px}
+.kn-total .kn-sh{margin-left:auto;color:var(--gold-hi)}
+.kn-types{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.kn-tb{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;font-size:13px}
+.kn-bar{height:6px;background:#ffffff1a}
+.kn-bar i{display:block;height:100%;background:#c39a3a}
+.kn-tb.t-defense .kn-bar i{background:#1f8f7a}.kn-tb.t-event .kn-bar i{background:#5b5fd6}.kn-tb.t-trap .kn-bar i{background:#b0306a}
+.kn-tb small{color:var(--muted)}
+.kn-dlg-card{position:relative;max-width:min(860px,calc(100vw - 32px));width:100%}
+.kn-x{position:absolute;top:8px;right:10px;border:0;background:none;color:var(--muted);font-size:26px;line-height:1;cursor:pointer}
+.kn-detail{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:start}
+.kn-text{display:grid;gap:10px}
+.kn-sec h4{margin:0 0 4px;display:flex;align-items:center;gap:8px;font-family:var(--f-name);font-weight:700;font-size:17px;color:var(--gold-hi)}
+.kn-sec h4 span{font-family:var(--f-body);font-size:11px;padding:1px 6px;border:1px solid currentColor;letter-spacing:.05em}
+.kn-sec p{margin:0;font-size:14.5px;line-height:1.75;color:var(--text)}
+.kn-sec.locked h4{color:var(--muted)}
+.kn-sec.locked p{color:var(--muted);font-style:italic}
+.kn-act{margin-top:14px;display:grid;gap:10px;justify-items:start}
+.kn-how{margin:0;font-size:13.5px;line-height:1.6;color:var(--muted)}
+.kn-how.done{color:var(--good)}
+.kn-msg{margin-top:12px;padding:10px 12px;font-size:14px;line-height:1.65;background:#ffffff0d;border-left:3px solid var(--gold)}
+.kn-q{width:100%}
+.kn-qtext{margin:0 0 8px;font-weight:600;font-size:15.5px;line-height:1.55}
+.dl-kcard{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;width:100%;margin-top:10px;padding:12px;text-align:left;font:inherit;color:var(--text);
+  background:var(--ink2);border:1px solid var(--line);cursor:pointer;--kw:110px}
+.dl-kcard.fresh{border-color:var(--gold);box-shadow:0 0 18px #d8b25a44}
+.dl-kcard span{display:grid;gap:4px}
+.dl-kcard small{color:var(--gold-hi);letter-spacing:.1em}
+.dl-kcard b{font-family:var(--f-name);font-size:20px}
+.dl-kcard em{font-style:normal;font-size:13.5px;color:var(--muted);line-height:1.55}
+.dl-kcard u{text-decoration:none;color:var(--gold-hi);font-size:13px}
+.shard-line b{color:var(--gold-hi)}
+@media (max-width:640px){
+  .kn-types{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kn-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .kn-grid .kcard{--kw:min(160px,42vw)}
+  .kn-detail{grid-template-columns:1fr;justify-items:center}
+  .kcard.big{--kw:min(220px,62vw)}
+  .kn-dlg-card{max-height:calc(100dvh - 24px);overflow:auto}
+}

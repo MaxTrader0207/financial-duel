@@ -35,6 +35,8 @@ import { init as init_progress } from './progress.js';
 import { init as init_pwa } from './pwa.js';
 import { init as init_daily } from './daily.js';
 import { init as init_dailyui } from './dailyui.js';
+import { init as init_knowledge } from './knowledge.js';
+import { init as init_knowledgeui } from './knowledgeui.js';
 import { init as init_boot } from './boot.js';
 
 export function initAll() {
@@ -73,6 +75,8 @@ export function initAll() {
   init_progress();
   init_pwa();
   init_daily();
+  init_knowledge();
   init_dailyui();
+  init_knowledgeui();
   init_boot();
 }
