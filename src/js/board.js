@@ -3,6 +3,7 @@
 import { CATS, MON, backHTML, cardHTML } from './cards.js';
 import { $, LP_MAX, esc } from './core.js';
 import { G } from './game.js';
+import { attackMult } from './market.js';
 import { WEAK_MULT, advOf } from './rules.js';
 import { saveGame } from './save.js';
 import { SKILLS } from './skills.js';
@@ -14,6 +15,8 @@ function handTag(m) {
   if (G.phase !== 'attack') return '';
   if (G.weak && m.cat === G.weak) return `<span class="tag-weak">弱項 ×${WEAK_MULT}</span>`;
   if (G.foeProf && G.foeProf.weak.includes(m.cat)) return '<span class="tag-adv tag-foe">對手不擅長</span>';
+  const em = attackMult(m.cat);
+  if (em !== 1) return `<span class="tag-adv tag-mkt${em < 1 ? ' bad' : ''}">事件 ×${em}</span>`;
   return '';
 }
 function renderHands() {

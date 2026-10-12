@@ -4,6 +4,7 @@ import { Actions } from './actions.js';
 import { MON } from './cards.js';
 import { $, DIFFS, Store, renameId } from './core.js';
 import { G } from './game.js';
+import * as Ranked from './ranked.js';
 import { fmtDate, fmtNum, pad2 } from './report.js';
 
 let SAVE_KEY, SAVE_V, MIGRATE_SAVE;
@@ -18,7 +19,7 @@ function serializeGame() {
   return { v: SAVE_V, savedAt: new Date().toISOString(), diffKey: Object.keys(DIFFS).find(k => DIFFS[k] === G.diff) || 'normal',
     lp: G.lp, deck: G.deck, hand: G.hand, turn: G.turn, phase: G.phase, used: [...G.used], streak: G.streak, maxStreak: G.maxStreak,
     stats: G.stats, missed: G.missed, history: G.history, dealt: G.dealt, taken: G.taken, mods: G.mods, flags: G.flags,
-    extraUsed: G.extraUsed, nbAdded: G.nbAdded || 0, bg: G.bg || null, deckList: G.deckList || null, weak: G.weak || null, foe: G.foeCard ? G.foeCard.id : null, foeProf: G.foeProf || null, foeStats: G.foeStats || null, startedAt: G.startedAt.toISOString() };
+    extraUsed: G.extraUsed, nbAdded: G.nbAdded || 0, bg: G.bg || null, deckList: G.deckList || null, weak: G.weak || null, foe: G.foeCard ? G.foeCard.id : null, foeProf: G.foeProf || null, foeStats: G.foeStats || null, mode: G.mode || 'casual', market: G.market || null, perf: G.perf || null, startedAt: G.startedAt.toISOString() };
 }
 function saveGame() {
   if (!G || G.over || (G.phase !== 'attack' && G.phase !== 'defend')) return false;
@@ -61,7 +62,7 @@ function renderResume() {
   $('#btn-discard').onclick = e => {
     const b = e.currentTarget;
     if (!armed) { b.textContent = '確定刪除？再按一次'; armed = setTimeout(() => { armed = 0; b.textContent = '刪除紀錄'; }, 3000); return; }
-    clearTimeout(armed); clearSave(); renderResume();
+    clearTimeout(armed); clearSave(); Ranked.forfeitIfActive(); renderResume();   // a discarded ranked duel counts as a loss
   };
 }
 

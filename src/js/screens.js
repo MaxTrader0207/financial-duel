@@ -2,6 +2,7 @@
 import { register } from './actions.js';
 import { renderDailyCard } from './dailyui.js';
 import { renderKnowButton } from './knowledgeui.js';
+import { renderRankedButton } from './rankedui.js';
 import { BG } from './backgrounds.js';
 import { BUILTIN, allQuestions, customMem } from './bank.js';
 import { CATS, MON, MONSTERS, RARITY, RARITY_FULL, cardHTML, cardSlot, fillLazy } from './cards.js';
@@ -33,10 +34,10 @@ function renderTitle() {
   $('#fan').innerHTML = picks.map(id => cardHTML(MON[id])).join('');
   const all = allQuestions();
   renderResume();
-  $('#tut-hint').textContent = Tutor.done() ? '' : '第一場對戰會有新手引導，帶你一步步完成出牌、答題和防禦。';
+  $('#tut-hint').textContent = Tutor.done() ? '' : '第一場對戰是「新手場」教學對戰，帶你一步步完成出牌、答題和防禦。';
   { const c = nbCounts(), b = $('#nb-badge'); b.hidden = !c.due; b.textContent = c.due; }
   $('#bank-note').textContent = `題庫共 ${all.length} 題（內建 ${BUILTIN.length}、自訂 ${customMem.length}）· 收藏 ${COL.owned.length}/${MONSTERS.length} 種${COL.pending ? ' · 有一張獎勵卡待領取' : ''}`;
-  renderDailyCard(); renderKnowButton();
+  renderDailyCard(); renderKnowButton(); renderRankedButton();
 }
 export function init() {
 register({ renderTitle });

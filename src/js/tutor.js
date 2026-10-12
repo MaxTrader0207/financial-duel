@@ -93,7 +93,7 @@ Tutor = (() => {
     if (shown.has('defend')) markDone();
   }
   $('#tut-ok').onclick = () => hide();
-  $('#tut-skip').onclick = () => { finish(); toast('已略過新手引導，可以在標題畫面按「新手引導」重新開始教學對戰。'); };
+  $('#tut-skip').onclick = () => { finish(); toast('已略過新手引導，可以在標題畫面按「新手場」重新開始教學對戰。'); };
 
   /* ---------- gentle nudges in a player's first few duels: if nothing is played for a while, suggest a card ---------- */
   let nudgeTimer = 0;
@@ -111,6 +111,7 @@ Tutor = (() => {
     adv: '手牌上的「相剋 ×1.5」代表這張卡剋制攻擊方，防禦時守備力提高；「被剋 ×0.5」則會減半。',
     foeBlock: '對手也會答題防禦：你答對後，對手派一張卡抵擋，並回答同屬性的題目；答對時你只造成「傷害 − 守備力」。對手資金下方寫著它這場擅長與不擅長的屬性，用它不擅長的屬性攻擊，比較容易打穿。',
     reward: '勝利可以從 3 張未收集的卡中選 1 張，之後到「牌組編輯」把它放進牌組。',
+    market: '市場事件：從第 2 回合起每 3 回合翻出一個金融事件（升息、股市暴跌…），某些屬性的攻擊力 ×1.2、某個 ×0.8，雙方都適用。手牌上標著「事件 ×1.2」的卡，這段期間出手比較划算。',
     record: '每場對戰都會記在「學習紀錄」，可以看各屬性的正確率趨勢和最常答錯的題目。',
   };
   let seen = new Set(Store.load(TIP_KEY, { version: TIP_V, fallback: () => [], validate: Array.isArray }));
@@ -142,7 +143,7 @@ Tutor = (() => {
         if (!shown.has('hand')) { show('hand', { suggestUid }); return; }
         if (shown.has('defend') && !shown.has('skill')) {
           await show('skill'); if (!active) return;
-          await show('done'); finish(); toast('教學完成！可以隨時在標題畫面按「新手引導」再玩一次。');
+          await show('done'); finish(); toast('教學完成！可以隨時在標題畫面按「新手場」再玩一次。');
         }
       } else if (ph === 'defend' && !shown.has('defend')) show('defend', { suggestUid });
     },

@@ -128,7 +128,15 @@ export function checkTitles(k) {
   return ids;
 }
 export function setTitle(id) { if (id === null || P.titles.includes(id)) { P.title = id; save(); return true; } return false; }
-export const titleName = id => (TITLES.find(t => t.id === id) || {}).name || '';
+export const titleName = id => (TITLES.find(t => t.id === id) || (P.custom || {})[id] || {}).name || '';
+/* titles granted by other systems (e.g. one per ranked season), kept with their name since they are not in TITLES */
+export function addCustomTitle(id, name, desc = '') {
+  P.custom = P.custom || {}; P.custom[id] = { name, desc };
+  if (!P.titles.includes(id)) P.titles.push(id);
+  save();
+}
+/* every title the player owns, in a stable order: built-in ones first, then season titles */
+export const ownedTitles = () => [...TITLES.filter(t => P.titles.includes(t.id)), ...Object.entries(P.custom || {}).filter(([id]) => P.titles.includes(id)).map(([id, t]) => ({ id, ...t }))];
 
 /* spend shards on one reward pick; the caller creates the pick */
 export function spendShards(cost = EXCHANGE_COST) { if (P.shards < cost) return false; P.shards -= cost; save(); return true; }

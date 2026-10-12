@@ -124,7 +124,7 @@ function cardBlock(s, fin) {
 }
 function titleSelect(P) {
   if (!P.titles.length) return `<p class="dl-note">連續完成每日挑戰就能解鎖稱號，第一個在完成第一天時取得。</p>`;
-  return `<select id="dl-title-sel" aria-label="顯示的稱號"><option value="">不顯示</option>${Daily.TITLES.filter(t => P.titles.includes(t.id))
+  return `<select id="dl-title-sel" aria-label="顯示的稱號"><option value="">不顯示</option>${Daily.ownedTitles()
     .map(t => `<option value="${t.id}" ${P.title === t.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select>
     <p class="dl-note">下一個：${esc((Daily.TITLES.find(t => !P.titles.includes(t.id)) || { desc: '全部解鎖了！' }).desc)}</p>`;
 }

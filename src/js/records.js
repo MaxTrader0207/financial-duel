@@ -13,7 +13,7 @@ function qsRecord(q, correct) { const e = QS[q.id] || (QS[q.id] = { t: 0, w: 0 }
 function recordGame(quit) {
   if (!G || G.recorded || !G.stats.total) return;
   G.recorded = true;
-  RECS.push({ at: Date.now(), diff: diffKeyOf(G.diff), win: !quit && !!G.win, quit: !!quit, turns: G.turn, total: G.stats.total, correct: G.stats.correct,
+  RECS.push({ at: Date.now(), mode: G.mode || 'casual', diff: diffKeyOf(G.diff), win: !quit && !!G.win, quit: !!quit, turns: G.turn, total: G.stats.total, correct: G.stats.correct,
     byCat: JSON.parse(JSON.stringify(G.stats.byCat)), dealt: G.dealt, taken: G.taken, maxStreak: G.maxStreak });
   if (RECS.length > REC_MAX) RECS = RECS.slice(-REC_MAX);
   recSave();

@@ -1,5 +1,6 @@
 // deckui.js — the 牌組編輯 screen and the 學習紀錄 back / clear buttons.
 import { register } from './actions.js';
+import { DECK_CAP, deckCost } from './ranked.js';
 import { CATS, MON, MONSTERS, RARITY, RARITY_FULL, cardHTML, cardSlot, fillLazy } from './cards.js';
 import { COL, DECK, DECK_COPY, DECK_EACH, DECK_FOCUS, DECK_OTHER, DECK_SIZE, setDeck, autoDeck, deckSave, deckValid, owns, rewardHTML, wireReward } from './collection.js';
 import { $, esc } from './core.js';
@@ -40,6 +41,8 @@ function renderDeck(msg) {
   }).join('');
   fillLazy($('#deck-grid'));
   wireReward(() => setTimeout(() => renderDeck(), 900));
+  const cost = deckCost(deckDraft);
+  $('#deck-cost').innerHTML = `排位牌組點數 <b class="${cost > DECK_CAP ? 'over' : ''}">${cost} / ${DECK_CAP}</b>（普通 1、稀有 2、超稀有 3、極稀有 5；只有排位賽有上限）`;
   $('#deck-status').textContent = msg || (deckDraft.length === DECK_SIZE ? (deckDraft.join() === DECK.join() ? '' : '尚未儲存') : `還差 ${DECK_SIZE - deckDraft.length} 張才能儲存`);
   $('#deck-save').disabled = deckDraft.length !== DECK_SIZE;
 }

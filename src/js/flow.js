@@ -9,7 +9,7 @@ import { showFoeAnswer } from './foequiz.js';
 import { foeQuestion } from './quiz.js';
 import { BG } from './backgrounds.js';
 import { CATS, MON } from './cards.js';
-import { COL, colSave, rewardOffer } from './collection.js';
+import { COL, colSave, cpuDeckList, rewardOffer } from './collection.js';
 import { $, DIFFS, LP_MAX, esc, foeAtkOf, sleep } from './core.js';
 import { clearField, damage, floatText, log, lunge, placeField, shatter } from './fx.js';
 import { RECS, recordGame } from './records.js';
@@ -23,13 +23,36 @@ import { show, transition } from './view.js';
 import { SKILLS, heal, skillFX } from './skills.js';
 import { Sound } from './sound.js';
 import { newGame } from './state.js';
-import { draw } from './deck.js';
+import { draw, makeDeck } from './deck.js';
 import { G, reserveUids, setGame } from './game.js';
 import { renderAll, renderHands, setPhase } from './board.js';
 import { Tutor } from './tutor.js';
+import * as Market from './market.js';
+import * as Ranked from './ranked.js';
 
 
 /* ---------- flow ---------- */
+const CAT_NAME = k => (CATS[k] ? CATS[k].name : k);
+const upDown = e => `${e.up.map(CAT_NAME).join('、')}攻擊 ×${Market.EVENT_UP}，${CAT_NAME(e.down)} ×${Market.EVENT_DOWN}`;
+function renderMarket() {
+  const el = $('#market-label'); if (!el) return;
+  const e = Market.current(), next = Market.nextTurn();
+  el.hidden = !G.market;
+  el.innerHTML = !G.market ? '' : e ? `<b>${esc(e.name)}</b><span>${esc(upDown(e))}</span>` : `<span>市場平穩 · 第 ${next} 回合起有市場事件</span>`;
+}
+/* ranked: the opponent's level follows your tier */
+function setupRanked() {
+  const dk = Ranked.tier().diff;
+  G.diff = DIFFS[dk]; G.deckList.c = cpuDeckList(dk, { grow: false }); G.deck.c = makeDeck(G.deckList.c);
+}
+/* strategy: attacking with an attribute the opponent is weak in or the market favours; blocking with advantage when you could */
+function trackPlay(mode, m, hand) {
+  const P = G.perf; if (!P) return;
+  if (mode === 'attack') { P.atk++; if ((G.foeProf && G.foeProf.weak.includes(m.cat)) || Market.attackMult(m.cat) > 1) P.smartAtk++; }
+  else if (G.foeCard && hand.some(c => advOf(c.cat, G.foeCard.cat) > 1)) { P.defChances++; if (advOf(m.cat, G.foeCard.cat) > 1) P.smartDef++; }
+}
+const perfStats = () => ({ total: G.stats.total, correct: G.stats.correct, ...G.perf, lpLeft: G.lp.p / LP_MAX });
+
 const NUDGE_DUELS = 3;                 // idle hints (suggested card) during a player's first few finished duels
 
 /* saves from before the opponent profile existed simply get a new one */
@@ -44,12 +67,14 @@ async function resumeDuel() {
         stats: d.stats, missed: d.missed || [], foeCard: d.foe ? MON[d.foe] : null, over: false, dealt: d.dealt || 0, taken: d.taken || 0,
         mods: { myAtk: 0, foeAtk: 0, skipFoe: false, skipMe: false, ...(d.mods || {}) }, flags: d.flags || {}, extraUsed: !!d.extraUsed, nbAdded: d.nbAdded || 0, bg: d.bg || BG.pick(),
         deckList: d.deckList && Array.isArray(d.deckList.p) ? d.deckList : null, weak: d.weak && CATS[d.weak] ? d.weak : null,
+        mode: ['casual', 'ranked'].includes(d.mode) ? d.mode : 'casual', market: d.market && typeof d.market === 'object' ? d.market : null,
+        perf: d.perf && typeof d.perf === 'object' ? d.perf : { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 },
         foeProf: okProf(d.foeProf) ? d.foeProf : foeProfile(), foeStats: d.foeStats && Number.isInteger(d.foeStats.t) ? d.foeStats : { t: 0, c: 0 } });
   const g = G;
   reserveUids(Math.max(...[...d.deck.p, ...d.deck.c, ...d.hand.p, ...d.hand.c].map(i => i.uid)));
   show('duel'); BG.apply(G.bg); Sound.startBGM(); Sound.setDanger(G.lp.p < LP_MAX * 0.3); clearField('p'); clearField('c');
   $('#save-label').textContent = `讀取 ${fmtDate(new Date(d.savedAt))} 的紀錄`;
-  setPhase('idle', '續戰', ''); renderAll(); log('讀取上次的對戰紀錄…');
+  setPhase('idle', '續戰', ''); renderAll(); renderMarket(); log('讀取上次的對戰紀錄…');
   G.fsm.go('resume');
   await transition('續戰', `繼續第 ${G.turn} 回合 · ${d.phase === 'defend' ? '對手攻擊中' : '我方攻擊'}`, 'gold');
   if (stale(g)) return;
@@ -67,16 +92,29 @@ async function resumeDuel() {
   }
 }
 
+/* opts.mode: 'casual' (default: chosen difficulty, no rank) | 'ranked' (difficulty from your tier, deck point cap,
+   result scored) — the 新手場 is opts.tutorial, and is forced until the tutorial has been done once */
 async function startDuel(opts = {}) {
+  const forfeited = Ranked.forfeitIfActive();          // a ranked duel left unfinished counts as a loss
   newGame();
+  const tutorial = !!opts.tutorial || !Tutor.done();
+  G.mode = tutorial ? 'tutorial' : opts.mode === 'ranked' ? 'ranked' : 'casual';
+  G.perf = { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 };
   G.fsm.go('intro');
   G.bg = BG.pick(); BG.apply(G.bg);
-  const tutorial = !!opts.tutorial || !Tutor.done();
   if (tutorial) setupTutorial();
+  else {
+    Market.enable();
+    if (G.mode === 'ranked') { setupRanked(); Ranked.begin(); }
+  }
   Tutor.begin(tutorial); show('duel'); Sound.startBGM(); clearField('p'); clearField('c');
-  log(tutorial ? `教學對戰：難度固定為簡易，只出初階題，對手資金 ${tutorialFoeLp()}。` : '雙方洗牌完畢。'); setPhase('idle', '待機', ''); renderAll();
+  log(tutorial ? `教學對戰：難度固定為簡易，只出初階題，對手資金 ${tutorialFoeLp()}。`
+    : G.mode === 'ranked' ? `排位賽：${Ranked.tier().name}，對手難度「${G.diff.name}」。從第 2 回合起每 3 回合發生一次市場事件。`
+    : '雙方洗牌完畢。從第 2 回合起每 3 回合發生一次市場事件。');
+  if (forfeited) log(`上一場排位賽未完成，以敗場計（${forfeited.delta} 分）。`);
+  setPhase('idle', '待機', ''); renderAll(); renderMarket();
   const g0 = G;
-  await transition('對決開始', '雙方準備就緒', 'gold');
+  await transition(G.mode === 'ranked' ? '排位對決' : '對決開始', G.mode === 'ranked' ? Ranked.tier().name : '雙方準備就緒', 'gold');
   if (stale(g0)) return;
   playerTurn();
 }
@@ -85,6 +123,13 @@ async function playerTurn() {
   if (stale(g0)) return;
   G.fsm.go('myTurn');
   G.turn++; G.extraUsed = false; draw('p'); draw('c'); renderAll();
+  const ev = Market.onTurn(G.turn);
+  if (ev) {
+    renderMarket();
+    await transition('市場事件', `${ev.name}：${upDown(ev)}`, 'gold'); if (stale(g0)) return;
+    log(`<b>市場事件【${esc(ev.name)}】</b> ${esc(ev.why)} ${upDown(ev)}（雙方適用，持續 ${Market.EVERY} 回合）`);
+    Tutor.tip('market');
+  }
   if (G.mods.skipMe) {
     G.mods.skipMe = false;
     await transition('我方回合', `第 ${G.turn} 回合 · 漲停鎖死，無法攻擊`, 'ally');
@@ -139,8 +184,10 @@ async function onPlay(uid) {
   G.busy = true;
   Tutor.onPlay(G.phase);
   Sound.select();
+  const handBefore = G.hand.p.map(i => MON[i.id]);
   const m = MON[G.hand.p.splice(idx, 1)[0].id];
-  const mode = G.phase; G.fsm.go(mode === 'attack' ? 'attackQuiz' : 'defendQuiz'); setPhase('busy', mode === 'attack' ? '攻擊階段' : '防禦階段', '');
+  const mode = G.phase;
+  trackPlay(mode, m, handBefore); G.fsm.go(mode === 'attack' ? 'attackQuiz' : 'defendQuiz'); setPhase('busy', mode === 'attack' ? '攻擊階段' : '防禦階段', '');
   placeField('p', m);
   log(mode === 'attack' ? `召喚 <b>【${esc(m.name)}】</b>！` : `以 <b>【${esc(m.name)}】</b> 守備表示迎擊！`);
   await sleep(650);
@@ -234,6 +281,7 @@ async function checkEnd() {
   G.over = true; const win = G.lp.c <= 0; G.win = win; G.endedAt = new Date(); clearSave(); Tutor.end();
   recordGame(false);
   if (win) G.shardsWon = onDuelWin();                     // shards for knowledge cards and reward picks
+  if (G.mode === 'ranked') { G.perfResult = Ranked.performance(perfStats()); G.rank = Ranked.applyMatch(win, G.perfResult.score); }
   if (win && !COL.pending) { COL.pending = rewardOffer(diffKeyOf(G.diff)); colSave(); }
   setPhase('idle', win ? '勝利' : '敗北', '');
   Sound.stopBGM();
@@ -246,4 +294,4 @@ async function checkEnd() {
 
 export function init() { register({ startDuel, resumeDuel }); }
 
-export { checkEnd, cpuTurn, onPlay, playerTurn, resolveAttack, resolveDefend, resumeDuel, startDuel };
+export { checkEnd, cpuTurn, onPlay, playerTurn, renderMarket, resolveAttack, resolveDefend, resumeDuel, startDuel };

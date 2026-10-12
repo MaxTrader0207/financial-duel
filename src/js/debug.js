@@ -6,7 +6,7 @@ import * as cards from './cards.js';
 import { SKILLS } from './skills.js';
 import { DATA } from './data.js';
 import { DIFFS, foeAtkOf, SET, Store } from './core.js';
-import { startDuel, onPlay, cpuTurn, playerTurn, resumeDuel } from './flow.js';
+import { startDuel, onPlay, cpuTurn, playerTurn, resumeDuel, renderMarket } from './flow.js';
 import { saveGame, readSave, migrateSave } from './save.js';
 import { makeReport } from './report.js';
 import * as pt from './playtime.js';
@@ -26,6 +26,9 @@ import * as daily from './daily.js';
 import { openDaily, renderDailyCard } from './dailyui.js';
 import * as knowledge from './knowledge.js';
 import { openKnow } from './knowledgeui.js';
+import * as ranked from './ranked.js';
+import * as market from './market.js';
+import { openRanked } from './rankedui.js';
 
 
 
@@ -36,5 +39,5 @@ window.__T = {
   get COL() { return col.COL; }, get DECK() { return col.DECK; }, get RECS() { return rec.RECS; }, get QS() { return rec.QS; }, get SET() { return SET; },
   advOf, weakCat: rec.weakCat, lifetimeByCat: rec.lifetimeByCat, cpuPick, cpuScore, autoDeck: col.autoDeck, deckValid: col.deckValid,
   rewardOffer: col.rewardOffer, claimReward: col.claimReward, cpuDeckList: col.cpuDeckList, renderRecord, openDeck, recordGame: rec.recordGame,
-  get BANK() { return DATA.questions.questions; }, get Store() { return Store; }, cardHTML: (...a) => cards.cardHTML(...a), migrateSave, fitDeck: col.fitDeck, openZoom, fsm, calc, daily, openDaily, renderDailyCard, knowledge, openKnow,
+  get BANK() { return DATA.questions.questions; }, get Store() { return Store; }, cardHTML: (...a) => cards.cardHTML(...a), migrateSave, fitDeck: col.fitDeck, openZoom, fsm, calc, renderMarket, daily, openDaily, renderDailyCard, knowledge, openKnow, ranked, market, openRanked,
 };

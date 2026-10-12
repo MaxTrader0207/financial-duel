@@ -11,7 +11,7 @@ async function waitStep(page, id) { await expect(page.locator('#tutor')).toBeVis
 
 test('a first-time player is walked through a whole tutorial duel', async ({ page, errors }) => {
   await open(page);
-  await expect(page.locator('#tut-hint')).toContainText('新手引導');
+  await expect(page.locator('#tut-hint')).toContainText('新手場');
   await page.click('#btn-start');
 
   await waitStep(page, 'goal');

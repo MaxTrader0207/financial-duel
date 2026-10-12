@@ -2,6 +2,7 @@
 // Skills still run through their hooks (skills.js), which may change G.mods / G.flags or draw and discard cards;
 // everything else here only reads G and returns numbers, so it can be unit-tested card by card.
 import { G } from './game.js';
+import { attackMult } from './market.js';
 import { SKILLS } from './skills.js';
 import { foeAtkOf, DIFFS } from './core.js';
 import { MON } from './cards.js';
@@ -22,6 +23,7 @@ export function attackHit(m, r) {
   if (c.mult !== 1) tags.push(`×${c.mult}`);
   let dmg = c.dmg * c.mult * (c.fastMult || 1);
   if (G.weak && m.cat === G.weak) { dmg *= WEAK_MULT; tags.push(`弱項 ×${WEAK_MULT}`); }
+  const em = attackMult(m.cat); if (em !== 1) { dmg *= em; tags.push(`事件 ×${em}`); }
   if (r.retried) { dmg *= RETRY_MULT; tags.push(`重答 ×${RETRY_MULT}`); }
   dmg = Math.round(dmg);
   if (c.lifesteal) c.heal += Math.round(dmg * c.lifesteal);

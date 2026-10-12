@@ -800,3 +800,82 @@ html.fx-lite .kcard.lv3::after{display:none}
   .kcard.big{--kw:min(220px,62vw)}
   .kn-dlg-card{max-height:calc(100dvh - 24px);overflow:auto}
 }
+/* ---------- 排位賽 · 市場事件 · 卡背 ---------- */
+.rk-btn small{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;opacity:.8;margin-top:1px}
+.rk-btn small:empty{display:none}
+.market-label{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:4px 0 6px;padding:6px 12px;font-size:13px;color:var(--text);
+  background:linear-gradient(90deg,#d8b25a2a,transparent 70%);border-left:3px solid var(--gold)}
+.market-label b{font-family:var(--f-name);font-weight:700;font-size:15px;color:var(--gold-hi)}
+.market-label span{color:var(--muted)}
+.market-label[hidden]{display:none}
+.tag-mkt{background:#8a6a1e}
+.tag-mkt.bad{background:#5a5f7a}
+.rk-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;padding:18px;background:var(--ink2);border:1px solid var(--gold)}
+.rk-seal{width:72px;height:72px;display:grid;place-items:center;font-family:var(--f-name);font-weight:900;font-size:36px;color:#fff6dc;
+  background:radial-gradient(circle at 35% 30%,#ffffff40,transparent 50%),var(--rk,#6b6f8a);border-radius:50%;box-shadow:inset 0 0 0 3px #ffffff55,0 0 0 2px var(--rk,#6b6f8a),0 6px 16px #0008}
+.rk-seal.t0{--rk:#6b6f8a}.rk-seal.t1{--rk:#7f8aa3}.rk-seal.t2{--rk:#2f8f7a}.rk-seal.t3{--rk:#c3902e}.rk-seal.t4{--rk:#c8321f}.rk-seal.t5{--rk:#7a3fd0}.rk-seal.t6{--rk:#1a1a1a;color:#f3dc95;box-shadow:inset 0 0 0 3px #f3dc95,0 0 0 2px #f3dc95,0 0 18px #f3dc9588}
+.rk-seal.mini{width:22px;height:22px;font-size:12px;font-style:normal;box-shadow:inset 0 0 0 1px #ffffff55}
+.rk-main{display:grid;gap:6px;min-width:0}
+.rk-k{font-size:12px;letter-spacing:.15em;color:var(--muted)}
+.rk-name{margin:0;font-family:var(--f-name);font-weight:700;font-size:26px;letter-spacing:.08em;color:var(--gold-hi)}
+.rk-rp{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.rk-rp b{font-size:22px;color:var(--text)}
+.rk-meta{font-size:12.5px;color:var(--muted)}
+.rk-tiers{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.rk-tiers span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;font-size:12.5px;color:var(--muted);border:1px solid var(--line);background:#ffffff08}
+.rk-tiers span small{opacity:.7}
+.rk-tiers span.on{color:var(--text);border-color:var(--gold);background:#d8b25a1f}
+.rk-tiers span.past{color:var(--text)}
+.rk-deck{display:grid;gap:4px;padding:12px 14px;margin:6px 0 12px;border:1px solid var(--line);background:var(--ink2)}
+.rk-deck.ok{border-color:#3fc78a66}.rk-deck.bad{border-color:#ff6a4d88}
+.rk-deck b{font-size:15px}.rk-deck.ok b{color:var(--good)}.rk-deck.bad b{color:#ffb19c}
+.rk-deck span{font-size:13.5px}.rk-deck small{color:var(--muted);font-size:12.5px}
+.rk-rules{margin:14px 0;font-size:14px}
+.rk-rules summary{cursor:pointer;color:var(--gold-hi)}
+.rk-rules ul{margin:8px 0 0;padding-left:1.2em;display:grid;gap:6px;line-height:1.6}
+.rk-h{margin:18px 0 8px;font-size:13px;letter-spacing:.15em;color:var(--muted);font-weight:600}
+.rk-backs{display:flex;flex-wrap:wrap;gap:10px}
+.rk-back{display:grid;justify-items:center;gap:4px;width:96px;padding:8px 6px;font:inherit;color:var(--text);background:var(--ink2);border:1px solid var(--line);cursor:pointer}
+.rk-back.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+.rk-back.locked{opacity:.5;cursor:default}
+.rk-back b{font-size:13px}.rk-back small{font-size:11px;color:var(--muted);text-align:center;line-height:1.35}
+.rk-back-face{width:56px;height:80px;display:grid;place-items:center;border-radius:5px;background:var(--fb,#141a46);
+  background-image:radial-gradient(circle at 50% 120%,transparent 40%,var(--fl,#232c6a) 41% 46%,transparent 47%);background-size:16px 8px;box-shadow:inset 0 0 0 2px var(--fi,#d8b25a)}
+.rk-back-face i{position:relative;font-style:normal;font-family:var(--f-name);font-weight:900;color:var(--fi,#d8b25a);font-size:15px;line-height:1;width:26px;height:26px;display:grid;place-items:center}
+.rk-back-face i::before{content:"";position:absolute;inset:2px;border:2px solid var(--fi,#d8b25a);transform:rotate(45deg)}
+.rk-back-face[data-back="silver"]{--fb:#262b38;--fl:#3e4558;--fi:#d6dbe8}
+.rk-back-face[data-back="seigaiha"]{--fb:#0c2a30;--fl:#1a5560;--fi:#9fe0dc}
+.rk-back-face[data-back="gold"]{--fb:#2a1c06;--fl:#5a3e10;--fi:#f3dc95}
+.rk-back-face[data-back="shu"]{--fb:#3a0c08;--fl:#6a1a12;--fi:#ffd2c0}
+.rk-back-face[data-back="phoenix"]{--fb:#24103a;--fl:#4a2a70;--fi:#ffb86a}
+.rk-back-face[data-back="legend"]{--fb:#0a0a0a;--fl:#2a2410;--fi:#f3dc95}
+.rk-back-face[data-back="season"]{--fb:var(--cb-bg);--fl:var(--cb-ln);--fi:var(--cb-ink)}
+/* the chosen back on every card back in a duel */
+html[data-back="silver"] .card.back{--w-bg:#262b38;--w-ln:#3e4558}
+html[data-back="seigaiha"] .card.back{--w-bg:#0c2a30;--w-ln:#1a5560}
+html[data-back="gold"] .card.back{--w-bg:#2a1c06;--w-ln:#5a3e10}
+html[data-back="shu"] .card.back{--w-bg:#3a0c08;--w-ln:#6a1a12}
+html[data-back="phoenix"] .card.back{--w-bg:#24103a;--w-ln:#4a2a70}
+html[data-back="legend"] .card.back{--w-bg:#0a0a0a;--w-ln:#2a2410}
+html[data-back="season"] .card.back{--w-bg:var(--cb-bg);--w-ln:var(--cb-ln)}
+html[data-back="silver"] .card.back .mark{color:#d6dbe8;border-color:#d6dbe8}
+html[data-back="seigaiha"] .card.back .mark{color:#9fe0dc;border-color:#9fe0dc}
+html[data-back="shu"] .card.back .mark{color:#ffd2c0;border-color:#ffd2c0}
+html[data-back="phoenix"] .card.back .mark{color:#ffb86a;border-color:#ffb86a}
+html[data-back="season"] .card.back .mark{color:var(--cb-ink);border-color:var(--cb-ink)}
+html[data-back="season"] .card.back .mark span{font-size:0}
+html[data-back="season"] .card.back .mark span::after{content:var(--cb-mark);font-size:calc(var(--cw,140px)*.074*1.9*.8)}
+.rk-hist{display:grid;gap:4px;font-size:13.5px;color:var(--muted)}
+.rank-res{margin:12px 0;padding:14px 16px;background:var(--ink2);border:1px solid var(--gold)}
+.rr-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;margin-bottom:10px}
+.rr-delta{font-family:var(--f-name);font-weight:900;font-size:34px}
+.rr-delta.up{color:var(--good)}.rr-delta.down{color:#ff8a70}
+.rr-top b{display:block;font-size:15px}.rr-top span{font-size:13px;color:var(--muted)}
+.rr-score{text-align:center}.rr-score b{font-size:28px;color:var(--gold-hi);font-family:var(--f-name)}.rr-score span{display:block;font-size:11.5px}
+.deck-cost{margin:6px 0 0;font-size:13px;color:var(--muted)}
+.deck-cost b{color:var(--good)}.deck-cost b.over{color:#ff8a70}
+@media (max-width:640px){
+  .rk-card{grid-template-columns:1fr;justify-items:start}
+  .rr-top{grid-template-columns:auto minmax(0,1fr)}
+  .rr-score{grid-column:1 / -1;text-align:left;display:flex;gap:8px;align-items:baseline}
+}

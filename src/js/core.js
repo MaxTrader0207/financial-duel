@@ -1,4 +1,5 @@
 // core.js — shared basics: DOM helpers, the versioned Store for localStorage, settings, difficulty levels, sleep / animation timing.
+import { attackMult } from './market.js';
 import { G } from './game.js';
 
 let $, esc, RM, META_KEY, ID_RENAMES, renameId, Store, isObj, SET_KEY, SET_V, SET, AD, sleep, shuffle, LP_MAX, HAND_SIZE, DIFFS, DIFF_KEY, foeAtkOf, diffKey, KEYS;
@@ -69,7 +70,7 @@ DIFFS = {
 };
 DIFF_KEY = 'soba-ketto.difficulty';
 /* opponent's effective attack: card ATK scaled by difficulty, then debuffs such as 追繳 */
-foeAtkOf = card => Math.max(0, Math.round(card.atk * (G.diff.foeMult || 1)) + G.mods.foeAtk);
+foeAtkOf = card => Math.max(0, Math.round(card.atk * (G.diff.foeMult || 1) * attackMult(card.cat)) + G.mods.foeAtk);   // market event ×1.2 / ×0.8
 diffKey = (() => { try { const v = localStorage.getItem(DIFF_KEY); return DIFFS[v] ? v : 'normal'; } catch (e) { return 'normal'; } })();
 KEYS = ['甲','乙','丙','丁','戊','己'];
 }

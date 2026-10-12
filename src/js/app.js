@@ -37,6 +37,8 @@ import { init as init_daily } from './daily.js';
 import { init as init_dailyui } from './dailyui.js';
 import { init as init_knowledge } from './knowledge.js';
 import { init as init_knowledgeui } from './knowledgeui.js';
+import { init as init_ranked } from './ranked.js';
+import { init as init_rankedui } from './rankedui.js';
 import { init as init_boot } from './boot.js';
 
 export function initAll() {
@@ -78,5 +80,7 @@ export function initAll() {
   init_knowledge();
   init_dailyui();
   init_knowledgeui();
+  init_ranked();
+  init_rankedui();
   init_boot();
 }

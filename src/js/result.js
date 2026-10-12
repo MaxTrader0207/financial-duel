@@ -1,5 +1,6 @@
 // result.js — the result screen: verdict, stats, opponent answers, reward card, missed questions and export buttons.
 import { Actions } from './actions.js';
+import { rankResultHTML } from './rankedui.js';
 import { COL } from './collection.js';
 import { Tutor } from './tutor.js';
 import { CATS } from './cards.js';
@@ -32,6 +33,7 @@ function renderResult(win) {
       <div class="stat"><div class="n">${G.dealt}</div><div class="l">造成傷害</div></div>
       <div class="stat"><div class="n">${G.taken}</div><div class="l">承受傷害</div></div>
     </div>
+    ${rankResultHTML(G)}
     ${G.shardsWon ? `<p class="lead shard-line">勝利額外獲得卡牌碎片 <b>+${G.shardsWon}</b>，可以到「知識圖鑑」解鎖、升級知識卡。</p>` : ''}
     ${G.foeStats && G.foeStats.t ? `<p class="lead foe-line">對手防禦答題 <b>${G.foeStats.c}/${G.foeStats.t}</b>${G.foeProf ? `（這場擅長 ${G.foeProf.strong.map(k => CATS[k].name).join('、')}，不擅長 ${G.foeProf.weak.map(k => CATS[k].name).join('、')}）` : ''}。</p>` : ''}
     ${win ? rewardHTML() : ''}

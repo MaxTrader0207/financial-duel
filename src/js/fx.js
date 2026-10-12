@@ -90,6 +90,7 @@ function floatText(anchor, text, cls = '') {
 }
 async function damage(side, amt, tags = []) {
   if (amt <= 0) return;
+  if (side === 'p' && G.perf) G.perf.maxHit = Math.max(G.perf.maxHit, amt);   // ranked: risk management
   const slot = $('#slot-' + side);
   tags.forEach((t, i) => setTimeout(() => floatText(slot, t, 'small'), 120 * i));
   floatText(slot, '−' + amt);

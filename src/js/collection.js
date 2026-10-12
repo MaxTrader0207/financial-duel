@@ -36,10 +36,11 @@ function deckSave() { return Store.trySave(DECK_KEY, DECK_V, DECK); }
    normal/rare cards for a super or ultra rare (at most CPU_GROW_MAX) */
 const CPU_GROW_PER = 6, CPU_GROW_MAX = 10;
 function cpuGrowth() { return Math.min(CPU_GROW_MAX, Math.floor(COL.owned.filter(id => MON[id] && MON[id].rank >= 3).length / CPU_GROW_PER)); }
-function cpuDeckList(dk) {
+/* grow = false: ranked, where the opponent depends on your tier only, never on how many cards you own */
+function cpuDeckList(dk, { grow = true } = {}) {
   const ids = f => shuffle(MONSTERS.filter(f).map(m => m.id));
   let [lo, sr, ur] = CPU_MIX[dk] || CPU_MIX.normal;
-  const g = Math.min(cpuGrowth(), lo); lo -= g; sr += Math.ceil(g / 2); ur += Math.floor(g / 2);
+  const g = grow ? Math.min(cpuGrowth(), lo) : 0; lo -= g; sr += Math.ceil(g / 2); ur += Math.floor(g / 2);
   return [...ids(m => m.rank <= 2).slice(0, lo), ...ids(m => m.rank === 3).slice(0, sr), ...ids(m => m.rank === 4).slice(0, ur)];
 }
 /* win reward: choose 1 of up to 3 uncollected cards; hard always offers an UR while any are left */

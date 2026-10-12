@@ -1,4 +1,5 @@
 // wiring.js — event wiring for buttons, keyboard shortcuts, long-press card zoom and card tilt.
+import * as Ranked from './ranked.js';
 import { renderBank } from './bankui.js';
 import { CATS, MON, RARITY, RARITY_FULL, cardHTML } from './cards.js';
 import { owns } from './collection.js';
@@ -11,7 +12,7 @@ import { recordGame } from './records.js';
 import { ADV_WHY, BEATS, WEAK_MULT, advOf } from './rules.js';
 import { clearSave, saveGame } from './save.js';
 import { setDexCat, renderDex, renderTitle } from './screens.js';
-import { T, show } from './view.js';
+import { T, show, toast } from './view.js';
 import { SKILLS } from './skills.js';
 import { Sound } from './sound.js';
 import { G } from './game.js';
@@ -106,7 +107,8 @@ $('#btn-quit').onclick = () => {
   const b = $('#btn-quit');
   if (!quitArmed) { b.textContent = '確定投降？再按一次'; quitArmed = setTimeout(() => { quitArmed = 0; b.textContent = '投降回標題'; }, 3000); return; }
   clearTimeout(quitArmed); quitArmed = 0; b.textContent = '投降回標題';
-  if (G && !G.over) { G.endedAt = new Date(); G.win = false; recordGame(true); }
+  if (G && !G.over) { G.endedAt = new Date(); G.win = false; recordGame(true);
+    if (G.mode === 'ranked') { const r = Ranked.applyMatch(false, 0); toast(`排位賽投降：${r.delta} 分`); } }
   if (G) G.over = true; Tutor.end(false); clearSave(); quizState?.cancel?.(); Sound.stopBGM(); $('#quiz').hidden = true; setQuizState(null); T.hidden = true; renderTitle(); show('title');
 };
 /* 3D tilt + foil follow the pointer on hand, quiz and title cards */

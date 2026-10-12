@@ -12,6 +12,7 @@ import { autoDeck, COL, cpuDeckList } from '../src/js/collection.js';
 import { cpuPick } from '../src/js/ai.js';
 import { advOf, WEAK_MULT } from '../src/js/rules.js';
 import * as calc from '../src/js/calc.js';
+import { rankedDeck } from '../src/js/ranked.js';
 
 const rnd = Math.random;
 /* chance to answer right: knowledge k plus a guess among the options left */
@@ -53,10 +54,10 @@ export function playDuel(opts) {
   const P = { acc: 0.7, fast: 0.5, policy: 'smart', deck: 'starter', ...opts };
   setDiffKey(P.diff);
   const ownedBefore = COL.owned;
-  if (P.deck === 'full') COL.owned = MONSTERS.map(m => m.id);
+  if (P.deck === 'full' || P.deck === 'ranked') COL.owned = MONSTERS.map(m => m.id);
   /* 'random': 40 cards drawn from all 160 (≤ 2 copies), so every card gets played for the per-card statistics */
-  const deck = P.deck === 'random' ? MONSTERS.flatMap(m => [m.id, m.id]).sort(() => rnd() - 0.5).slice(0, 40) : autoDeck();
-  const cpuDeck = cpuDeckList(P.diff);          // the opponent grows with the collection we simulate
+  const deck = P.deck === 'list' ? P.list : P.deck === 'ranked' ? rankedDeck() : P.deck === 'random' ? MONSTERS.flatMap(m => [m.id, m.id]).sort(() => rnd() - 0.5).slice(0, 40) : autoDeck();
+  const cpuDeck = cpuDeckList(P.diff, { grow: !P.ranked });          // the opponent grows with the collection we simulate
   COL.owned = ownedBefore;
   state.newGame();
   const G = game.G;

@@ -4,7 +4,7 @@ import { BG } from './backgrounds.js';
 import { $, RM, SET, sleep } from './core.js';
 import { Sound } from './sound.js';
 
-const SCREENS = ['title', 'duel', 'result', 'bank', 'dex', 'notebook', 'record', 'deck', 'daily', 'know'];
+const SCREENS = ['title', 'duel', 'result', 'bank', 'dex', 'notebook', 'record', 'deck', 'daily', 'know', 'ranked'];
 let T;                                    // #trans, the transition overlay
 
 function show(name) { SCREENS.forEach(s => $('#scr-' + s).hidden = s !== name); const fq = $('#foe-quiz'); if (fq) { fq.hidden = true; fq.classList.remove('on'); } window.scrollTo(0, 0); if (name !== 'duel' && name !== 'result' && BG) BG.clear(); }

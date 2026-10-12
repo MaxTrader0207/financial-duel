@@ -68,6 +68,8 @@
         <li><span class="k">擋</span><span><b>對手防禦：</b>你答對後，對手會派一張手牌抵擋，並當場回答一題你攻擊卡屬性的題目。它答對時你只造成「傷害 − 守備力」（不會反彈）。對手的答對率依難易度為 45%／50%／55%，每場另有 2 個擅長屬性（+15%）與 2 個不擅長屬性（−15%），寫在對手資金下方。對手防禦時不發動技能。</span></li>
         <li><span class="k">守</span><span><b>對手回合：</b>對手召喚怪獸攻擊，選一張手牌防禦，題目出<b>攻擊方的屬性</b>。答對時只承受「攻擊力 − 守備力」，守備力較高還會反彈；答錯則全額承受。</span></li>
         <li><span class="k">剋</span><span><b>屬性相剋：</b>風險管理 → 衍生性商品 → 虛擬貨幣 → 外匯 → 籌碼與市場 → 基本面 → ETF → 技術分析 → 風險管理（箭頭前者剋制後者）。防禦卡剋制攻擊方時守備力 ×1.5，被剋制時 ×0.5。</span></li>
+        <li><span class="k">市</span><span><b>市場事件：</b>休閒場與排位場從第 2 回合起每 3 回合翻出一個金融事件（升息、股市暴跌、通膨…），兩個屬性攻擊力 ×1.2、一個 ×0.8，雙方都適用，手牌上會標出「事件 ×1.2」。</span></li>
+        <li><span class="k">排</span><span><b>排位賽：</b>依段位配對手強度（見習交易員 → 傳奇投資人）。勝 +15～+30、敗 −20～−8，依知識、策略、風險管理的表現計分；排位牌組點數上限 80（普通 1、稀有 2、超稀有 3、極稀有 5）。每月一個賽季，依最高段位發放限定稱號與卡背。</span></li>
         <li><span class="k">弱</span><span><b>弱項加成：</b>學習紀錄中正確率最低的屬性是你的弱項，用弱項屬性的卡攻擊，答對時傷害 ×1.2。</span></li>
         <li><span class="k">組</span><span><b>牌組：</b>用 40 張卡組成自己的牌組（每種最多 2 張）。一開始擁有普通與稀有卡，每贏一場可以從 3 張未收集的卡中選 1 張加入收藏。</span></li>
         <li><span class="k">技</span><span><b>技能：</b>每張卡都有專屬技能，例如刪去錯誤選項、減半傷害、反彈、回復資金或再攻擊一次。對手的卡在攻擊命中時也會發動技能，可在卡牌圖鑑查看全部。</span></li>
@@ -82,8 +84,9 @@
       </fieldset>
       <div class="resume" id="resume" hidden></div>
       <div class="title-btns">
-        <button class="btn" id="btn-start" type="button">開始對決</button>
-        <button class="btn ghost" id="btn-tut" type="button">新手引導</button>
+        <button class="btn" id="btn-start" type="button">休閒對戰</button>
+        <button class="btn rk-btn" id="btn-ranked" type="button">排位賽<small id="rk-badge"></small></button>
+        <button class="btn ghost" id="btn-tut" type="button">新手場</button>
         <button class="btn ghost" id="btn-deck" type="button">牌組編輯</button>
         <button class="btn ghost" id="btn-nb" type="button">錯題本<span class="badge" id="nb-badge" hidden></span></button>
         <button class="btn ghost" id="btn-rec" type="button">學習紀錄</button>
@@ -101,6 +104,7 @@
 <section class="screen" id="scr-duel" hidden>
   <div class="duel" id="duel">
     <div class="topline"><span class="turn" id="turn-label">第 1 回合</span><span id="streak-label"></span><span id="bg-label" class="bg-label"></span><span id="save-label" class="save-label"></span><span id="pt-label" class="pt-label"></span></div>
+    <div class="market-label" id="market-label" hidden></div>
     <div class="bar foe">
       <div class="seal">對手</div>
       <div class="lp">
@@ -192,6 +196,14 @@
     <div class="btn-row"><button class="btn" id="btn-know-back" type="button">回標題</button></div>
   </div>
 </section>
+<section class="screen" id="scr-ranked" hidden>
+  <div class="page">
+    <div class="eyebrow" id="rk-season"></div>
+    <h3 class="sec">排位賽</h3>
+    <p class="lead">依段位配對對手強度，依勝負與策略表現計分。每月一個賽季，月底依最高段位發放限定稱號與卡背。</p>
+    <div id="rk-body"></div>
+  </div>
+</section>
 <section class="screen" id="scr-record" hidden>
   <div class="page">
     <div class="eyebrow">長期學習數據</div>
@@ -210,6 +222,7 @@
     <p class="lead">從已收集的卡中選 40 張組成牌組，每種卡最多 2 張。對戰時牌組用完會重新洗牌。每贏一場可以從 3 張未收集的卡中選 1 張，困難模式勝利的選項必定包含極稀有卡。</p>
     <div class="deck-sum" id="deck-sum"></div>
     <div class="btn-row"><button class="btn small" id="deck-save" type="button">儲存牌組</button><button class="btn ghost small" id="deck-auto" type="button">自動組牌</button><button class="btn ghost small" id="deck-weak" type="button">弱項練習牌組</button><button class="btn ghost small" id="deck-clear" type="button">清空</button><span class="status" id="deck-status" role="status"></span></div>
+    <p class="deck-cost" id="deck-cost"></p>
     <div class="dex-filter" id="deck-filter"></div>
     <div class="deck-grid" id="deck-grid"></div>
     <div><button class="btn" id="btn-deck-back" type="button">回標題</button></div>
@@ -282,6 +295,9 @@
 <div class="update-bar" id="update-bar" hidden role="status"><span>有新版本可以使用。對戰進度會自動記錄，重新載入後可以繼續。</span><button class="btn small" id="update-go" type="button">重新載入</button><button class="btn ghost small" id="update-later" type="button">稍後</button></div>
 <div id="kn-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-label="知識卡">
   <div class="care-card kn-dlg-card"><button class="kn-x" id="kn-close" type="button" aria-label="關閉">×</button><div id="kn-card"></div></div>
+</div>
+<div id="season-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-label="賽季結算">
+  <div class="care-card"><div id="season-body"></div><div class="btn-row"><button class="btn" id="season-ok" type="button">收下</button></div></div>
 </div>
 <div id="settings" class="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="set-title">
   <div class="care-card">
