@@ -22,6 +22,8 @@ import { openDeck } from './deckui.js';
 import { openZoom } from './wiring.js';
 import * as fsm from './fsm.js';
 import * as calc from './calc.js';
+import * as daily from './daily.js';
+import { openDaily, renderDailyCard } from './dailyui.js';
 
 
 
@@ -32,5 +34,5 @@ window.__T = {
   get COL() { return col.COL; }, get DECK() { return col.DECK; }, get RECS() { return rec.RECS; }, get QS() { return rec.QS; }, get SET() { return SET; },
   advOf, weakCat: rec.weakCat, lifetimeByCat: rec.lifetimeByCat, cpuPick, cpuScore, autoDeck: col.autoDeck, deckValid: col.deckValid,
   rewardOffer: col.rewardOffer, claimReward: col.claimReward, cpuDeckList: col.cpuDeckList, renderRecord, openDeck, recordGame: rec.recordGame,
-  get BANK() { return DATA.questions.questions; }, get Store() { return Store; }, cardHTML: (...a) => cards.cardHTML(...a), migrateSave, fitDeck: col.fitDeck, openZoom, fsm, calc,
+  get BANK() { return DATA.questions.questions; }, get Store() { return Store; }, cardHTML: (...a) => cards.cardHTML(...a), migrateSave, fitDeck: col.fitDeck, openZoom, fsm, calc, daily, openDaily, renderDailyCard,
 };

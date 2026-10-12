@@ -63,7 +63,7 @@ function claimReward(id) {
 }
 function rewardHTML() {
   if (!COL.pending) return '';
-  return `<div class="reward" id="reward"><h3 class="sec">勝利獎勵 · 選一張加入收藏</h3>
+  return `<div class="reward" id="reward"><h3 class="sec">獎勵選卡 · 選一張加入收藏</h3>
     <p class="lead">選好之後，到「牌組編輯」把它放進牌組。</p>
     <div class="reward-opts">${COL.pending.map(id => { const m = MON[id]; return `<button type="button" data-id="${id}">${cardHTML(m)}<span>${esc(m.name)} · ${RARITY_FULL[RARITY[m.rank]]}</span></button>`; }).join('')}</div></div>`;
 }

@@ -54,6 +54,7 @@
     <div class="title-info">
       <div class="eyebrow">金融知識卡牌對決</div>
       <h2>召喚交易怪獸，答對題目才能發動攻擊。</h2>
+      <button class="daily-card" id="daily-card" type="button" hidden></button>
       <div class="fan" id="fan"></div>
       <ol class="steps3" aria-label="三步驟玩法">
         <li><span class="n">壹</span><b>出牌</b><span>從手牌選一張卡召喚</span></li>
@@ -173,6 +174,12 @@
 </section>
 
 <!-- LEARNING RECORD -->
+<section class="screen" id="scr-daily" hidden>
+  <div class="page daily-page">
+    <div class="daily-top"><div class="eyebrow" id="daily-date"></div><div class="daily-streak" id="daily-streak"></div></div>
+    <div id="daily-body"></div>
+  </div>
+</section>
 <section class="screen" id="scr-record" hidden>
   <div class="page">
     <div class="eyebrow">長期學習數據</div>
