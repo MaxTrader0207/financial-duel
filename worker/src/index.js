@@ -9,6 +9,7 @@
 // belongs to the player and is used once; the duel lasted at least MIN_MATCH_MS; the performance parts are within
 // their maximums; at most MAX_MATCHES_PER_HOUR duels; leaving a duel open (starting another) counts as a loss.
 import { TIERS, tierOf, scoreMatch, seasonStart, checkPerf, seasonOf, prevSeason } from '../../src/js/rankrules.js';
+import { cleanPing, ping, report, reportHTML } from './stats.js';
 
 const MAX_MATCHES_PER_HOUR = 30;
 const REGISTER_PER_IP_PER_DAY = 5;
@@ -195,6 +196,26 @@ async function board(req, env, now, url) {
     200, p ? { 'Cache-Control': 'no-store' } : { 'Cache-Control': 'public, max-age=15' });
 }
 
+/* ---------- anonymous daily statistics (stats.js) ---------- */
+async function statsPing(req, env, now) {
+  const c = cleanPing(await body(req), now); if (c.error) fail(400, 'ping', c.error);
+  const ip = await sha256(`ip:${req.headers.get('CF-Connecting-IP') || 'local'}`);
+  if (!await limit(env, `ping:${ip}`, 120, 3600e3, now)) fail(429, 'slow', '太頻繁了，請稍後再試');
+  return json({ ok: true, days: await ping(env, c) });
+}
+async function stats(req, env, now, url) {
+  if (!env.STATS_KEY) fail(503, 'no_key', '尚未設定 STATS_KEY：請在 GitHub 的 Actions secrets 加入 STATS_KEY 後重新部署');
+  const ip = await sha256(`ip:${req.headers.get('CF-Connecting-IP') || 'local'}`);
+  const given = url.searchParams.get('key') || '';
+  if (await sha256(given) !== await sha256(env.STATS_KEY)) {
+    if (!await limit(env, `statskey:${ip}`, 10, 3600e3, now)) fail(429, 'slow', '密碼錯誤次數太多，請一小時後再試');
+    fail(403, 'key', '密碼不正確');
+  }
+  const r = await report(env, now);
+  if (url.searchParams.get('format') === 'json') return json(r, 200, { 'Cache-Control': 'no-store' });
+  return new Response(reportHTML(r), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });
+}
+
 async function route(req, env, now) {
   const url = new URL(req.url), path = url.pathname.replace(/\/+$/, ''), m = req.method;
   if (m === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
@@ -206,6 +227,8 @@ async function route(req, env, now) {
   if (m === 'DELETE' && path === '/v1/me') return leave(req, env);
   if (m === 'POST' && path === '/v1/match/start') return matchStart(req, env, now);
   if (m === 'POST' && path === '/v1/match/end') return matchEnd(req, env, now);
+  if (m === 'POST' && path === '/v1/ping') return statsPing(req, env, now);
+  if (m === 'GET' && path === '/v1/stats') return stats(req, env, now, url);
   fail(404, 'not_found', '找不到這個網址');
 }
 

@@ -41,6 +41,7 @@ import { init as init_ranked } from './ranked.js';
 import { init as init_rankedui } from './rankedui.js';
 import { init as init_online } from './online.js';
 import { init as init_boardui } from './boardui.js';
+import { init as init_usage } from './usage.js';
 import { init as init_boot } from './boot.js';
 
 export function initAll() {
@@ -86,5 +87,6 @@ export function initAll() {
   init_rankedui();
   init_online();
   init_boardui();
+  init_usage();
   init_boot();
 }

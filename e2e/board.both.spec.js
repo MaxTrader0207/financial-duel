@@ -17,6 +17,7 @@ function mockApi() {
     calls.push(`${method} ${path}`);
     const reply = (status, body) => route.fulfill({ status, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify(body) });
     if (method === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS' } });
+    if (path === '/v1/ping') return reply(200, { ok: true, days: 1 });
     const body = req.postData() ? JSON.parse(req.postData()) : {};
     const p = who(req);
     if (path === '/v1/register') {

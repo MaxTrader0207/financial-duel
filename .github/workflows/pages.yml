@@ -68,6 +68,7 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      STATS_KEY: ${{ secrets.STATS_KEY }}
       API_URL: https://financial-duel-api.maxwei6699.workers.dev
     defaults:
       run:
@@ -96,6 +97,8 @@ jobs:
           sed -i "s/00000000-0000-0000-0000-000000000000/$id/" wrangler.toml
           npx wrangler d1 migrations apply financial-duel --remote
           npx wrangler deploy
+          # the password of the /v1/stats page (optional GitHub secret STATS_KEY)
+          if [ -n "$STATS_KEY" ]; then printf '%s' "$STATS_KEY" | npx wrangler secret put STATS_KEY; else echo "::notice title=每日統計頁未設密碼::加入 GitHub secret STATS_KEY 後重新部署，就能用 /v1/stats?key=… 查看每日玩家數"; fi
       - name: Check the deployed API
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: |
@@ -106,7 +109,9 @@ jobs:
           auth=$(echo "$reg" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const r=JSON.parse(s);process.stdout.write(r.id+'.'+r.token)})")
           curl -fsS "$API_URL/v1/me" -H "Authorization: Bearer $auth" | grep -q "$name"
           curl -fsS -X DELETE "$API_URL/v1/me" -H "Authorization: Bearer $auth"
-          echo; echo "API OK: register / me / delete"
+          # the statistics route answers (an empty ping is refused without counting anything)
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST "$API_URL/v1/ping" -H 'Content-Type: application/json' -d '{}')" = 400
+          echo; echo "API OK: register / me / delete / ping"
   build:
     needs: test
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

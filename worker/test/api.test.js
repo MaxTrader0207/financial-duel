@@ -34,7 +34,7 @@ before(async () => {
   const opts = { cwd: new URL('..', import.meta.url), stdio: 'pipe' };
   execFileSync('npx', ['wrangler', 'd1', 'migrations', 'apply', 'financial-duel', '--local', '--persist-to', '.wrangler/test'], opts);
   dev = spawn('npx', ['wrangler', 'dev', '--local', '--port', String(PORT), '--ip', '127.0.0.1', '--persist-to', '.wrangler/test',
-    '--var', 'TEST_CLOCK:1', '--var', 'MIN_MATCH_MS:60000', '--show-interactive-dev-session=false'], { ...opts, detached: true });
+    '--var', 'TEST_CLOCK:1', '--var', 'MIN_MATCH_MS:60000', '--var', 'STATS_KEY:test-stats-key', '--show-interactive-dev-session=false'], { ...opts, detached: true });
   let log = ''; dev.stdout.on('data', d => { log += d; }); dev.stderr.on('data', d => { log += d; });
   for (let i = 0; i < 120; i++) {
     try { const r = await fetch(`${BASE}/v1/health`); if (r.ok) return; } catch { /* not up yet */ }
@@ -168,4 +168,28 @@ test('rate limit: at most 30 duels an hour', async () => {
   let last;
   for (let i = 0; i < 31; i++) last = await call('POST', '/v1/match/start', { auth: p });
   assert.equal(last.status, 429);
+});
+
+test('anonymous daily statistics: pings add up per day, the report needs the key', async () => {
+  clock = Date.UTC(2026, 11, 10, 4);                                      // 2026-12-10, a quiet month for this test
+  const pid = n => n.toString(16).padStart(32, '0');
+  const send = (p, days, ip) => call('POST', '/v1/ping', { body: { pid: p, days }, ip });
+  assert.equal((await send(pid(1), { '2026-12-10': { open: 1, duels: 2, casual: 2, wins: 1 } })).status, 200);
+  await send(pid(1), { '2026-12-10': { open: 1, duels: 1, ranked: 1 } });          // same player again: still one player
+  await send(pid(2), { '2026-12-10': { open: 1, daily: 1 }, '2026-12-09': { open: 1, duels: 1, tutorial: 1 } });
+  await send(pid(3), { '2026-12-11': { open: 1 }, '2026-11-01': { open: 1 }, '2026-12-08': { open: 1, duels: 9999, hack: 5 } });   // future & old days dropped, counts capped
+  assert.equal((await send('nope', {})).status, 400);
+  assert.equal((await call('GET', '/v1/stats')).status, 403);
+  assert.equal((await call('GET', '/v1/stats?key=wrong')).status, 403);
+  const r = await call('GET', '/v1/stats?key=test-stats-key&format=json');
+  assert.equal(r.status, 200);
+  const day = d => r.body.rows.find(x => x.day === d);
+  assert.deepEqual([day('2026-12-10').players, day('2026-12-10').duels, day('2026-12-10').casual, day('2026-12-10').ranked, day('2026-12-10').daily, day('2026-12-10').open], [2, 3, 2, 1, 1, 3]);
+  assert.deepEqual([day('2026-12-09').players, day('2026-12-09').newPlayers, day('2026-12-10').newPlayers], [1, 1, 1]);
+  assert.equal(day('2026-12-08').duels, 200);
+  assert.equal(r.body.rows.find(x => x.day === '2026-12-11'), undefined);
+  assert.equal(r.body.summary.weekPlayers, 3);
+  const html = await fetch(`${BASE}/v1/stats?key=test-stats-key`, { headers: { 'X-Test-Now': String(clock) } });
+  assert.match(html.headers.get('content-type'), /text\/html/);
+  assert.match(await html.text(), /每日統計/);
 });

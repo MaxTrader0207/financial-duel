@@ -121,3 +121,36 @@ describe('online leaderboard client: ordering', () => {
     expect(s.w).toBe(1);
   });
 });
+
+import * as Usage from '../src/js/usage.js';
+import { SET } from '../src/js/core.js';
+describe('anonymous usage statistics', () => {
+  beforeEach(() => { localStorage.removeItem(Usage.USAGE_KEY); SET.stats = true; Usage.setClock(() => Date.UTC(2026, 9, 13, 4)); Usage.load(); });
+  it('counts events per Taiwan day under a random id, and sends them once', async () => {
+    const sent = [];
+    globalThis.fetch = vi.fn(async (url, opt) => { sent.push(JSON.parse(opt.body)); return { ok: true, status: 200, json: async () => ({ ok: true }) }; });
+    expect(Usage.state().pid).toMatch(/^[0-9a-f]{32}$/);
+    Usage.mark('open'); Usage.duel('ranked', true); Usage.duel('casual', false); Usage.mark('daily', 'nonsense');
+    expect(Usage.state().pending['2026-10-13']).toEqual({ open: 1, duels: 2, ranked: 1, wins: 1, casual: 1, daily: 1 });
+    expect(await Usage.flush()).toBe(true);
+    expect(sent[0].days['2026-10-13'].duels).toBe(2);
+    expect(Usage.state().pending).toEqual({});
+    expect(await Usage.flush()).toBe(true); expect(sent).toHaveLength(1);           // nothing new: nothing sent
+  });
+  it('keeps the counts when the server cannot be reached', async () => {
+    globalThis.fetch = vi.fn(async () => { throw new TypeError('offline'); });
+    Usage.mark('open');
+    expect(await Usage.flush()).toBe(false);
+    expect(Usage.state().pending['2026-10-13'].open).toBe(1);
+  });
+  it('turned off in settings: nothing is counted or sent, and waiting counts are dropped', async () => {
+    globalThis.fetch = vi.fn();
+    Usage.mark('open'); Usage.setEnabled(false); Usage.mark('duels');
+    expect(Usage.state().pending).toEqual({});
+    await Usage.flush(); expect(globalThis.fetch).not.toHaveBeenCalled();
+  });
+  it('a new day starts after midnight in Taiwan', () => {
+    expect(Usage.dayKey(Date.UTC(2026, 9, 13, 15, 59))).toBe('2026-10-13');
+    expect(Usage.dayKey(Date.UTC(2026, 9, 13, 16, 0))).toBe('2026-10-14');
+  });
+});

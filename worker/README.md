@@ -43,6 +43,26 @@
 | `DELETE /v1/me` | 退出排行榜，刪除暱稱與所有成績 |
 | `POST /v1/match/start` | 開始一場排位賽，取得對戰憑證。若有沒結束的上一場，先以敗場結算 |
 | `POST /v1/match/end` `{ticket, win, perf}` 或 `{ticket, surrender: true}` | 結算這場 |
+| `POST /v1/ping` `{pid, days}` | 匿名使用統計：一個隨機編號，加上每天的開啟與對戰次數 |
+| `GET /v1/stats?key=密碼` | 最近 30 天的每日統計頁（加 `&format=json` 取得 JSON） |
+
+## 每日玩家數
+
+遊戲第一次開啟時會產生一個隨機的匿名編號。之後每天記下開啟次數、對戰（休閒／排位／新手場）、勝場、每日挑戰，送到 `/v1/ping`。這些資料不含帳號、暱稱、IP 或任何個人資料；玩家可以在「設定 → 匿名使用統計」關閉。
+
+查看統計：
+
+1. 在 GitHub repo 的 **Settings → Secrets and variables → Actions** 新增 secret `STATS_KEY`，內容是你自己取的一組密碼（建議 16 個字以上）。
+2. 重新部署（Actions → Run workflow，或推一個 commit）。
+3. 打開 `https://financial-duel-api.maxwei6699.workers.dev/v1/stats?key=你的密碼`。
+
+統計頁顯示以下內容：
+
+- 今天的玩家數，近 7 天的玩家數與對戰數。
+- 累計玩家數、加入排行榜的人數、線上排位賽場數。
+- 最近 30 天每一天的明細：玩家、新玩家、開啟次數、對戰、休閒、排位、新手場、每日挑戰。
+
+「玩家」是當天開啟遊戲的不同裝置數，日期以台灣時間計算。密碼連續錯 10 次，該網路位址會被擋一小時。
 
 ## 計分與防作弊
 

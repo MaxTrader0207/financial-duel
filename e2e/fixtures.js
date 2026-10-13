@@ -16,6 +16,13 @@ export const test = base.extend({
   },
   page: async ({ page, tutorialDone, fastWaits }, use) => {
     await page.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+    /* the real server is never called: usage pings are answered here, everything else fails (a spec may route it) */
+    await page.route(/financial-duel-api\./, r => {
+      const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS' };
+      if (new URL(r.request().url()).pathname !== '/v1/ping') return r.abort();
+      if (r.request().method() === 'OPTIONS') return r.fulfill({ status: 204, headers: cors });
+      return r.fulfill({ status: 200, contentType: 'application/json', headers: cors, body: '{"ok":true,"days":1}' });
+    });
     if (fastWaits) await page.addInitScript(() => { try { localStorage.setItem('soba-ketto.e2e.fast', '1'); } catch (e) {} });
     if (tutorialDone) await page.addInitScript(() => { try { localStorage.setItem('soba-ketto.tutorial.v1', 'done'); } catch (e) {} });
     await use(page);

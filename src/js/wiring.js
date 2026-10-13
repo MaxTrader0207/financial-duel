@@ -1,6 +1,7 @@
 // wiring.js — event wiring for buttons, keyboard shortcuts, long-press card zoom and card tilt.
 import * as Ranked from './ranked.js';
 import * as Online from './online.js';
+import * as Usage from './usage.js';
 import { renderBank } from './bankui.js';
 import { CATS, MON, RARITY, RARITY_FULL, cardHTML } from './cards.js';
 import { owns } from './collection.js';
@@ -108,7 +109,7 @@ $('#btn-quit').onclick = () => {
   const b = $('#btn-quit');
   if (!quitArmed) { b.textContent = '確定投降？再按一次'; quitArmed = setTimeout(() => { quitArmed = 0; b.textContent = '投降回標題'; }, 3000); return; }
   clearTimeout(quitArmed); quitArmed = 0; b.textContent = '投降回標題';
-  if (G && !G.over) { G.endedAt = new Date(); G.win = false; recordGame(true);
+  if (G && !G.over) { G.endedAt = new Date(); G.win = false; recordGame(true); Usage.duel(G.mode, false);
     if (G.mode === 'ranked') { const r = Ranked.applyMatch(false, 0); toast(`排位賽投降：${r.delta} 分`); Online.endMatch({ surrender: true }); } }
   if (G) G.over = true; Tutor.end(false); clearSave(); quizState?.cancel?.(); Sound.stopBGM(); $('#quiz').hidden = true; setQuizState(null); T.hidden = true; renderTitle(); show('title');
 };

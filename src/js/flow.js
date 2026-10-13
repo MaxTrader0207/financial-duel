@@ -30,6 +30,7 @@ import { Tutor } from './tutor.js';
 import * as Market from './market.js';
 import * as Ranked from './ranked.js';
 import * as Online from './online.js';
+import * as Usage from './usage.js';
 import { refreshRankResult } from './rankedui.js';
 
 
@@ -287,7 +288,7 @@ async function checkEnd() {
   if (G.lp.c > 0 && G.lp.p > 0) return false;
   G.fsm.go('over');
   G.over = true; const win = G.lp.c <= 0; G.win = win; G.endedAt = new Date(); clearSave(); Tutor.end();
-  recordGame(false);
+  recordGame(false); Usage.duel(G.mode, win);
   if (win) G.shardsWon = onDuelWin();                     // shards for knowledge cards and reward picks
   if (G.mode === 'ranked') {
     G.perfResult = Ranked.performance(perfStats()); G.rank = Ranked.applyMatch(win, G.perfResult.score);

@@ -9,6 +9,7 @@ import * as K from './knowledge.js';
 import { kcardHTML, openKnow } from './knowledgeui.js';
 import { Sound } from './sound.js';
 import { show } from './view.js';
+import * as Usage from './usage.js';
 
 let order = [], cur = 0, answered = false;
 const WEEK = ['日', '一', '二', '三', '四', '五', '六'];
@@ -77,7 +78,7 @@ function pick(i) {
     <p>${esc(q.explain)}</p>
     <div class="dl-chips">${chips(res.reward)}${res.ok ? '' : '<span class="dl-chip soft">答錯也有獎勵，記住這個觀念就好</span>'}</div>
     <button class="btn small" id="dl-next" type="button">${last ? '看今日成果 ▶' : '下一題 ▶'}</button>`;
-  if (res.finished) { const k = K.onDailyFinished(s); res.finished.card = k ? k.card : null; if (k) res.finished.newTitles.push(...k.titles); }
+  if (res.finished) { Usage.mark('daily'); const k = K.onDailyFinished(s); res.finished.card = k ? k.card : null; if (k) res.finished.newTitles.push(...k.titles); }
   $('#dl-next').onclick = () => { if (last) { Sound.jingle(true); renderSummary(res.finished); } else { cur++; renderQuestion(); } };
   $('#dl-next').focus({ preventScroll: true });
   renderStreak();
