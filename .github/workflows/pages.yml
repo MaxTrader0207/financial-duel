@@ -75,6 +75,7 @@ jobs:
     steps:
       - name: Cloudflare secrets missing
         if: env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == ''
+        working-directory: ${{ github.workspace }}        # nothing is checked out in this case
         run: echo "::notice title=排行榜 API 未部署::請在 repo 的 Settings → Secrets and variables → Actions 加入 CLOUDFLARE_API_TOKEN 與 CLOUDFLARE_ACCOUNT_ID（見 worker/README.md）"
       - uses: actions/checkout@v7
         if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
