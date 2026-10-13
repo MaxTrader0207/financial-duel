@@ -6,6 +6,7 @@ import * as Daily from './daily.js';
 import * as K from './knowledge.js';
 import { Sound } from './sound.js';
 import { show } from './view.js';
+import * as KB from './kbonus.js';
 
 let filter = 'all', openId = null, quiz = null;
 const TYPE_SEAL = { stock: '股', defense: '防', event: '事', trap: '陷' };
@@ -28,11 +29,25 @@ export function renderKnowButton() {
   const s = K.stats(); b.hidden = !s.fresh; b.textContent = s.fresh;
 }
 
+/* 知識加成: card levels per kind → a small duel bonus (kbonus.js) */
+function bonusHTML() {
+  const pts = K.points(), types = K.TYPES();
+  return `<details class="kn-bonus" open><summary>知識加成 <small>對戰中自動生效（新手場除外）</small></summary>
+    <p class="kn-bonus-lead">每張卡的等級（Lv1～Lv3）都算進它那一類的知識點數，每 ${KB.POINTS_PER_LEVEL} 點升一級加成，最高 ${KB.MAX_LEVEL} 級。升級卡片要答對檢定題，所以加成來自真的學會，而且效果很小，不會取代答題與策略。</p>
+    <div class="kn-bonus-list">${Object.entries(KB.KINDS).map(([t, k]) => {
+      const p = pts[t] || 0, l = KB.levelOf(p), next = l < KB.MAX_LEVEL ? (l + 1) * KB.POINTS_PER_LEVEL : null;
+      return `<div class="kn-bn t-${t}" data-kind="${t}"><div class="kn-bn-top"><b>${esc(k.name)}</b><span class="kn-bn-lv">Lv ${l} / ${KB.MAX_LEVEL}</span></div>
+        <div class="kn-bn-fx">${l ? esc(k.text(l)) : `<span class="muted">尚未生效</span>`}</div>
+        <div class="kn-bar"><i style="width:${next ? Math.round((p - l * KB.POINTS_PER_LEVEL) / KB.POINTS_PER_LEVEL * 100) : 100}%"></i></div>
+        <small>${esc(types[t] || '')}知識點數 ${p}${next ? ` · 再 ${next - p} 點升到 Lv ${l + 1}（${esc(k.text(l + 1))}）` : ' · 已達最高'}</small></div>`; }).join('')}</div></details>`;
+}
+
 function renderKnow() {
   const s = K.stats(), types = K.TYPES(), P = Daily.profile();
   $('#kn-sum').innerHTML = `<div class="kn-total"><b>${s.owned}</b><span>/ ${s.total} 已收集</span><b class="m">${s.mastered}</b><span>張精通</span><span class="kn-sh">碎片 ${P.shards}</span></div>
     <div class="kn-types">${Object.entries(types).map(([t, n]) => { const b = s.byType[t] || { owned: 0, total: 0 };
-      return `<div class="kn-tb t-${t}"><span>${esc(n)}</span><div class="kn-bar"><i style="width:${b.total ? Math.round(b.owned / b.total * 100) : 0}%"></i></div><small>${b.owned}/${b.total}</small></div>`; }).join('')}</div>`;
+      return `<div class="kn-tb t-${t}"><span>${esc(n)}</span><div class="kn-bar"><i style="width:${b.total ? Math.round(b.owned / b.total * 100) : 0}%"></i></div><small>${b.owned}/${b.total}</small></div>`; }).join('')}</div>
+    ${bonusHTML()}`;
   $('#kn-filter').innerHTML = [['all', '全部'], ...Object.entries(types)].map(([k, n]) =>
     `<button class="btn ghost small" type="button" data-k="${k}" aria-pressed="${filter === k}">${esc(n)}</button>`).join('');
   /* collected cards first (stable order inside each group), so the grid opens on what the player already has */

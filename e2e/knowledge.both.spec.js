@@ -71,3 +71,17 @@ test('a duel win adds shards, and the first win of the day a knowledge card', as
   await expect(page.locator('.shard-line').nth(1)).toContainText(`今日首勝，收集到知識卡【${card}】`);
   expect(await page.evaluate(() => window.__T.knowledge.stats().owned)).toBe(5);
 });
+
+test('知識加成: card levels build a small duel bonus, shown in the encyclopedia and used in duels', async ({ page, errors }) => {
+  await open(page);
+  await page.evaluate(() => { const T = window.__T; T.daily.addShards(5000);
+    for (const c of T.knowledge.all().filter(c => c.type === 'stock').slice(0, 5)) { T.knowledge.buy(c.id); T.knowledge.upgrade(c.id, c.quiz[0].answer); T.knowledge.upgrade(c.id, c.quiz[1].answer); } });
+  await page.click('#btn-know');
+  await expect(page.locator('.kn-bn[data-kind="stock"]')).toContainText('Lv 1 / 5');
+  await expect(page.locator('.kn-bn[data-kind="stock"]')).toContainText('攻擊傷害 +0.8%');
+  await expect(page.locator('.kn-bn[data-kind="trap"]')).toContainText('尚未生效');
+  await page.click('#btn-know-back');
+  await page.click('#btn-start');
+  await until(page, () => window.__T.G && window.__T.G.phase === 'attack');
+  expect(await page.evaluate(() => window.__T.G.kb)).toEqual({ stock: 1, defense: 0, event: 0, trap: 0 });
+});

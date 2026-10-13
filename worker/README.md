@@ -45,6 +45,8 @@
 | `POST /v1/match/end` `{ticket, win, perf}` 或 `{ticket, surrender: true}` | 結算這場 |
 | `POST /v1/ping` `{pid, days}` | 匿名使用統計：一個隨機編號，加上每天的開啟與對戰次數 |
 | `GET /v1/stats?key=密碼` | 最近 30 天的每日統計頁（加 `&format=json` 取得 JSON） |
+| `POST /v1/transfer` `{data}` | 上傳進度，換一組 8 碼轉移碼（24 小時內有效，同一網路位址每天最多 10 組） |
+| `POST /v1/transfer/redeem` `{code}` | 用轉移碼取回進度；只能用一次，取回後伺服器立即刪除 |
 
 ## 每日玩家數
 

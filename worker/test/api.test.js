@@ -193,3 +193,18 @@ test('anonymous daily statistics: pings add up per day, the report needs the key
   assert.match(html.headers.get('content-type'), /text\/html/);
   assert.match(await html.text(), /每日統計/);
 });
+
+test('transfer codes: upload progress, redeem once on another device, expire after a day', async () => {
+  const data = { app: 'financial-duel', format: 1, exportedAt: 'x', data: { 'soba-ketto.collection.v1': '{"v":1}', 'soba-ketto.big': 'x'.repeat(50_000) } };
+  const c = await call('POST', '/v1/transfer', { body: { data } });
+  assert.equal(c.status, 201, JSON.stringify(c.body));
+  assert.match(c.body.code, /^[2-9A-HJKMNP-Z]{4}-[2-9A-HJKMNP-Z]{4}$/);
+  assert.equal((await call('POST', '/v1/transfer', { body: { data: { app: 'other' } } })).status, 400);
+  const typed = c.body.code.toLowerCase().replace('-', ' ');                // lower case and a space still work
+  const r = await call('POST', '/v1/transfer/redeem', { body: { code: typed } });
+  assert.equal(r.status, 200); assert.deepEqual(r.body.data, data);
+  assert.equal((await call('POST', '/v1/transfer/redeem', { body: { code: c.body.code } })).status, 404);   // single use
+  assert.equal((await call('POST', '/v1/transfer/redeem', { body: { code: '12' } })).status, 400);
+  const old = await call('POST', '/v1/transfer', { body: { data } });
+  assert.equal((await call('POST', '/v1/transfer/redeem', { body: { code: old.body.code }, now: clock + 25 * 3600e3 })).status, 404);  // expired
+});

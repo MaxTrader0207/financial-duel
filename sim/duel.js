@@ -68,7 +68,7 @@ export function playDuel(opts) {
   Object.assign(G, { diff: DIFFS[P.diff], weak: null, deckList: { p: deck, c: cpuDeck } });
   G.deck = { p: decks.makeDeck(G.deckList.p), c: decks.makeDeck(G.deckList.c) };
   if (P.market) Market.enable();
-  G.foeBoost = P.foeBoost || 0;
+  G.foeBoost = P.foeBoost || 0; G.kb = P.kb || null;
   const PF = { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 };
   const T = P.track;
   const over = () => G.lp.p <= 0 || G.lp.c <= 0;

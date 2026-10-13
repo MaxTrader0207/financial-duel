@@ -6,6 +6,7 @@
 import { Store, isObj } from './core.js';
 import { DATA } from './data.js';
 import * as Daily from './daily.js';
+import { levels, KINDS } from './kbonus.js';
 
 export const KNOW_KEY = 'soba-ketto.knowledge.v1', KNOW_V = 1;
 export const MAX_LV = 3;
@@ -86,5 +87,13 @@ export function onDuelWin(rnd = Math.random) {
   out.titles = unlock(c.id, 'duel') || []; out.card = c;
   return out;
 }
+
+/* 知識加成: card levels summed per kind, and the bonus levels they give (kbonus.js) */
+export function points() {
+  const pts = Object.fromEntries(Object.keys(KINDS).map(k => [k, 0]));
+  for (const c of all()) if (c.type in pts) pts[c.type] += lv(c.id);
+  return pts;
+}
+export const bonusLevels = () => levels(points());
 
 export function init() { load(); }

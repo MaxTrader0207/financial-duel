@@ -25,7 +25,7 @@ function cycles() {                                 // Tarjan's strongly connect
 describe('module structure', () => {
   it('has no import cycles', () => { expect(cycles()).toEqual([]); });
   it('the shared leaf modules import nothing from the game', () => {
-    for (const f of ['game.js', 'actions.js', 'ui.js', 'rankrules.js']) expect(graph[f], f).toEqual([]);
+    for (const f of ['game.js', 'actions.js', 'ui.js', 'rankrules.js', 'kbonus.js']) expect(graph[f], f).toEqual([]);
   });
   it('game rules never import screen code', () => {
     const screen = ['board.js', 'fx.js', 'view.js', 'screens.js', 'wiring.js', 'result.js', 'flow.js', 'rankedui.js', 'boardui.js'];

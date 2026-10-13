@@ -1,6 +1,7 @@
 // progress.js — export every saved piece of progress to one JSON file, and import it on another device or browser.
 import { $ } from './core.js';
 import { downloadsP, pad2 } from './report.js';
+import { apiBase } from './online.js';
 
 export const PREFIX = 'soba-ketto.', FORMAT = 1;
 const SKIP = k => k.endsWith('.backup');
@@ -41,7 +42,51 @@ async function exportProgress() {
   } catch (e) { st.className = 'status' + (e && e.code === 'declined' ? '' : ' err'); st.textContent = e && e.code === 'declined' ? '已取消儲存。' : '匯出失敗：' + ((e && e.message) || '未知錯誤'); }
 }
 
+/* ---------- transfer code (worker /v1/transfer): progress through the server, no file needed ---------- */
+async function post(path, body) {
+  try {
+    const res = await fetch(apiBase() + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    return { ok: res.ok, status: res.status, data: await res.json().catch(() => null) };
+  } catch { return { ok: false, status: 0, data: null }; }
+}
+const errText = r => (r.data && r.data.error) || (r.status === 0 ? '連不上伺服器，請確認網路後再試' : '暫時無法使用，請稍後再試');
+export async function makeTransfer() {
+  const r = await post('/v1/transfer', { data: collectProgress() });
+  return r.ok ? { ok: true, code: r.data.code, expires: r.data.expires } : { ok: false, error: errText(r) };
+}
+export async function redeemTransfer(code) {
+  const r = await post('/v1/transfer/redeem', { code });
+  if (!r.ok) return { ok: false, error: errText(r) };
+  try { return { ok: true, progress: parseProgress(JSON.stringify(r.data.data)) }; } catch (e) { return { ok: false, error: e.message }; }
+}
+function initTransfer() {
+  const st = (cls, t) => { const e = $('#xfer-status'); e.className = 'status' + (cls ? ' ' + cls : ''); e.textContent = t; };
+  $('#xfer-make').onclick = async e => {
+    const b = e.currentTarget; b.disabled = true; st('', '產生中…');
+    const r = await makeTransfer(); b.disabled = false;
+    if (!r.ok) { st('err', r.error); return; }
+    const box = $('#xfer-code'); box.hidden = false;
+    box.innerHTML = `<b>${r.code}</b><small>${new Date(r.expires).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })} 前有效 · 只能用一次</small>`;
+    st('ok', '在另一台裝置打開遊戲 → 設定 → 轉移碼，輸入上面的代碼。之後這台裝置繼續玩的進度不會同步過去。');
+  };
+  let armed = 0;                                                       // the code is used up when redeemed, so confirm first
+  const reset = () => { clearTimeout(armed); armed = 0; $('#xfer-use').textContent = '接續進度'; };
+  $('#xfer-in').oninput = reset;
+  $('#xfer-use').onclick = async e => {
+    const b = e.currentTarget;
+    if (!$('#xfer-in').value.trim()) { st('err', '請先輸入轉移碼'); return; }
+    if (!armed) { b.textContent = '會取代這台裝置的進度，再按一次'; st('', '目前的資料會另存備份。'); armed = setTimeout(reset, 5000); return; }
+    reset(); b.disabled = true; st('', '讀取中…');
+    const r = await redeemTransfer($('#xfer-in').value); b.disabled = false;
+    if (!r.ok) { st('err', r.error); return; }
+    const n = applyProgress(r.progress);
+    st('ok', `已接續 ${n} 項資料，重新載入中…`);
+    setTimeout(() => location.reload(), 600);
+  };
+}
+
 export function init() {
+  initTransfer();
   let pending = null, armed = 0;
   $('#prog-export').onclick = exportProgress;
   $('#prog-import').onclick = () => { $('#prog-file').value = ''; $('#prog-file').click(); };

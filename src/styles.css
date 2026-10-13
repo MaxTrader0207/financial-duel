@@ -929,3 +929,22 @@ html[data-back="season"] .card.back .mark span::after{content:var(--cb-mark);fon
 .rk-table td:nth-child(n+2){font-variant-numeric:tabular-nums}
 .rk-table tr.on td{background:#d8b25a1f;color:var(--text)}
 .rk-table small{margin-left:4px;font-size:11px;color:var(--muted)}
+
+/* ---------- 知識加成 ---------- */
+.kn-bonus{margin:14px 0 4px;padding:12px 14px;border:1px solid var(--line);background:var(--ink2)}
+.kn-bonus summary{cursor:pointer;font-weight:600;color:var(--gold-hi)}
+.kn-bonus summary small{font-weight:400;color:var(--muted);font-size:12px;margin-left:6px}
+.kn-bonus-lead{margin:8px 0 10px;font-size:12.5px;line-height:1.7;color:var(--muted)}
+.kn-bonus-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.kn-bn{display:grid;gap:5px;padding:10px 12px;border:1px solid var(--line);background:#ffffff06}
+.kn-bn-top{display:flex;justify-content:space-between;align-items:baseline}
+.kn-bn-top b{font-weight:600}
+.kn-bn-lv{font-size:12.5px;color:var(--gold-hi);font-variant-numeric:tabular-nums}
+.kn-bn-fx{font-size:13px}
+.kn-bn-fx .muted{color:var(--muted)}
+.kn-bn small{font-size:11.5px;color:var(--muted);line-height:1.5}
+.kn-bn.t-defense .kn-bar i{background:#1f8f7a}.kn-bn.t-event .kn-bar i{background:#5b5fd6}.kn-bn.t-trap .kn-bar i{background:#b0306a}
+.xfer-code{display:grid;gap:2px;justify-items:start;padding:10px 14px;margin:6px 0;border:1px dashed var(--gold)}
+.xfer-code b{font-size:26px;font-weight:600;letter-spacing:.12em;color:var(--gold-hi);font-variant-numeric:tabular-nums}
+.xfer-code small{font-size:12px;color:var(--muted)}
+#xfer .bd-form{margin-top:6px}

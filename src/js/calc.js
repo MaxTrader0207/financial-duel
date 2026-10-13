@@ -3,6 +3,7 @@
 // everything else here only reads G and returns numbers, so it can be unit-tested card by card.
 import { G } from './game.js';
 import { attackMult } from './market.js';
+import * as KB from './kbonus.js';
 import { SKILLS } from './skills.js';
 import { foeAtkOf, DIFFS } from './core.js';
 import { MON } from './cards.js';
@@ -23,7 +24,8 @@ export function attackHit(m, r) {
   if (c.mult !== 1) tags.push(`×${c.mult}`);
   let dmg = c.dmg * c.mult * (c.fastMult || 1);
   if (G.weak && m.cat === G.weak) { dmg *= WEAK_MULT; tags.push(`弱項 ×${WEAK_MULT}`); }
-  const em = attackMult(m.cat); if (em !== 1) { dmg *= em; tags.push(`事件 ×${em}`); }
+  const em = KB.eventMult(G.kb, attackMult(m.cat)); if (em !== 1) { dmg *= em; tags.push(`事件 ×${+em.toFixed(2)}`); }
+  const km = KB.attackMult(G.kb); if (km !== 1) { dmg *= km; tags.push(`知識 +${+((km - 1) * 100).toFixed(1)}%`); }
   if (r.retried) { dmg *= RETRY_MULT; tags.push(`重答 ×${RETRY_MULT}`); }
   dmg = Math.round(dmg);
   if (c.lifesteal) c.heal += Math.round(dmg * c.lifesteal);
@@ -56,7 +58,7 @@ export function defendOk(m, s, r) {
   const c = { atk: s.atk, def: s.def, reflect: Math.max(0, s.def - s.atk), pierce: Math.max(0, s.atk - s.def), heal: 0 };
   if (r.retried) { c.pierce = Math.max(c.pierce, Math.round(s.atk / 2)); c.reflect = Math.round(c.reflect / 2); }
   const fired = sk.defOk ? !!sk.defOk(c) : false;
-  return { pierce: c.pierce, reflect: c.reflect, heal: c.heal, fired };
+  return { pierce: Math.round(c.pierce * KB.damageTakenMult(G.kb)), reflect: c.reflect, heal: c.heal, fired };
 }
 
 /* defence answered wrong: full attack (after the opponent's hit skill and our defFail skill) */
@@ -64,7 +66,7 @@ export function defendFail(m, foe, s) {
   const sk = SKILLS[m.id], fsk = SKILLS[foe.id];
   const c = { side: 'c', atk: s.atk, dmg: s.atk, def: s.def, mult: 1, heal: 0, fast: false, left: 0 };
   const foeFired = fsk.hit ? !!fsk.hit(c) : false;
-  c.dmg = Math.round(c.dmg * c.mult);
+  c.dmg = Math.round(c.dmg * c.mult * KB.damageTakenMult(G.kb));       // 知識加成（防禦卡）
   const fired = sk.defFail ? !!sk.defFail(c) : false;
   if (c.lifesteal) c.heal += Math.round(c.dmg * c.lifesteal);
   return { dmg: c.dmg, foeHeal: c.heal, foeFired, fired };
@@ -97,7 +99,7 @@ export function foeProfile(rnd = Math.random) {
 export function foeAcc(cat) {
   const p = G.foeProf || {}, base = FOE_BLOCK[dkOf()] ?? 0.45;
   const s = (p.strong || []).includes(cat) ? FOE_FORTE : (p.weak || []).includes(cat) ? -FOE_FORTE : 0;
-  return Math.min(0.95, Math.max(0.05, base + s + (G.foeBoost || 0)));     // foeBoost: top ranked tiers
+  return Math.min(0.95, Math.max(0.05, base + s + (G.foeBoost || 0) - KB.blockCut(G.kb)));     // foeBoost: top ranked tiers; blockCut: 知識加成（陷阱卡）
 }
 /* returns null when the opponent has no card; otherwise the blocker, its answer and what actually lands */
 export function foeBlock(m, dmg) {

@@ -321,6 +321,11 @@
     <div class="set-prog"><span><b>進度備份</b><small>收藏、牌組、錯題本、學習紀錄與設定存成一個檔案，可以搬到另一台裝置或另一個瀏覽器。</small></span>
       <div class="btn-row"><button class="btn ghost small" id="prog-export" type="button">匯出進度</button><button class="btn ghost small" id="prog-import" type="button">匯入進度</button><button class="btn small" id="prog-apply" type="button" hidden>套用這個進度</button></div>
       <input type="file" id="prog-file" accept=".json,application/json" hidden><p class="status" id="prog-status" role="status"></p></div>
+    <div class="set-prog" id="xfer"><span><b>轉移碼</b><small>不用傳檔案：這台裝置產生一組 8 碼代碼，24 小時內在另一台裝置或瀏覽器（例如從 LINE 換到 Chrome）輸入，就能接續目前的進度。代碼只能使用一次。</small></span>
+      <div class="btn-row"><button class="btn ghost small" id="xfer-make" type="button">產生轉移碼</button></div>
+      <div class="xfer-code" id="xfer-code" hidden></div>
+      <div class="bd-form"><input id="xfer-in" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="9" placeholder="輸入轉移碼，例如 K7Q2-M9XD" aria-label="轉移碼"><button class="btn ghost small" id="xfer-use" type="button">接續進度</button></div>
+      <p class="status" id="xfer-status" role="status"></p></div>
     <div class="btn-row"><button class="btn small" id="set-ok" type="button">完成</button></div>
   </div>
 </div>

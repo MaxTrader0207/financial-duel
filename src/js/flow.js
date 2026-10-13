@@ -13,7 +13,7 @@ import { COL, DECK, colSave, cpuDeckList, rewardOffer } from './collection.js';
 import { $, DIFFS, LP_MAX, esc, foeAtkOf, sleep } from './core.js';
 import { clearField, damage, floatText, log, lunge, placeField, shatter } from './fx.js';
 import { RECS, recordGame } from './records.js';
-import { onDuelWin } from './knowledge.js';
+import { onDuelWin, bonusLevels } from './knowledge.js';
 import { ensureAdvantage, tutorialFoeLp, setupTutorial, suggestCard, tutorialFoeMiss } from './tutorial-script.js';
 import { renderResult } from './result.js';
 import { WEAK_MULT, advOf, diffKeyOf } from './rules.js';
@@ -74,7 +74,7 @@ async function resumeDuel() {
         deckList: d.deckList && Array.isArray(d.deckList.p) ? d.deckList : null, weak: d.weak && CATS[d.weak] ? d.weak : null,
         mode: ['casual', 'ranked'].includes(d.mode) ? d.mode : 'casual', market: d.market && typeof d.market === 'object' ? d.market : null,
         perf: d.perf && typeof d.perf === 'object' ? d.perf : { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 },
-        foeProf: okProf(d.foeProf) ? d.foeProf : foeProfile(), foeStats: d.foeStats && Number.isInteger(d.foeStats.t) ? d.foeStats : { t: 0, c: 0 }, foeBoost: typeof d.foeBoost === 'number' ? Math.min(0.3, Math.max(0, d.foeBoost)) : 0 });
+        foeProf: okProf(d.foeProf) ? d.foeProf : foeProfile(), foeStats: d.foeStats && Number.isInteger(d.foeStats.t) ? d.foeStats : { t: 0, c: 0 }, foeBoost: typeof d.foeBoost === 'number' ? Math.min(0.3, Math.max(0, d.foeBoost)) : 0, kb: d.kb && typeof d.kb === 'object' ? d.kb : null });
   const g = G;
   reserveUids(Math.max(...[...d.deck.p, ...d.deck.c, ...d.hand.p, ...d.hand.c].map(i => i.uid)));
   show('duel'); BG.apply(G.bg); Sound.startBGM(); Sound.setDanger(G.lp.p < LP_MAX * 0.3); clearField('p'); clearField('c');
@@ -110,6 +110,7 @@ async function startDuel(opts = {}) {
   if (tutorial) setupTutorial();
   else {
     Market.enable();
+    G.kb = bonusLevels();                                 // 知識加成, fixed for this duel
     if (G.mode === 'ranked') {
       setupRanked(); Ranked.begin();
       if (Online.joined()) { const g = G; Online.startMatch().then(r => { if (r && !r.ok && g === G) log(`線上排行榜：${r.error}。這場只計入這台裝置。`); }); }

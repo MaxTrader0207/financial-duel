@@ -32,9 +32,9 @@ const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, 
 const sha256 = async s => hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)));
 const randomHex = n => hex(crypto.getRandomValues(new Uint8Array(n)));
 
-async function body(req) {
+async function body(req, max = 2048) {
   const text = await req.text();
-  if (text.length > 2048) fail(413, 'too_large', '資料太大');
+  if (text.length > max) fail(413, 'too_large', '資料太大');
   if (!text) return {};
   try { const v = JSON.parse(text); return v && typeof v === 'object' ? v : {}; } catch { fail(400, 'bad_json', '資料格式錯誤'); }
 }
@@ -216,6 +216,33 @@ async function stats(req, env, now, url) {
   return new Response(reportHTML(r), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });
 }
 
+/* ---------- transfer codes: carry saved progress to another device ---------- */
+const CODE_CHARS = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';           // no 0/O, 1/I/L
+const TRANSFER_MS = 24 * 3600e3, TRANSFER_MAX = 600_000;
+const newCode = () => { const b = crypto.getRandomValues(new Uint8Array(8)); const s = [...b].map(x => CODE_CHARS[x % CODE_CHARS.length]).join(''); return `${s.slice(0, 4)}-${s.slice(4)}`; };
+export const normCode = c => { const s = String(c || '').toUpperCase().replace(/[^0-9A-Z]/g, ''); return s.length === 8 && [...s].every(ch => CODE_CHARS.includes(ch)) ? `${s.slice(0, 4)}-${s.slice(4)}` : null; };
+async function transferCreate(req, env, now) {
+  const b = await body(req, TRANSFER_MAX);
+  if (!b.data || typeof b.data !== 'object' || b.data.app !== 'financial-duel') fail(400, 'data', '進度資料不正確');
+  const ip = await sha256(`ip:${req.headers.get('CF-Connecting-IP') || 'local'}`);
+  if (!await limit(env, `tcreate:${ip}`, 10, 864e5, now)) fail(429, 'slow', '今天產生的轉移碼太多了，請明天再試');
+  await env.DB.prepare('DELETE FROM transfers WHERE expires < ?').bind(now).run();
+  const code = newCode(), expires = now + TRANSFER_MS;
+  await env.DB.prepare('INSERT INTO transfers (code, data, created, expires) VALUES (?, ?, ?, ?)').bind(code, JSON.stringify(b.data), now, expires).run();
+  return json({ code, expires }, 201);
+}
+async function transferRedeem(req, env, now) {
+  const b = await body(req);
+  const ip = await sha256(`ip:${req.headers.get('CF-Connecting-IP') || 'local'}`);
+  if (!await limit(env, `tredeem:${ip}`, 20, 3600e3, now)) fail(429, 'slow', '嘗試次數太多，請一小時後再試');
+  const code = normCode(b.code); if (!code) fail(400, 'code', '轉移碼格式不正確，應該是 8 個英數字');
+  const row = await env.DB.prepare('SELECT data, expires FROM transfers WHERE code = ?').bind(code).first();
+  if (!row || row.expires < now) fail(404, 'code', '找不到這組轉移碼，可能打錯或已經過期');
+  const del = await env.DB.prepare('DELETE FROM transfers WHERE code = ?').bind(code).run();      // one use only
+  if (!del.meta || del.meta.changes !== 1) fail(404, 'code', '這組轉移碼已經用過了');
+  return json({ data: JSON.parse(row.data) }, 200, { 'Cache-Control': 'no-store' });
+}
+
 async function route(req, env, now) {
   const url = new URL(req.url), path = url.pathname.replace(/\/+$/, ''), m = req.method;
   if (m === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
@@ -228,6 +255,8 @@ async function route(req, env, now) {
   if (m === 'POST' && path === '/v1/match/start') return matchStart(req, env, now);
   if (m === 'POST' && path === '/v1/match/end') return matchEnd(req, env, now);
   if (m === 'POST' && path === '/v1/ping') return statsPing(req, env, now);
+  if (m === 'POST' && path === '/v1/transfer') return transferCreate(req, env, now);
+  if (m === 'POST' && path === '/v1/transfer/redeem') return transferRedeem(req, env, now);
   if (m === 'GET' && path === '/v1/stats') return stats(req, env, now, url);
   fail(404, 'not_found', '找不到這個網址');
 }
