@@ -6,7 +6,7 @@ import { $, esc } from './core.js';
 import * as Daily from './daily.js';
 import * as Online from './online.js';
 import * as Ranked from './ranked.js';
-import { show } from './view.js';
+import { show, toast } from './view.js';
 
 /* month palettes for the season-limited backs: [background, pattern, ink] */
 const SEASON_PALETTE = [['#2a0f1a', '#5a1d33', '#f5b8c8'], ['#1a1030', '#3a2a66', '#d9c8ff'], ['#0f2418', '#24533a', '#c8f0d0'], ['#2a1a08', '#5a3a12', '#ffd9a0'],
@@ -37,7 +37,7 @@ export function renderRankedButton() {
 /* ---------- screen ---------- */
 export function openRanked({ sync = true } = {}) {
   const R = Ranked.state(), cached = { rp: R.rp, w: R.w, l: R.l }, t = Ranked.tierOf(R.rp), T = Ranked.TIERS[t], pr = Ranked.progress(), [y, m] = R.season.split('-').map(Number);
-  const cost = Ranked.deckCost(DECK), ok = Ranked.deckOk(DECK) && DECK.length === 40;
+  const cost = Ranked.deckCost(DECK), ok = !Ranked.deckForRanked(DECK).auto, autoCost = ok ? cost : Ranked.deckCost(Ranked.rankedDeck());
   $('#rk-season').textContent = `${y} 年 ${m} 月賽季 · 剩 ${Ranked.seasonDaysLeft()} 天`;
   $('#rk-body').innerHTML = `
     <div class="rk-card">
@@ -49,10 +49,11 @@ export function openRanked({ sync = true } = {}) {
     </div>
     <div class="rk-online" id="rk-online">${onlineHTML()}</div>
     <div class="rk-tiers">${Ranked.TIERS.map((x, i) => `<span class="${i === t ? 'on' : i < t ? 'past' : ''}"><i class="rk-seal mini t${i}">${x.seal}</i>${esc(x.name)}<small>${x.at}</small></span>`).join('')}</div>
-    <div class="rk-deck ${ok ? 'ok' : 'bad'}"><b>排位牌組點數 ${cost} / ${Ranked.DECK_CAP}</b><span>${ok ? '符合排位規則。' : DECK.length !== 40 ? '請先在「牌組編輯」儲存 40 張的牌組。' : '超過上限：請到「牌組編輯」換掉一些稀有卡。'}</span>
-      <small>普通 1、稀有 2、超稀有 3、極稀有 5 點；上限讓勝負靠策略與知識，而不是誰的稀有卡多。</small>
-      ${ok ? '' : '<button class="btn ghost small" id="rk-auto" type="button">一鍵組成符合上限的牌組</button>'}</div>
-    <div class="btn-row"><button class="btn" id="rk-go" type="button" ${ok ? '' : 'disabled'}>開始排位賽</button><button class="btn ghost" id="rk-deck" type="button">牌組編輯</button><button class="btn ghost" id="rk-home" type="button">回標題</button></div>
+    <div class="rk-deck ${ok ? 'ok' : 'auto'}">${ok ? `<b>排位牌組點數 ${cost} / ${Ranked.DECK_CAP}</b><span>你的牌組符合排位規則，直接開始就好。</span>`
+      : `<b>排位賽會自動幫你組一副合規的牌組</b><span>${DECK.length !== 40 ? '你還沒有儲存 40 張的牌組' : `你的牌組 ${cost} 點，超過排位上限 ${Ranked.DECK_CAP} 點`}。按「開始排位賽」時，會用你擁有的卡自動組出 ${autoCost} 點的最強合規牌組，只用在排位賽，你儲存的牌組不會改變。</span>
+      <div class="btn-row"><button class="btn ghost small" id="rk-auto" type="button">把這副牌存成我的牌組</button><button class="btn ghost small" id="rk-deck2" type="button">自己調整牌組</button></div>`}
+      <small>普通 1、稀有 2、超稀有 3、極稀有 5 點；上限讓勝負靠策略與知識，而不是誰的稀有卡多。</small></div>
+    <div class="btn-row"><button class="btn" id="rk-go" type="button">開始排位賽</button>${ok ? '<button class="btn ghost" id="rk-deck" type="button">牌組編輯</button>' : ''}<button class="btn ghost" id="rk-home" type="button">回標題</button></div>
     <details class="rk-rules" open><summary>怎麼計分</summary><ul>
       <li><b>勝 +15～+30、敗 −20～−8：</b>同樣是贏，打得好分數多；輸了但打得好，扣得少。</li>
       <li><b>知識（40）：</b>答題正確率。</li>
@@ -68,8 +69,8 @@ export function openRanked({ sync = true } = {}) {
       return `<span>${sy} 年 ${sm} 月 · 最高 ${esc(Ranked.TIERS[s.peak].name)} · ${s.w} 勝 ${s.l} 敗</span>`; }).join('')}</div>` : ''}`;
   $('#rk-go').onclick = () => Actions.startDuel({ mode: 'ranked' });
   $('#rk-board').onclick = () => Actions.openBoard();
-  const auto = $('#rk-auto'); if (auto) auto.onclick = () => { setDeck(Ranked.rankedDeck()); deckSave(); openRanked(); };
-  $('#rk-deck').onclick = () => Actions.openDeck();
+  const auto = $('#rk-auto'); if (auto) auto.onclick = () => { setDeck(Ranked.rankedDeck()); deckSave(); toast('已存成你的牌組'); openRanked({ sync: false }); };
+  for (const id of ['#rk-deck', '#rk-deck2']) { const b = $(id); if (b) b.onclick = () => Actions.openDeck(); }
   $('#rk-home').onclick = () => { Actions.renderTitle(); show('title'); };
   document.querySelectorAll('#rk-body .rk-back:not(.locked)').forEach(b => { b.onclick = () => { Ranked.setBack(b.dataset.id); applyBack(); openRanked(); }; });
   show('ranked');

@@ -42,7 +42,7 @@ function renderDeck(msg) {
   fillLazy($('#deck-grid'));
   wireReward(() => setTimeout(() => renderDeck(), 900));
   const cost = deckCost(deckDraft);
-  $('#deck-cost').innerHTML = `排位牌組點數 <b class="${cost > DECK_CAP ? 'over' : ''}">${cost} / ${DECK_CAP}</b>（普通 1、稀有 2、超稀有 3、極稀有 5；只有排位賽有上限）`;
+  $('#deck-cost').innerHTML = `排位牌組點數 <b class="${cost > DECK_CAP ? 'over' : ''}">${cost} / ${DECK_CAP}</b>（普通 1、稀有 2、超稀有 3、極稀有 5；只有排位賽有上限${cost > DECK_CAP ? '，超過時排位賽會自動改用合規牌組' : ''}）`;
   $('#deck-status').textContent = msg || (deckDraft.length === DECK_SIZE ? (deckDraft.join() === DECK.join() ? '' : '尚未儲存') : `還差 ${DECK_SIZE - deckDraft.length} 張才能儲存`);
   $('#deck-save').disabled = deckDraft.length !== DECK_SIZE;
 }

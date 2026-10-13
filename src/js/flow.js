@@ -9,7 +9,7 @@ import { showFoeAnswer } from './foequiz.js';
 import { foeQuestion } from './quiz.js';
 import { BG } from './backgrounds.js';
 import { CATS, MON } from './cards.js';
-import { COL, colSave, cpuDeckList, rewardOffer } from './collection.js';
+import { COL, DECK, colSave, cpuDeckList, rewardOffer } from './collection.js';
 import { $, DIFFS, LP_MAX, esc, foeAtkOf, sleep } from './core.js';
 import { clearField, damage, floatText, log, lunge, placeField, shatter } from './fx.js';
 import { RECS, recordGame } from './records.js';
@@ -19,7 +19,7 @@ import { renderResult } from './result.js';
 import { WEAK_MULT, advOf, diffKeyOf } from './rules.js';
 import { clearSave, readSave } from './save.js';
 import { stale } from './game.js';
-import { show, transition } from './view.js';
+import { show, toast, transition } from './view.js';
 import { SKILLS, heal, skillFX } from './skills.js';
 import { Sound } from './sound.js';
 import { newGame } from './state.js';
@@ -46,6 +46,8 @@ function renderMarket() {
 function setupRanked() {
   const dk = Ranked.tier().diff;
   G.diff = DIFFS[dk]; G.deckList.c = cpuDeckList(dk, { grow: false }); G.deck.c = makeDeck(G.deckList.c);
+  const rd = Ranked.deckForRanked(DECK);                 // over the point cap: a legal deck for this duel only
+  G.deckList.p = rd.list; G.deck.p = makeDeck(rd.list); G.rankedAuto = rd.auto;
 }
 /* strategy: attacking with an attribute the opponent is weak in or the market favours; blocking with advantage when you could */
 function trackPlay(mode, m, hand) {
@@ -116,6 +118,7 @@ async function startDuel(opts = {}) {
   log(tutorial ? `教學對戰：難度固定為簡易，只出初階題，對手資金 ${tutorialFoeLp()}。`
     : G.mode === 'ranked' ? `排位賽：${Ranked.tier().name}，對手難度「${G.diff.name}」。從第 2 回合起每 3 回合發生一次市場事件。`
     : '雙方洗牌完畢。從第 2 回合起每 3 回合發生一次市場事件。');
+  if (G.rankedAuto) toast(`這場排位賽自動使用符合上限的牌組（${Ranked.deckCost(G.deckList.p)} / ${Ranked.DECK_CAP} 點），你儲存的牌組沒有變動。`);
   if (forfeited) log(`上一場排位賽未完成，以敗場計（${forfeited.delta} 分）。`);
   setPhase('idle', '待機', ''); renderAll(); renderMarket();
   const g0 = G;

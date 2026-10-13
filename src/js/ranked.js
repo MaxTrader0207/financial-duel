@@ -7,7 +7,7 @@
 import { Store, isObj } from './core.js';
 import { MON } from './carddata.js';
 import * as Daily from './daily.js';
-import { DECK_COPY, autoDeck, owns } from './collection.js';
+import { DECK_COPY, autoDeck, deckValid, owns } from './collection.js';
 import { TIERS, tierOf, scoreMatch, seasonStart, seasonOf } from './rankrules.js';
 
 export const RANK_KEY = 'soba-ketto.ranked.v1', RANK_V = 1;
@@ -71,7 +71,18 @@ export function rankedDeck(cap = DECK_CAP) {
     const p = deck.reduce((t, id) => t + power(id), 0);
     if (!best || p > best.p) best = { deck, p };
   }
-  return best ? best.deck : autoDeck();
+  if (best) return best.deck;
+  const auto = autoDeck();
+  if (deckCost(auto) <= cap) return auto;
+  /* last resort: the cheapest owned cards, two copies each, so a legal deck always exists */
+  return Object.values(MON).filter(m => owns(m.id)).sort((a, b) => a.rank - b.rank || (b.atk + b.def) - (a.atk + a.def))
+    .flatMap(m => Array(DECK_COPY).fill(m.id)).slice(0, 40);
+}
+/* the deck a ranked duel uses: yours when it is a legal 40-card deck within the cap, otherwise one built
+   automatically for this duel only (your saved deck is not changed), so a player is never stuck at the door */
+export function deckForRanked(list) {
+  if (deckValid(list) && deckOk(list)) return { list: list.slice(), auto: false };
+  return { list: rankedDeck(), auto: true };
 }
 
 /* ---------- a match ---------- */

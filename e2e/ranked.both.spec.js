@@ -36,12 +36,25 @@ test('surrendering a ranked duel counts as a loss', async ({ page, errors }) => 
   expect(await page.evaluate(() => window.__T.ranked.state().rp)).toBe(280);
 });
 
-test('a deck over the point cap cannot enter ranked until it is fixed', async ({ page, errors }) => {
+test('a deck over the point cap never blocks ranked: a legal deck is used for that duel', async ({ page, errors }) => {
+  await open(page);
+  const big = await page.evaluate(() => { const T = window.__T; T.COL.owned = T.MONSTERS.map(m => m.id); T.DECK.splice(0, 40, ...T.MONSTERS.filter(m => m.rank === 4).flatMap(m => [m.id]).concat(T.MONSTERS.filter(m => m.rank === 3).map(m => m.id)).slice(0, 40)); return T.DECK.slice(); });
+  await page.click('#btn-ranked');
+  await expect(page.locator('.rk-deck')).toHaveClass(/auto/);
+  await expect(page.locator('.rk-deck')).toContainText('自動幫你組');
+  await expect(page.locator('#rk-go')).toBeEnabled();
+  await page.click('#rk-go');
+  await until(page, () => window.__T.G && window.__T.G.phase === 'attack' && !window.__T.G.busy);
+  const r = await page.evaluate(() => { const T = window.__T; return { auto: T.G.rankedAuto, cost: T.ranked.deckCost(T.G.deckList.p), n: T.G.deckList.p.length, saved: T.DECK.slice() }; });
+  expect(r.auto).toBe(true); expect(r.n).toBe(40); expect(r.cost).toBeLessThanOrEqual(80);
+  expect(r.saved).toEqual(big);                                   // the saved deck is untouched
+  await expect(page.locator('.toast').first()).toContainText('自動使用符合上限的牌組');
+});
+
+test('the suggested ranked deck can be saved as your deck', async ({ page, errors }) => {
   await open(page);
   await page.evaluate(() => { const T = window.__T; T.COL.owned = T.MONSTERS.map(m => m.id); T.DECK.splice(0, 40, ...T.MONSTERS.filter(m => m.rank === 4).flatMap(m => [m.id]).concat(T.MONSTERS.filter(m => m.rank === 3).map(m => m.id)).slice(0, 40)); });
   await page.click('#btn-ranked');
-  await expect(page.locator('.rk-deck')).toHaveClass(/bad/);
-  await expect(page.locator('#rk-go')).toBeDisabled();
   await page.click('#rk-auto');
   await expect(page.locator('.rk-deck')).toHaveClass(/ok/);
   await expect(page.locator('#rk-go')).toBeEnabled();

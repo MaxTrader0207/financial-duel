@@ -83,3 +83,16 @@ describe('market events', () => {
     for (const e of Market.EVENTS) expect(K.byId(e.card), e.id).toBeTruthy();
   });
 });
+
+describe('ranked deck at the door', () => {
+  it('uses your deck when it is legal, otherwise a legal one for that duel only', () => {
+    COL.owned = MONSTERS.map(m => m.id);
+    const urs = MONSTERS.filter(m => m.rank === 4).map(m => m.id), srs = MONSTERS.filter(m => m.rank === 3).map(m => m.id);
+    const big = [...urs, ...urs, ...srs].slice(0, 40);
+    const r = Ranked.deckForRanked(big);
+    expect(r.auto).toBe(true); expect(r.list).toHaveLength(40); expect(Ranked.deckCost(r.list)).toBeLessThanOrEqual(Ranked.DECK_CAP);
+    const legal = Ranked.rankedDeck();
+    expect(Ranked.deckForRanked(legal)).toEqual({ list: legal, auto: false });
+    expect(Ranked.deckForRanked([]).auto).toBe(true);
+  });
+});
