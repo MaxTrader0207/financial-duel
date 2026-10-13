@@ -1,8 +1,8 @@
 name: Test and deploy to GitHub Pages
 # Every push and pull request: unit tests (Vitest), browser tests (Playwright, desktop + phone), and the leaderboard
 # API tests (worker/, on a local D1). Pushes to main deploy to GitHub Pages only when the game's tests pass, and deploy
-# the leaderboard API to Cloudflare Workers when the repository has the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID
-# secrets (without them that job only prints how to add them).
+# the leaderboard API to Cloudflare Workers when the repository has the CLOUDFLARE_API_TOKEN secret (CLOUDFLARE_ACCOUNT_ID
+# is optional: wrangler finds the account when the token covers only one; without a token the job only prints a notice).
 # Node.js 24 (LTS); the runner is pinned to Ubuntu 24.04 so Playwright's browser dependencies install cleanly.
 on:
   push:
@@ -74,19 +74,19 @@ jobs:
         working-directory: worker
     steps:
       - name: Cloudflare secrets missing
-        if: env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == ''
+        if: env.CLOUDFLARE_API_TOKEN == ''
         working-directory: ${{ github.workspace }}        # nothing is checked out in this case
-        run: echo "::notice title=排行榜 API 未部署::請在 repo 的 Settings → Secrets and variables → Actions 加入 CLOUDFLARE_API_TOKEN 與 CLOUDFLARE_ACCOUNT_ID（見 worker/README.md）"
+        run: echo "::notice title=排行榜 API 未部署::請在 repo 的 Settings → Secrets and variables → Actions 加入 CLOUDFLARE_API_TOKEN（見 worker/README.md）"
       - uses: actions/checkout@v7
-        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
+        if: env.CLOUDFLARE_API_TOKEN != ''
       - uses: actions/setup-node@v7
-        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
+        if: env.CLOUDFLARE_API_TOKEN != ''
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: worker/package-lock.json
       - name: Deploy the leaderboard API
-        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
+        if: env.CLOUDFLARE_API_TOKEN != ''
         run: |
           npm ci
           find_db() { npx wrangler d1 list --json 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const l=JSON.parse(s.slice(s.indexOf('[')));const d=l.find(x=>x.name==='financial-duel');process.stdout.write(d?d.uuid:'')})"; }
@@ -97,7 +97,7 @@ jobs:
           npx wrangler d1 migrations apply financial-duel --remote
           npx wrangler deploy
       - name: Check the deployed API
-        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
+        if: env.CLOUDFLARE_API_TOKEN != ''
         run: |
           for i in 1 2 3 4 5 6; do curl -fsS "$API_URL/v1/health" && exit 0; sleep 10; done; exit 1
   build:

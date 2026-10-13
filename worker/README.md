@@ -14,10 +14,10 @@
    2. 選範本 **Edit Cloudflare Workers**。
    3. 在 Permissions 再加一列：**Account · D1 · Edit**。
    4. Account Resources 選你的帳號，然後建立 Token。
-2. **找到 Account ID**：在 Cloudflare 後台右側欄（Workers & Pages 頁面）可以看到，複製下來。
+2. **（可省略）Account ID**：登入 Cloudflare 後台後，網址 `dash.cloudflare.com/` 後面那段 32 個英數字。Token 只涵蓋一個帳號時可以不填，wrangler 會自己找到帳號。
 3. **加到 GitHub**：打開 repo 的 **Settings → Secrets and variables → Actions → New repository secret**，新增：
-   - `CLOUDFLARE_API_TOKEN`
-   - `CLOUDFLARE_ACCOUNT_ID`
+   - `CLOUDFLARE_API_TOKEN`（必要）
+   - `CLOUDFLARE_ACCOUNT_ID`（可省略）
 4. **重新部署**：到 **Actions → Test and deploy to GitHub Pages → Run workflow** 再跑一次，或推一個新 commit。
 
 第一次部署時，工作會自動做這些事：
