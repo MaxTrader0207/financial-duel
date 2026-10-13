@@ -7,10 +7,10 @@ import { scoreMatch, seasonStart, checkPerf, seasonOf, prevSeason } from '../src
 
 describe('shared point rules (game and server)', () => {
   it('scores a match and protects the first three tiers', () => {
-    expect(scoreMatch(500, true, 100).delta).toBe(30);
-    expect(scoreMatch(500, false, 0).delta).toBe(-20);
+    expect(scoreMatch(500, true, 100).delta).toBe(22);
+    expect(scoreMatch(500, false, 0).delta).toBe(-26);
     expect(scoreMatch(105, false, 0)).toMatchObject({ after: 100, shielded: true });
-    expect(scoreMatch(460, false, 0)).toMatchObject({ after: 440, demoted: true });
+    expect(scoreMatch(460, false, 0)).toMatchObject({ after: 434, demoted: true });
   });
   it('starts a new season two tiers lower', () => {
     expect(seasonStart(520)).toEqual({ rp: 100, peak: 1 });
@@ -72,8 +72,8 @@ describe('online leaderboard client', () => {
     const s = server(); await Online.join('小明');
     expect((await Online.startMatch()).ok).toBe(true);
     const r = await Online.endMatch({ win: true, perf: { knowledge: 40, strategy: 35, risk: 25, score: 100 } });
-    expect(r).toMatchObject({ ok: true, delta: 30 });
-    expect(Ranked.state()).toMatchObject({ rp: 30, w: 1 });
+    expect(r).toMatchObject({ ok: true, delta: 28 });
+    expect(Ranked.state()).toMatchObject({ rp: 28, w: 1 });
     expect(s.calls).toEqual(['POST /v1/register', 'POST /v1/match/start', 'POST /v1/match/end']);
     expect(await Online.endMatch({ win: true, perf: { knowledge: 0, strategy: 0, risk: 0 } })).toBe(null);   // the ticket is gone
   });
@@ -117,7 +117,7 @@ describe('online leaderboard client: ordering', () => {
     await Online.endMatch({ win: true, perf: { knowledge: 40, strategy: 35, risk: 25 } });
     release(); await reading;
     expect(Online.state().me.w).toBe(1);
-    expect(Ranked.state().rp).toBe(30);
+    expect(Ranked.state().rp).toBe(28);
     expect(s.w).toBe(1);
   });
 });

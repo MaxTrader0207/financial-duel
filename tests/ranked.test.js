@@ -15,13 +15,27 @@ describe('ranked points', () => {
   it('scores performance from knowledge, strategy and risk management', () => {
     expect(Ranked.performance({ total: 10, correct: 10, atk: 4, smartAtk: 4, defChances: 3, smartDef: 3, lpLeft: 1, maxHit: 0 }).score).toBe(100);
     const p = Ranked.performance({ total: 10, correct: 5, atk: 4, smartAtk: 2, defChances: 0, smartDef: 0, lpLeft: 0.4, maxHit: 3500 });
-    expect(p).toEqual({ score: 20 + 28 + 6 + 5, knowledge: 20, strategy: 28, risk: 11 });
+    expect(p).toEqual({ score: 20 + 18 + 6 + 5, knowledge: 20, strategy: 18, risk: 11 });     // no block chance: attacks carry all 35
+    expect(Ranked.performance({ total: 4, correct: 4, atk: 2, smartAtk: 0, defChances: 0, smartDef: 0, lpLeft: 1, maxHit: 0 }).strategy).toBe(0);
   });
-  it('a win earns 15–30 and a loss costs 8–20, depending on performance', () => {
-    Ranked.state().rp = 500;
-    expect(Ranked.applyMatch(true, 0).delta).toBe(15); expect(Ranked.applyMatch(true, 100).delta).toBe(30);
-    expect(Ranked.applyMatch(false, 0).delta).toBe(-20); expect(Ranked.applyMatch(false, 100).delta).toBe(-8);
-    expect(Ranked.state()).toMatchObject({ w: 2, l: 2 });
+  it('points depend on the tier, and performance moves them by up to ±6 around 50', () => {
+    Ranked.state().rp = 500;                                          // 操盤手: win 16, loss −20
+    expect(Ranked.applyMatch(true, 50).delta).toBe(16); expect(Ranked.applyMatch(true, 100).delta).toBe(22); expect(Ranked.applyMatch(true, 0).delta).toBe(10);
+    expect(Ranked.applyMatch(false, 50).delta).toBe(-20); expect(Ranked.applyMatch(false, 100).delta).toBe(-14); expect(Ranked.applyMatch(false, 0).delta).toBe(-26);
+    expect(Ranked.state()).toMatchObject({ w: 3, l: 3 });
+    Ranked.state().rp = 0; expect(Ranked.applyMatch(true, 50).delta).toBe(22);          // 見習交易員 is generous
+    Ranked.state().rp = 1500; expect(Ranked.applyMatch(true, 50).delta).toBe(10); expect(Ranked.applyMatch(false, 50).delta).toBe(-24);
+  });
+  it('higher tiers face stronger opponents, never chosen by collection', () => {
+    const lv = rp => { Ranked.state().rp = rp; return Ranked.opponent(); };
+    expect(lv(0)).toMatchObject({ diff: 'easy', boost: 0 });
+    expect(lv(300)).toMatchObject({ diff: 'normal' });
+    expect(lv(500)).toMatchObject({ diff: 'hard', boost: 0 });
+    expect(lv(1500)).toMatchObject({ diff: 'hard', boost: 18, block: 0.18 });
+    for (let i = 1; i < Ranked.TIERS.length; i++) {                 // the break-even win rate rises tier by tier
+      const be = t => -t.loss / (t.win - t.loss);
+      expect(be(Ranked.TIERS[i])).toBeGreaterThan(be(Ranked.TIERS[i - 1]));
+    }
   });
   it('promotes across tier lines and protects the first three tiers from demotion', () => {
     Ranked.state().rp = 95;
@@ -29,11 +43,11 @@ describe('ranked points', () => {
     Ranked.state().rp = 105;
     const down = Ranked.applyMatch(false, 0); expect(down).toMatchObject({ shielded: true, after: 100, demoted: false });
     Ranked.state().rp = 460;                                         // 操盤手 is not protected
-    expect(Ranked.applyMatch(false, 0)).toMatchObject({ demoted: true, after: 440 });
+    expect(Ranked.applyMatch(false, 0)).toMatchObject({ demoted: true, after: 434 });
   });
   it('an abandoned ranked duel counts as a loss', () => {
     Ranked.state().rp = 300; Ranked.begin();
-    expect(Ranked.forfeitIfActive().delta).toBe(-20); expect(Ranked.forfeitIfActive()).toBeNull();
+    expect(Ranked.forfeitIfActive().delta).toBe(-25); expect(Ranked.forfeitIfActive()).toBeNull();
   });
 });
 

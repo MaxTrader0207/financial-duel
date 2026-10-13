@@ -7,6 +7,7 @@ import * as Daily from './daily.js';
 import * as Online from './online.js';
 import * as Ranked from './ranked.js';
 import { show, toast } from './view.js';
+import { Tutor } from './tutor.js';
 
 /* month palettes for the season-limited backs: [background, pattern, ink] */
 const SEASON_PALETTE = [['#2a0f1a', '#5a1d33', '#f5b8c8'], ['#1a1030', '#3a2a66', '#d9c8ff'], ['#0f2418', '#24533a', '#c8f0d0'], ['#2a1a08', '#5a3a12', '#ffd9a0'],
@@ -37,7 +38,7 @@ export function renderRankedButton() {
 /* ---------- screen ---------- */
 export function openRanked({ sync = true } = {}) {
   const R = Ranked.state(), cached = { rp: R.rp, w: R.w, l: R.l }, t = Ranked.tierOf(R.rp), T = Ranked.TIERS[t], pr = Ranked.progress(), [y, m] = R.season.split('-').map(Number);
-  const cost = Ranked.deckCost(DECK), ok = !Ranked.deckForRanked(DECK).auto, autoCost = ok ? cost : Ranked.deckCost(Ranked.rankedDeck());
+  const gate = !Tutor.done(), cost = Ranked.deckCost(DECK), ok = !Ranked.deckForRanked(DECK).auto, autoCost = ok ? cost : Ranked.deckCost(Ranked.rankedDeck());
   $('#rk-season').textContent = `${y} 年 ${m} 月賽季 · 剩 ${Ranked.seasonDaysLeft()} 天`;
   $('#rk-body').innerHTML = `
     <div class="rk-card">
@@ -45,29 +46,33 @@ export function openRanked({ sync = true } = {}) {
       <div class="rk-main"><span class="rk-k">目前段位</span><b class="rk-name">${esc(T.name)}</b>
         <div class="rk-rp"><b>${R.rp}</b><span>積分</span>${pr.next ? `<span>· 距離「${esc(pr.next)}」還差 ${pr.need - pr.into} 分</span>` : '<span>· 最高段位</span>'}</div>
         <div class="dl-bar"><i style="width:${pr.need ? Math.round(pr.into / pr.need * 100) : 100}%"></i></div>
-        <div class="rk-meta">本季 ${R.w} 勝 ${R.l} 敗 · 本季最高 ${esc(Ranked.TIERS[R.peak].name)} · 對手難度「${esc({ easy: '簡易', normal: '適中', hard: '困難' }[T.diff])}」</div></div>
+        <div class="rk-meta">本季 ${R.w} 勝 ${R.l} 敗 · 本季最高 ${esc(Ranked.TIERS[R.peak].name)} · 對手「${esc(Ranked.LEVEL_NAME[T.level])}」 · 勝 +${T.win}／敗 ${T.loss}（表現 ±${Ranked.PERF_SWING}）</div></div>
     </div>
     <div class="rk-online" id="rk-online">${onlineHTML()}</div>
     <div class="rk-tiers">${Ranked.TIERS.map((x, i) => `<span class="${i === t ? 'on' : i < t ? 'past' : ''}"><i class="rk-seal mini t${i}">${x.seal}</i>${esc(x.name)}<small>${x.at}</small></span>`).join('')}</div>
-    <div class="rk-deck ${ok ? 'ok' : 'auto'}">${ok ? `<b>排位牌組點數 ${cost} / ${Ranked.DECK_CAP}</b><span>你的牌組符合排位規則，直接開始就好。</span>`
+    ${gate ? `<div class="rk-deck gate"><b>先完成新手場，就能開始排位賽</b><span>新手場是一場約 3 分鐘的教學對戰，會帶你走過出牌、答題、防禦與相剋。完成後回到這裡，就能直接開始排位賽。</span></div>
+    <div class="btn-row"><button class="btn" id="rk-tut" type="button">開始新手場</button><button class="btn ghost" id="rk-home" type="button">回標題</button></div>` : `<div class="rk-deck ${ok ? 'ok' : 'auto'}">${ok ? `<b>排位牌組點數 ${cost} / ${Ranked.DECK_CAP}</b><span>你的牌組符合排位規則，直接開始就好。</span>`
       : `<b>排位賽會自動幫你組一副合規的牌組</b><span>${DECK.length !== 40 ? '你還沒有儲存 40 張的牌組' : `你的牌組 ${cost} 點，超過排位上限 ${Ranked.DECK_CAP} 點`}。按「開始排位賽」時，會用你擁有的卡自動組出 ${autoCost} 點的最強合規牌組，只用在排位賽，你儲存的牌組不會改變。</span>
       <div class="btn-row"><button class="btn ghost small" id="rk-auto" type="button">把這副牌存成我的牌組</button><button class="btn ghost small" id="rk-deck2" type="button">自己調整牌組</button></div>`}
       <small>普通 1、稀有 2、超稀有 3、極稀有 5 點；上限讓勝負靠策略與知識，而不是誰的稀有卡多。</small></div>
-    <div class="btn-row"><button class="btn" id="rk-go" type="button">開始排位賽</button>${ok ? '<button class="btn ghost" id="rk-deck" type="button">牌組編輯</button>' : ''}<button class="btn ghost" id="rk-home" type="button">回標題</button></div>
+    <div class="btn-row"><button class="btn" id="rk-go" type="button">開始排位賽</button>${ok ? '<button class="btn ghost" id="rk-deck" type="button">牌組編輯</button>' : ''}<button class="btn ghost" id="rk-home" type="button">回標題</button></div>`}
     <details class="rk-rules" open><summary>怎麼計分</summary><ul>
-      <li><b>勝 +15～+30、敗 −20～−8：</b>同樣是贏，打得好分數多；輸了但打得好，扣得少。</li>
+      <li><b>勝負決定加減分，表現再微調 ±${Ranked.PERF_SWING}：</b>表現 50 分是基準，打得越好，贏得越多、輸得越少。</li>
       <li><b>知識（40）：</b>答題正確率。</li>
       <li><b>策略（35）：</b>用對手不擅長、或市場事件加成的屬性攻擊；有相剋卡可用時，用它來防禦。</li>
       <li><b>風險管理（25）：</b>結束時剩下的資金，以及有沒有吃下單次 ${Ranked.BIG_HIT} 以上的重擊。</li>
+      <li><b>越高越難：</b>段位越高，對手越強、贏的分越少、輸的分越多。段位會停在和你實力相當的地方，不是打越多場就一定越高。</li>
       <li><b>段位保護：</b>前 ${Ranked.PROTECTED_TIERS} 個段位輸了不會降段。投降或中途放棄的排位賽以敗場計。</li>
-      <li><b>每月賽季：</b>月底結算本季最高段位，下個月第一次開啟時發放限定稱號與卡背，積分往下調兩個段位重新開始。</li></ul></details>
+      <li><b>每月賽季：</b>月底結算本季最高段位，下個月第一次開啟時發放限定稱號與卡背，積分往下調兩個段位重新開始。</li></ul>
+      <table class="rk-table"><thead><tr><th>段位</th><th>門檻</th><th>對手</th><th>勝</th><th>敗</th></tr></thead><tbody>${Ranked.TIERS.map((x, i) => `<tr class="${i === t ? 'on' : ''}"><td>${esc(x.name)}</td><td>${x.at}</td><td>${esc(Ranked.LEVEL_NAME[x.level])}</td><td>+${x.win}</td><td>${x.loss}${i < Ranked.PROTECTED_TIERS ? '<small>保護</small>' : ''}</td></tr>`).join('')}</tbody></table></details>
     <h4 class="rk-h">外觀 · 卡背</h4>
     <div class="rk-backs">${Ranked.BACKS.map(b => backTile(b.id, R.backs.includes(b.id), `賽季達到「${Ranked.TIERS[b.tier].name}」解鎖`)).join('')}
       ${R.backs.filter(id => id.startsWith('s-')).map(id => backTile(id, true, '')).join('')}
       ${R.backs.some(id => id === `s-${R.season}`) ? '' : backTile(`s-${R.season}`, false, `本季達到「${Ranked.TIERS[Ranked.SEASON_BACK_TIER].name}」，下個月領取`)}</div>
     ${R.seasons.length ? `<h4 class="rk-h">過去賽季</h4><div class="rk-hist">${R.seasons.slice().reverse().map(s => { const [sy, sm] = s.season.split('-').map(Number);
       return `<span>${sy} 年 ${sm} 月 · 最高 ${esc(Ranked.TIERS[s.peak].name)} · ${s.w} 勝 ${s.l} 敗</span>`; }).join('')}</div>` : ''}`;
-  $('#rk-go').onclick = () => Actions.startDuel({ mode: 'ranked' });
+  const go = $('#rk-go'); if (go) go.onclick = () => Actions.startDuel({ mode: 'ranked' });
+  const tut = $('#rk-tut'); if (tut) tut.onclick = () => Actions.startDuel({ tutorial: true });
   $('#rk-board').onclick = () => Actions.openBoard();
   const auto = $('#rk-auto'); if (auto) auto.onclick = () => { setDeck(Ranked.rankedDeck()); deckSave(); toast('已存成你的牌組'); openRanked({ sync: false }); };
   for (const id of ['#rk-deck', '#rk-deck2']) { const b = $(id); if (b) b.onclick = () => Actions.openDeck(); }

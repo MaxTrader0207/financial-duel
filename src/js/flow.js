@@ -44,8 +44,8 @@ function renderMarket() {
 }
 /* ranked: the opponent's level follows your tier */
 function setupRanked() {
-  const dk = Ranked.tier().diff;
-  G.diff = DIFFS[dk]; G.deckList.c = cpuDeckList(dk, { grow: false }); G.deck.c = makeDeck(G.deckList.c);
+  const o = Ranked.opponent();                           // the tier decides the opponent; your collection never does
+  G.diff = DIFFS[o.diff]; G.foeBoost = o.block; G.deckList.c = cpuDeckList(o.diff, { grow: false, boost: o.boost }); G.deck.c = makeDeck(G.deckList.c);
   const rd = Ranked.deckForRanked(DECK);                 // over the point cap: a legal deck for this duel only
   G.deckList.p = rd.list; G.deck.p = makeDeck(rd.list); G.rankedAuto = rd.auto;
 }
@@ -73,7 +73,7 @@ async function resumeDuel() {
         deckList: d.deckList && Array.isArray(d.deckList.p) ? d.deckList : null, weak: d.weak && CATS[d.weak] ? d.weak : null,
         mode: ['casual', 'ranked'].includes(d.mode) ? d.mode : 'casual', market: d.market && typeof d.market === 'object' ? d.market : null,
         perf: d.perf && typeof d.perf === 'object' ? d.perf : { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 },
-        foeProf: okProf(d.foeProf) ? d.foeProf : foeProfile(), foeStats: d.foeStats && Number.isInteger(d.foeStats.t) ? d.foeStats : { t: 0, c: 0 } });
+        foeProf: okProf(d.foeProf) ? d.foeProf : foeProfile(), foeStats: d.foeStats && Number.isInteger(d.foeStats.t) ? d.foeStats : { t: 0, c: 0 }, foeBoost: typeof d.foeBoost === 'number' ? Math.min(0.3, Math.max(0, d.foeBoost)) : 0 });
   const g = G;
   reserveUids(Math.max(...[...d.deck.p, ...d.deck.c, ...d.hand.p, ...d.hand.c].map(i => i.uid)));
   show('duel'); BG.apply(G.bg); Sound.startBGM(); Sound.setDanger(G.lp.p < LP_MAX * 0.3); clearField('p'); clearField('c');
@@ -116,7 +116,7 @@ async function startDuel(opts = {}) {
   }
   Tutor.begin(tutorial); show('duel'); Sound.startBGM(); clearField('p'); clearField('c');
   log(tutorial ? `教學對戰：難度固定為簡易，只出初階題，對手資金 ${tutorialFoeLp()}。`
-    : G.mode === 'ranked' ? `排位賽：${Ranked.tier().name}，對手難度「${G.diff.name}」。從第 2 回合起每 3 回合發生一次市場事件。`
+    : G.mode === 'ranked' ? `排位賽：${Ranked.tier().name}，對手「${Ranked.LEVEL_NAME[Ranked.tier().level]}」。從第 2 回合起每 3 回合發生一次市場事件。`
     : '雙方洗牌完畢。從第 2 回合起每 3 回合發生一次市場事件。');
   if (G.rankedAuto) toast(`這場排位賽自動使用符合上限的牌組（${Ranked.deckCost(G.deckList.p)} / ${Ranked.DECK_CAP} 點），你儲存的牌組沒有變動。`);
   if (forfeited) log(`上一場排位賽未完成，以敗場計（${forfeited.delta} 分）。`);

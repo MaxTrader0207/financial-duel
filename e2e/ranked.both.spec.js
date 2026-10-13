@@ -26,14 +26,37 @@ test('a ranked win earns points scored by performance', async ({ page, errors })
   expect(await page.evaluate(() => window.__T.ranked.state().rp)).toBe(r.after);
 });
 
+test.describe('before the tutorial', () => {
+  test.use({ tutorialDone: false });
+  test('ranked asks for the 新手場 first and starts it from there', async ({ page, errors }) => {
+    await open(page);
+    await page.click('#btn-ranked');
+    await expect(page.locator('.rk-deck.gate')).toContainText('先完成新手場');
+    await expect(page.locator('#rk-go')).toHaveCount(0);
+    await page.click('#rk-tut');
+    await until(page, () => window.__T.G && window.__T.G.mode === 'tutorial');
+  });
+});
+
+test('the opponent follows the tier: stronger at the top, never from your collection', async ({ page, errors }) => {
+  await open(page);
+  await page.evaluate(() => { window.__T.ranked.state().rp = 1500; });
+  await page.click('#btn-ranked');
+  await expect(page.locator('.rk-meta')).toContainText('困難＋＋＋');
+  await expect(page.locator('.rk-table tr.on')).toContainText('傳奇投資人');
+  await page.click('#rk-go');
+  const g = await page.evaluate(() => ({ diff: window.__T.G.diff.name, boost: window.__T.G.foeBoost }));
+  expect(g).toEqual({ diff: '困難', boost: 0.18 });
+});
+
 test('surrendering a ranked duel counts as a loss', async ({ page, errors }) => {
   await open(page);
   await page.evaluate(() => { window.__T.ranked.state().rp = 300; });
   await page.click('#btn-ranked'); await page.click('#rk-go');
   await until(page, () => window.__T.G && window.__T.G.phase === 'attack' && !window.__T.G.busy);
   await page.click('#btn-quit'); await page.click('#btn-quit');
-  await expect(page.locator('.toast')).toContainText('排位賽投降：-20');
-  expect(await page.evaluate(() => window.__T.ranked.state().rp)).toBe(280);
+  await expect(page.locator('.toast')).toContainText('排位賽投降：-25');
+  expect(await page.evaluate(() => window.__T.ranked.state().rp)).toBe(275);
 });
 
 test('a deck over the point cap never blocks ranked: a legal deck is used for that duel', async ({ page, errors }) => {

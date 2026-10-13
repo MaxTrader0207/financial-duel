@@ -8,10 +8,12 @@ import { Store, isObj } from './core.js';
 import { MON } from './carddata.js';
 import * as Daily from './daily.js';
 import { DECK_COPY, autoDeck, deckValid, owns } from './collection.js';
-import { TIERS, tierOf, scoreMatch, seasonStart, seasonOf } from './rankrules.js';
+import { TIERS, LEVELS, tierOf, scoreMatch, seasonStart, seasonOf } from './rankrules.js';
+/* the opponent of the current tier: { diff, boost, block } */
+export const opponent = () => LEVELS[TIERS[tierOf(R.rp)].level];
 
 export const RANK_KEY = 'soba-ketto.ranked.v1', RANK_V = 1;
-export { TIERS, PROTECTED_TIERS, WIN, LOSS, tierOf } from './rankrules.js';
+export { TIERS, LEVELS, LEVEL_NAME, PROTECTED_TIERS, PERF_SWING, tierOf } from './rankrules.js';
 export const DECK_CAP = 80;
 export const CARD_COST = { 1: 1, 2: 2, 3: 3, 4: 5 };
 export const BIG_HIT = 3000;                 // a single hit this large counts against risk management
@@ -91,8 +93,8 @@ export function performance(s) {
   const acc = s.total ? s.correct / s.total : 0;
   const knowledge = Math.round(acc * 40);
   const atkPart = s.atk ? s.smartAtk / s.atk : 0;
-  const defPart = s.defChances ? s.smartDef / s.defChances : 1;          // no chance to use advantage: not held against you
-  const strategy = Math.round(atkPart * 15 + defPart * 20);
+  /* no chance to block with type advantage in this duel: the attack choices carry the whole strategy part */
+  const strategy = Math.round(s.defChances ? atkPart * 15 + (s.smartDef / s.defChances) * 20 : atkPart * 35);
   const risk = Math.round(Math.max(0, Math.min(1, s.lpLeft)) * 15 + (s.maxHit < BIG_HIT ? 10 : s.maxHit < BIG_HIT * 1.5 ? 5 : 0));
   return { score: Math.min(100, knowledge + strategy + risk), knowledge, strategy, risk };
 }

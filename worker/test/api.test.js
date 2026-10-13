@@ -82,9 +82,9 @@ test('a ranked duel: the server computes the points', async () => {
   const p = await join('小華');
   const r = await duel(p, true, perf(40, 35, 25));
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.equal(r.body.delta, 30); assert.equal(r.body.me.rp, 30); assert.equal(r.body.me.w, 1);
+  assert.equal(r.body.delta, 28); assert.equal(r.body.me.rp, 28); assert.equal(r.body.me.w, 1);   // 見習交易員: +22, +6 for a perfect duel
   const l = await duel(p, false, perf(0, 0, 0));
-  assert.equal(l.body.delta, -20); assert.equal(l.body.me.rp, 10);
+  assert.equal(l.body.delta, -16); assert.equal(l.body.me.rp, 12);
   const shield = await duel(p, false, perf(0, 0, 0));
   assert.equal(shield.body.after, 0);
 });
@@ -134,14 +134,14 @@ test('board: order, ties, your own rank, players with no duel hidden', async () 
 
 test('a new season starts two tiers lower; the old board stays', async () => {
   const p = await join('賽季測試', { rp: 250 });
-  for (let i = 0; i < 9; i++) await duel(p, true, perf(40, 35, 25));     // 250 + 9×30 = 520 → 操盤手
+  for (let i = 0; i < 9; i++) await duel(p, true, perf(40, 35, 25));     // 250 + 9×23 = 457 → 操盤手
   const before = await call('GET', '/v1/me', { auth: p });
   assert.equal(before.body.me.tier, 3);
   clock = Date.UTC(2026, 10, 2, 4);                                       // 2026-11-02
   const now = await call('GET', '/v1/me', { auth: p });
   assert.equal(now.body.me.season, '2026-11'); assert.equal(now.body.me.rp, 100); assert.equal(now.body.me.tier, 1);
   const old = await call('GET', '/v1/board?season=2026-10');
-  assert.ok(old.body.rows.some(x => x.name === '賽季測試' && x.rp === 520));
+  assert.ok(old.body.rows.some(x => x.name === '賽季測試' && x.rp === 457));
   const cur = await call('GET', '/v1/board');
   assert.equal(cur.body.season, '2026-11'); assert.equal(cur.body.previous, '2026-10');
 });

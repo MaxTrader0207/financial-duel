@@ -828,6 +828,7 @@ html.fx-lite .kcard.lv3::after{display:none}
 .rk-tiers span.past{color:var(--text)}
 .rk-deck{display:grid;gap:4px;padding:12px 14px;margin:6px 0 12px;border:1px solid var(--line);background:var(--ink2)}
 .rk-deck.ok{border-color:#3fc78a66}.rk-deck.auto{border-color:#d8b25a88}
+.rk-deck.gate{border-color:var(--gold)}.rk-deck.gate b{color:var(--gold-hi)}
 .rk-deck b{font-size:15px}.rk-deck.ok b{color:var(--good)}.rk-deck.auto b{color:var(--gold-hi)}
 .rk-deck .btn-row{margin:6px 0 0}
 .rk-deck span{font-size:13.5px}.rk-deck small{color:var(--muted);font-size:12.5px}
@@ -922,3 +923,9 @@ html[data-back="season"] .card.back .mark span::after{content:var(--cb-mark);fon
 .bd-msg{padding:18px 14px;text-align:center;color:var(--muted);border:1px dashed var(--line);margin:0}
 .bd-msg.bad{color:#ffb19c}
 .bd-foot{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+.rk-table{width:100%;border-collapse:collapse;margin:10px 0 2px;font-size:13px}
+.rk-table th,.rk-table td{padding:6px 8px;text-align:left;border-top:1px solid var(--line);font-weight:400}
+.rk-table th{color:var(--muted);font-size:12px;border-top:0}
+.rk-table td:nth-child(n+2){font-variant-numeric:tabular-nums}
+.rk-table tr.on td{background:#d8b25a1f;color:var(--text)}
+.rk-table small{margin-left:4px;font-size:11px;color:var(--muted)}

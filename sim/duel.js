@@ -12,7 +12,8 @@ import { autoDeck, COL, cpuDeckList } from '../src/js/collection.js';
 import { cpuPick } from '../src/js/ai.js';
 import { advOf, WEAK_MULT } from '../src/js/rules.js';
 import * as calc from '../src/js/calc.js';
-import { rankedDeck } from '../src/js/ranked.js';
+import { rankedDeck, performance } from '../src/js/ranked.js';
+import * as Market from '../src/js/market.js';
 
 const rnd = Math.random;
 /* chance to answer right: knowledge k plus a guess among the options left */
@@ -39,7 +40,10 @@ const take = (side, idx) => MON[game.G.hand[side].splice(idx, 1)[0].id];
 function pickAttack(P) {
   const G = game.G, h = G.hand.p;
   if (P.policy === 'random') return Math.floor(rnd() * h.length);
-  const v = h.map(i => { const m = MON[i.id]; return m.atk * (G.weak === m.cat ? WEAK_MULT : 1) + (SKILLS[m.id].hit ? 150 : 0); });
+  /* a strategic player (P.strat = how often it looks) also weighs the market event and the opponent's weak attributes */
+  const look = rnd() < (P.strat ?? 0);
+  const v = h.map(i => { const m = MON[i.id]; const base = m.atk * (G.weak === m.cat ? WEAK_MULT : 1) + (SKILLS[m.id].hit ? 150 : 0);
+    return look ? base * Market.attackMult(m.cat) * (G.foeProf && G.foeProf.weak.includes(m.cat) ? 1.25 : G.foeProf && G.foeProf.strong.includes(m.cat) ? 0.85 : 1) : base; });
   return v.indexOf(Math.max(...v));
 }
 function pickDefend(P, foe) {
@@ -57,23 +61,28 @@ export function playDuel(opts) {
   if (P.deck === 'full' || P.deck === 'ranked') COL.owned = MONSTERS.map(m => m.id);
   /* 'random': 40 cards drawn from all 160 (≤ 2 copies), so every card gets played for the per-card statistics */
   const deck = P.deck === 'list' ? P.list : P.deck === 'ranked' ? rankedDeck() : P.deck === 'random' ? MONSTERS.flatMap(m => [m.id, m.id]).sort(() => rnd() - 0.5).slice(0, 40) : autoDeck();
-  const cpuDeck = cpuDeckList(P.diff, { grow: !P.ranked });          // the opponent grows with the collection we simulate
+  const cpuDeck = cpuDeckList(P.diff, { grow: !P.ranked, boost: P.boost || 0 });          // the opponent grows with the collection we simulate
   COL.owned = ownedBefore;
   state.newGame();
   const G = game.G;
   Object.assign(G, { diff: DIFFS[P.diff], weak: null, deckList: { p: deck, c: cpuDeck } });
   G.deck = { p: decks.makeDeck(G.deckList.p), c: decks.makeDeck(G.deckList.c) };
+  if (P.market) Market.enable();
+  G.foeBoost = P.foeBoost || 0;
+  const PF = { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 };
   const T = P.track;
   const over = () => G.lp.p <= 0 || G.lp.c <= 0;
   while (!over() && G.turn < 80) {
     // ---- our turn
     G.turn++; G.extraUsed = false; decks.draw('p'); decks.draw('c');
+    if (P.market) Market.onTurn(G.turn);
     if (G.mods.skipMe) G.mods.skipMe = false;
     else {
       let again = true;
       while (again && !over() && G.hand.p.length) {
         again = false;
         const m = take('p', pickAttack(P));
+        PF.atk++; if ((G.foeProf && G.foeProf.weak.includes(m.cat)) || Market.attackMult(m.cat) > 1) PF.smartAtk++;
         const r = answer(m, P); r.mode = 'attack'; record(r, m);
         let swing;
         if (r.correct) {
@@ -97,12 +106,14 @@ export function playDuel(opts) {
     if (!G.hand.c.length) decks.draw('c');
     const foe = take('c', cpuPick()); G.foeCard = foe;
     if (!G.hand.p.length) decks.draw('p');
+    const could = G.hand.p.some(i => advOf(MON[i.id].cat, foe.cat) > 1);
     const m = take('p', pickDefend(P, foe));
+    if (could) { PF.defChances++; if (advOf(m.cat, foe.cat) > 1) PF.smartDef++; }
     const r = answer(m, P); r.mode = 'defend'; record(r, m);
     const s = calc.defendSetup(m, foe);
     const lpP = G.lp.p, lpC = G.lp.c;
-    if (r.correct) { const out = calc.defendOk(m, s, r); hurt('p', out.pierce); hurt('c', out.reflect); heal('p', out.heal); }
-    else { const out = calc.defendFail(m, foe, s); hurt('p', out.dmg); heal('c', out.foeHeal); }
+    if (r.correct) { const out = calc.defendOk(m, s, r); hurt('p', out.pierce); hurt('c', out.reflect); heal('p', out.heal); PF.maxHit = Math.max(PF.maxHit, out.pierce); }
+    else { const out = calc.defendFail(m, foe, s); hurt('p', out.dmg); heal('c', out.foeHeal); PF.maxHit = Math.max(PF.maxHit, out.dmg); }
     if (T) {
       const taken = lpP - G.lp.p, dealt = lpC - G.lp.c;
       const t = T[m.id] || (T[m.id] = { atkN: 0, atkSum: 0, defN: 0, defSum: 0, foeN: 0, foeSum: 0 }); t.defN++; t.defSum += s.atk - taken + dealt;
@@ -111,5 +122,7 @@ export function playDuel(opts) {
     G.foeCard = null;
   }
   G.over = true;
-  return { win: G.lp.c <= 0 && G.lp.p > 0, turns: G.turn, timeout: !over() };
+  const win = G.lp.c <= 0 && G.lp.p > 0;
+  const perf = performance({ total: G.stats.total, correct: G.stats.correct, ...PF, lpLeft: G.lp.p / LP_MAX });
+  return { win, turns: G.turn, timeout: !over(), perf };
 }

@@ -97,7 +97,7 @@ export function foeProfile(rnd = Math.random) {
 export function foeAcc(cat) {
   const p = G.foeProf || {}, base = FOE_BLOCK[dkOf()] ?? 0.45;
   const s = (p.strong || []).includes(cat) ? FOE_FORTE : (p.weak || []).includes(cat) ? -FOE_FORTE : 0;
-  return Math.min(0.95, Math.max(0.05, base + s));
+  return Math.min(0.95, Math.max(0.05, base + s + (G.foeBoost || 0)));     // foeBoost: top ranked tiers
 }
 /* returns null when the opponent has no card; otherwise the blocker, its answer and what actually lands */
 export function foeBlock(m, dmg) {
