@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
       target: 'es2022',
       assetsInlineLimit: single ? 100000000 : 4096,
     },
-    define: { __PWA__: JSON.stringify(!single) },     // installable web app + offline cache only for the Pages build
+    define: { __PWA__: JSON.stringify(!single), __API__: JSON.stringify(process.env.VITE_API || 'https://financial-duel-api.maxwei6699.workers.dev') },     // installable web app + offline cache only for the Pages build
     plugins: single ? [viteSingleFile()] : [pwa()],
     test: { environment: 'jsdom', include: ['tests/**/*.test.js'], setupFiles: ['tests/setup.js'] },
   };

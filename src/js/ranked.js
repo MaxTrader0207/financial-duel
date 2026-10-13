@@ -8,21 +8,12 @@ import { Store, isObj } from './core.js';
 import { MON } from './carddata.js';
 import * as Daily from './daily.js';
 import { DECK_COPY, autoDeck, owns } from './collection.js';
+import { TIERS, tierOf, scoreMatch, seasonStart, seasonOf } from './rankrules.js';
 
 export const RANK_KEY = 'soba-ketto.ranked.v1', RANK_V = 1;
-export const TIERS = [
-  { name: '見習交易員', seal: '見', at: 0, diff: 'easy' },
-  { name: '初級分析師', seal: '初', at: 100, diff: 'easy' },
-  { name: '資深分析師', seal: '析', at: 250, diff: 'normal' },
-  { name: '操盤手', seal: '操', at: 450, diff: 'normal' },
-  { name: '基金經理人', seal: '基', at: 700, diff: 'hard' },
-  { name: '投資長', seal: '長', at: 1000, diff: 'hard' },
-  { name: '傳奇投資人', seal: '傳', at: 1400, diff: 'hard' },
-];
-export const PROTECTED_TIERS = 3;            // in the first three tiers a loss never drops you to a lower tier
+export { TIERS, PROTECTED_TIERS, WIN, LOSS, tierOf } from './rankrules.js';
 export const DECK_CAP = 80;
 export const CARD_COST = { 1: 1, 2: 2, 3: 3, 4: 5 };
-export const WIN = { base: 15, perf: 15 }, LOSS = { base: -20, perf: 12 };   // win +15…+30, loss −20…−8
 export const BIG_HIT = 3000;                 // a single hit this large counts against risk management
 
 /* card backs: one per tier (kept forever), plus a limited back per season (reached 資深分析師 or higher that month) */
@@ -36,9 +27,8 @@ export const seasonBack = season => { const m = Number(season.split('-')[1]); re
 
 let clock = () => new Date();
 export const setClock = f => { clock = f || (() => new Date()); };
-const pad = n => String(n).padStart(2, '0');
-export const seasonKey = (d = clock()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
-export function seasonDaysLeft(d = clock()) { const end = new Date(d.getFullYear(), d.getMonth() + 1, 1); return Math.max(1, Math.ceil((end - d) / 864e5)); }
+export const seasonKey = (d = clock()) => seasonOf(d.getTime());           // calendar month in Taiwan time, like the server
+export function seasonDaysLeft(d = clock()) { const [y, m] = seasonKey(d).split('-').map(Number); const end = Date.UTC(y, m, 1) - 8 * 3600e3; return Math.max(1, Math.ceil((end - d.getTime()) / 864e5)); }
 
 const fresh = () => ({ season: seasonKey(), rp: 0, peak: 0, w: 0, l: 0, played: 0, backs: ['default'], back: 'default', seasons: [], pending: null, active: false });
 let R = fresh();
@@ -46,7 +36,6 @@ export function load() { R = { ...fresh(), ...Store.load(RANK_KEY, { version: RA
 const save = () => Store.trySave(RANK_KEY, RANK_V, R);
 export const state = () => R;
 
-export const tierOf = rp => TIERS.reduce((t, x, i) => (rp >= x.at ? i : t), 0);
 export const tier = () => TIERS[tierOf(R.rp)];
 export function progress(rp = R.rp) {
   const i = tierOf(rp), next = TIERS[i + 1];
@@ -99,13 +88,15 @@ export function performance(s) {
 export function begin() { R.active = true; save(); }
 /* record a ranked result; returns what changed for the result screen */
 export function applyMatch(win, perfScore) {
-  const before = R.rp, tBefore = tierOf(before);
-  let delta = win ? WIN.base + Math.round(perfScore / 100 * WIN.perf) : LOSS.base + Math.round(perfScore / 100 * LOSS.perf);
-  let rp = Math.max(0, before + delta), shielded = false;
-  if (!win && tBefore < PROTECTED_TIERS && tierOf(rp) < tBefore) { rp = TIERS[tBefore].at; shielded = true; }
-  delta = rp - before;
-  R.rp = rp; R.played++; win ? R.w++ : R.l++; R.peak = Math.max(R.peak, tierOf(rp)); R.active = false; save();
-  return { win, delta, before, after: rp, tierBefore: tBefore, tierAfter: tierOf(rp), shielded, promoted: tierOf(rp) > tBefore, demoted: tierOf(rp) < tBefore };
+  const r = scoreMatch(R.rp, win, perfScore);
+  R.rp = r.after; R.played++; win ? R.w++ : R.l++; R.peak = Math.max(R.peak, r.tierAfter); R.active = false; save();
+  return r;
+}
+/* after joining the online leaderboard the server's standing is the truth (same season only) */
+export function syncOnline(me) {
+  if (!me || me.season !== R.season) return false;
+  Object.assign(R, { rp: me.rp, peak: Math.max(me.peak, tierOf(me.rp)), w: me.w, l: me.l, played: Math.max(R.played, me.w + me.l) });
+  save(); return true;
 }
 /* a ranked duel that was abandoned (save discarded, another duel started) counts as a loss with no performance */
 export function forfeitIfActive() { return R.active ? applyMatch(false, 0) : null; }
@@ -127,8 +118,8 @@ export function checkSeason(now = seasonKey()) {
     Daily.addCustomTitle(reward.title.id, reward.title.name, reward.title.desc);
     R.seasons.push({ season: R.season, peak: R.peak, rp: R.rp, w: R.w, l: R.l });
   }
-  const t = Math.max(0, tierOf(R.rp) - 2);
-  Object.assign(R, { season: now, rp: TIERS[t].at, peak: t, w: 0, l: 0, played: 0, pending: reward, active: false });
+  const st = seasonStart(R.rp);
+  Object.assign(R, { season: now, rp: st.rp, peak: st.peak, w: 0, l: 0, played: 0, pending: reward, active: false });
   save();
   return reward;
 }

@@ -1,0 +1,15 @@
+{
+  "name": "financial-duel-api",
+  "private": true,
+  "type": "module",
+  "description": "金融決鬥線上排行榜 API（Cloudflare Workers + D1）",
+  "scripts": {
+    "dev": "wrangler dev --local --port 8787",
+    "migrate:local": "wrangler d1 migrations apply financial-duel --local",
+    "test": "node --test --test-concurrency=1 test/api.test.js",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.140.0"
+  }
+}

@@ -1,9 +1,10 @@
 // rankedui.js — the 排位賽 screen (tier, points, season, deck point check, card backs, past seasons),
 // the season-reward dialog, the ranked block on the result screen, and applying the chosen card back.
-import { Actions } from './actions.js';
+import { Actions, register } from './actions.js';
 import { DECK, deckSave, setDeck } from './collection.js';
 import { $, esc } from './core.js';
 import * as Daily from './daily.js';
+import * as Online from './online.js';
 import * as Ranked from './ranked.js';
 import { show } from './view.js';
 
@@ -34,8 +35,8 @@ export function renderRankedButton() {
 }
 
 /* ---------- screen ---------- */
-export function openRanked() {
-  const R = Ranked.state(), t = Ranked.tierOf(R.rp), T = Ranked.TIERS[t], pr = Ranked.progress(), [y, m] = R.season.split('-').map(Number);
+export function openRanked({ sync = true } = {}) {
+  const R = Ranked.state(), cached = { rp: R.rp, w: R.w, l: R.l }, t = Ranked.tierOf(R.rp), T = Ranked.TIERS[t], pr = Ranked.progress(), [y, m] = R.season.split('-').map(Number);
   const cost = Ranked.deckCost(DECK), ok = Ranked.deckOk(DECK) && DECK.length === 40;
   $('#rk-season').textContent = `${y} 年 ${m} 月賽季 · 剩 ${Ranked.seasonDaysLeft()} 天`;
   $('#rk-body').innerHTML = `
@@ -46,6 +47,7 @@ export function openRanked() {
         <div class="dl-bar"><i style="width:${pr.need ? Math.round(pr.into / pr.need * 100) : 100}%"></i></div>
         <div class="rk-meta">本季 ${R.w} 勝 ${R.l} 敗 · 本季最高 ${esc(Ranked.TIERS[R.peak].name)} · 對手難度「${esc({ easy: '簡易', normal: '適中', hard: '困難' }[T.diff])}」</div></div>
     </div>
+    <div class="rk-online" id="rk-online">${onlineHTML()}</div>
     <div class="rk-tiers">${Ranked.TIERS.map((x, i) => `<span class="${i === t ? 'on' : i < t ? 'past' : ''}"><i class="rk-seal mini t${i}">${x.seal}</i>${esc(x.name)}<small>${x.at}</small></span>`).join('')}</div>
     <div class="rk-deck ${ok ? 'ok' : 'bad'}"><b>排位牌組點數 ${cost} / ${Ranked.DECK_CAP}</b><span>${ok ? '符合排位規則。' : DECK.length !== 40 ? '請先在「牌組編輯」儲存 40 張的牌組。' : '超過上限：請到「牌組編輯」換掉一些稀有卡。'}</span>
       <small>普通 1、稀有 2、超稀有 3、極稀有 5 點；上限讓勝負靠策略與知識，而不是誰的稀有卡多。</small>
@@ -65,12 +67,23 @@ export function openRanked() {
     ${R.seasons.length ? `<h4 class="rk-h">過去賽季</h4><div class="rk-hist">${R.seasons.slice().reverse().map(s => { const [sy, sm] = s.season.split('-').map(Number);
       return `<span>${sy} 年 ${sm} 月 · 最高 ${esc(Ranked.TIERS[s.peak].name)} · ${s.w} 勝 ${s.l} 敗</span>`; }).join('')}</div>` : ''}`;
   $('#rk-go').onclick = () => Actions.startDuel({ mode: 'ranked' });
+  $('#rk-board').onclick = () => Actions.openBoard();
   const auto = $('#rk-auto'); if (auto) auto.onclick = () => { setDeck(Ranked.rankedDeck()); deckSave(); openRanked(); };
   $('#rk-deck').onclick = () => Actions.openDeck();
   $('#rk-home').onclick = () => { Actions.renderTitle(); show('title'); };
   document.querySelectorAll('#rk-body .rk-back:not(.locked)').forEach(b => { b.onclick = () => { Ranked.setBack(b.dataset.id); applyBack(); openRanked(); }; });
   show('ranked');
   const p = Ranked.takePending(); if (p) showSeasonReward(p);
+  if (sync && Online.joined()) Online.sync().then(me => {     // take the server's points, then redraw what changed
+    if (!me || $('#scr-ranked').hidden) return;
+    if (R.rp !== cached.rp || R.w !== cached.w || R.l !== cached.l) openRanked({ sync: false });
+    else { $('#rk-online').innerHTML = onlineHTML(); $('#rk-board').onclick = () => Actions.openBoard(); }
+  });
+}
+function onlineHTML() {
+  const O = Online.state();
+  if (!Online.joined()) return `<span><b>線上排行榜</b>取一個暱稱，和其他玩家比本季排名。</span><button class="btn ghost small" id="rk-board" type="button">查看排行榜</button>`;
+  return `<span><b>線上排行榜 · ${esc(O.name || '')}</b>${O.me && O.me.w + O.me.l > 0 ? `本季第 ${O.me.rank} 名` : '打完一場排位賽就會上榜'}</span><button class="btn ghost small" id="rk-board" type="button">查看排行榜</button>`;
 }
 
 /* ---------- season reward ---------- */
@@ -92,11 +105,24 @@ export function rankResultHTML(G) {
   return `<div class="rank-res"><div class="rr-top"><span class="rr-delta ${r.delta >= 0 ? 'up' : 'down'}">${r.delta >= 0 ? '+' : ''}${r.delta}</span>
     <div><b>排位積分 ${r.before} → ${r.after}</b><span>${esc(T[r.tierAfter].name)}${r.promoted ? ' · 晉升！' : r.demoted ? ' · 降段' : ''}${r.shielded ? ' · 段位保護：沒有降段' : ''}</span></div>
     <div class="rr-score"><b>${p.score}</b><span>表現分</span></div></div>
-    <div class="catbars">${bar('知識', p.knowledge, 40)}${bar('策略', p.strategy, 35)}${bar('風險管理', p.risk, 25)}</div></div>`;
+    <div class="catbars">${bar('知識', p.knowledge, 40)}${bar('策略', p.strategy, 35)}${bar('風險管理', p.risk, 25)}</div>${onlineResult(G.online)}</div>`;
+}
+function onlineResult(o) {
+  if (!o) return '';
+  if (o.pending) return '<div class="rr-online">線上排行榜：結算中…</div>';
+  if (!o.ok) return `<div class="rr-online bad">線上排行榜：${esc(o.error)}</div>`;
+  return `<div class="rr-online ok">線上排行榜：本季第 <b>${o.me.rank}</b> 名 · <button class="linkbtn" type="button" data-act="board">查看排行榜</button></div>`;
+}
+/* the server answered after the result screen was drawn: redraw just the ranked block */
+export function refreshRankResult(G) {
+  const el = document.querySelector('#scr-result .rank-res');
+  if (el) el.outerHTML = rankResultHTML(G);
 }
 
 export function init() {
-  $('#btn-ranked').onclick = openRanked;
+  register({ openRanked });
+  $('#btn-ranked').onclick = () => openRanked();
+  $('#scr-result').addEventListener('click', e => { if (e.target.closest('.rr-online [data-act="board"]')) Actions.openBoard(); });
   $('#season-ok').onclick = () => { $('#season-dlg').hidden = true; };
   applyBack();
   renderRankedButton();

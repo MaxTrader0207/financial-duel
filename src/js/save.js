@@ -5,6 +5,7 @@ import { MON } from './cards.js';
 import { $, DIFFS, Store, renameId } from './core.js';
 import { G } from './game.js';
 import * as Ranked from './ranked.js';
+import * as Online from './online.js';
 import { fmtDate, fmtNum, pad2 } from './report.js';
 
 let SAVE_KEY, SAVE_V, MIGRATE_SAVE;
@@ -62,7 +63,7 @@ function renderResume() {
   $('#btn-discard').onclick = e => {
     const b = e.currentTarget;
     if (!armed) { b.textContent = '確定刪除？再按一次'; armed = setTimeout(() => { armed = 0; b.textContent = '刪除紀錄'; }, 3000); return; }
-    clearTimeout(armed); clearSave(); Ranked.forfeitIfActive(); renderResume();   // a discarded ranked duel counts as a loss
+    clearTimeout(armed); clearSave(); if (Ranked.forfeitIfActive()) Online.endMatch({ surrender: true }); renderResume();   // a discarded ranked duel counts as a loss
   };
 }
 

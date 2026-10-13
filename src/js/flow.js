@@ -29,6 +29,8 @@ import { renderAll, renderHands, setPhase } from './board.js';
 import { Tutor } from './tutor.js';
 import * as Market from './market.js';
 import * as Ranked from './ranked.js';
+import * as Online from './online.js';
+import { refreshRankResult } from './rankedui.js';
 
 
 /* ---------- flow ---------- */
@@ -105,7 +107,10 @@ async function startDuel(opts = {}) {
   if (tutorial) setupTutorial();
   else {
     Market.enable();
-    if (G.mode === 'ranked') { setupRanked(); Ranked.begin(); }
+    if (G.mode === 'ranked') {
+      setupRanked(); Ranked.begin();
+      if (Online.joined()) { const g = G; Online.startMatch().then(r => { if (r && !r.ok && g === G) log(`線上排行榜：${r.error}。這場只計入這台裝置。`); }); }
+    }
   }
   Tutor.begin(tutorial); show('duel'); Sound.startBGM(); clearField('p'); clearField('c');
   log(tutorial ? `教學對戰：難度固定為簡易，只出初階題，對手資金 ${tutorialFoeLp()}。`
@@ -281,7 +286,17 @@ async function checkEnd() {
   G.over = true; const win = G.lp.c <= 0; G.win = win; G.endedAt = new Date(); clearSave(); Tutor.end();
   recordGame(false);
   if (win) G.shardsWon = onDuelWin();                     // shards for knowledge cards and reward picks
-  if (G.mode === 'ranked') { G.perfResult = Ranked.performance(perfStats()); G.rank = Ranked.applyMatch(win, G.perfResult.score); }
+  if (G.mode === 'ranked') {
+    G.perfResult = Ranked.performance(perfStats()); G.rank = Ranked.applyMatch(win, G.perfResult.score);
+    if (Online.joined()) {                                 // the server scores it again; its answer replaces ours
+      const g = G; g.online = { pending: true };
+      Online.endMatch({ win, perf: g.perfResult }).then(r => {
+        g.online = r || { ok: false, error: '這場開始時沒有連上排行榜，只計入這台裝置' };
+        if (r && r.ok) g.rank = { ...g.rank, delta: r.delta, before: r.before, after: r.after, tierBefore: r.tierBefore, tierAfter: r.tierAfter, shielded: r.shielded, promoted: r.promoted, demoted: r.demoted };
+        refreshRankResult(g);
+      });
+    }
+  }
   if (win && !COL.pending) { COL.pending = rewardOffer(diffKeyOf(G.diff)); colSave(); }
   setPhase('idle', win ? '勝利' : '敗北', '');
   Sound.stopBGM();

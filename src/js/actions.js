@@ -8,5 +8,7 @@ export const Actions = {
   resumeDuel: missing('resumeDuel'),      // flow.js
   renderTitle: missing('renderTitle'),    // screens.js
   openDeck: missing('openDeck'),          // deckui.js
+  openRanked: missing('openRanked'),      // rankedui.js
+  openBoard: missing('openBoard'),        // boardui.js
 };
 export function register(fns) { Object.assign(Actions, fns); }

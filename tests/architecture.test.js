@@ -25,11 +25,11 @@ function cycles() {                                 // Tarjan's strongly connect
 describe('module structure', () => {
   it('has no import cycles', () => { expect(cycles()).toEqual([]); });
   it('the shared leaf modules import nothing from the game', () => {
-    for (const f of ['game.js', 'actions.js', 'ui.js']) expect(graph[f], f).toEqual([]);
+    for (const f of ['game.js', 'actions.js', 'ui.js', 'rankrules.js']) expect(graph[f], f).toEqual([]);
   });
   it('game rules never import screen code', () => {
-    const screen = ['board.js', 'fx.js', 'view.js', 'screens.js', 'wiring.js', 'result.js', 'flow.js'];
-    for (const f of ['skills.js', 'calc.js', 'deck.js', 'carddata.js', 'rules.js', 'records.js', 'daily.js', 'knowledge.js', 'ranked.js', 'market.js'])
+    const screen = ['board.js', 'fx.js', 'view.js', 'screens.js', 'wiring.js', 'result.js', 'flow.js', 'rankedui.js', 'boardui.js'];
+    for (const f of ['skills.js', 'calc.js', 'deck.js', 'carddata.js', 'rules.js', 'records.js', 'daily.js', 'knowledge.js', 'ranked.js', 'market.js', 'online.js'])
       expect(graph[f].filter(d => screen.includes(d)), f).toEqual([]);
   });
   it('has no auto-generated setters left', () => {
