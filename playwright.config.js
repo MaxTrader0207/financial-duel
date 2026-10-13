@@ -11,7 +11,7 @@ export default defineConfig({
   fullyParallel: true,
   workers: CI ? 2 : 4,
   retries: CI ? 1 : 0,
-  reporter: CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  reporter: CI ? [['list'], ['github'], ['html', { open: 'never' }]] : 'list',   // github: failures show up as annotations on the run
   use: {
     baseURL: `http://127.0.0.1:${PORT}/`,
     reducedMotion: 'reduce',             // the game shortens animations under reduced motion, so duels run fast
