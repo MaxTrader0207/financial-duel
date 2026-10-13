@@ -7,7 +7,7 @@
 
 ## 第一次上線（只要做一次）
 
-推到 `main` 時，GitHub Actions 的 `worker-deploy` 工作會自動部署。它需要 repo 裡有以下兩個 secret：
+推到 `main` 時，GitHub Actions 的 `worker-deploy` 工作會自動部署。它需要 repo 裡有 `CLOUDFLARE_API_TOKEN` 這個 secret：
 
 1. **建立 API Token**
    1. 打開 Cloudflare 後台的 **My Profile → API Tokens → Create Token**。
