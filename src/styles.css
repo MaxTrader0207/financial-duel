@@ -979,3 +979,5 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-conten
 .nv-rel ul{margin:8px 0 2px;padding-left:1.2em;font-size:13.5px;line-height:1.7}
 .nv-build{font-size:11.5px;color:var(--muted);margin:8px 0 0}
 .set-ver{font-size:12.5px;margin:10px 0 0}
+.nb-export{margin-top:22px}
+.nb-export-opt{display:flex;align-items:center;gap:8px;font-size:14px;margin:4px 0 2px;color:var(--muted)}

@@ -1,4 +1,5 @@
 // 版本資訊: version and update time on the title screen, the changelog dialog, and "what's new" once after an update
+import { readFileSync } from 'node:fs';
 import { test, expect, open } from './fixtures.js';
 
 test('the title shows the version; the changelog opens from it', async ({ page, errors }) => {
@@ -15,11 +16,13 @@ test('the title shows the version; the changelog opens from it', async ({ page, 
 });
 
 test('a returning player sees what changed since the last visit, once', async ({ page, errors }) => {
-  await page.addInitScript(() => { if (!sessionStorage.getItem('v-set')) { localStorage.setItem('soba-ketto.seen-version', '3.11.0'); sessionStorage.setItem('v-set', '1'); } });
+  const log = JSON.parse(readFileSync(new URL('../src/data/changelog.json', import.meta.url), 'utf8')).releases;
+  const seen = log[2].version;                                              // two releases behind
+  await page.addInitScript(v => { if (!sessionStorage.getItem('v-set')) { localStorage.setItem('soba-ketto.seen-version', v); sessionStorage.setItem('v-set', '1'); } }, seen);
   await open(page);
   await expect(page.locator('#news-dlg')).toBeVisible();
-  await expect(page.locator('#news-body')).toContainText('v3.11.0');
-  await expect(page.locator('#news-dlg .nv-rel').first()).toContainText('v3.13.0');
+  await expect(page.locator('#news-body')).toContainText(`v${seen}`);
+  await expect(page.locator('#news-dlg .nv-rel').first()).toContainText(`v${log[0].version}`);
   expect(await page.locator('#news-dlg .nv-rel').count()).toBe(2);
   await page.click('#news-all');
   expect(await page.locator('#news-dlg .nv-rel').count()).toBeGreaterThan(10);

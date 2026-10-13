@@ -45,6 +45,7 @@ import { init as init_usage } from './usage.js';
 import { init as init_challenge } from './challenge.js';
 import { init as init_challengeui } from './challengeui.js';
 import { init as init_version } from './version.js';
+import { init as init_nbexport } from './nbexport.js';
 import { init as init_boot } from './boot.js';
 
 export function initAll() {
@@ -94,5 +95,6 @@ export function initAll() {
   init_challenge();
   init_challengeui();
   init_version();
+  init_nbexport();
   init_boot();
 }

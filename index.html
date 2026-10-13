@@ -167,6 +167,12 @@
       <div class="dex-filter" id="nb-filter"></div>
       <div class="missed" id="nb-list"></div>
       <div class="btn-row"><button class="btn ghost small" id="nb-toggle" type="button">顯示已掌握的題目</button></div>
+      <div class="export nb-export">
+        <div class="export-head"><h3 class="sec">輸出錯題本</h3><p class="lead">依照上面選的屬性輸出。複習講義附正解與解說；測驗卷只有題目，解答在最後一頁，可以印出來自己考；CSV 可以用 Excel 或 Google 試算表開啟。</p></div>
+        <label class="nb-export-opt"><input type="checkbox" id="nb-export-mastered"> 包含已掌握的題目</label>
+        <div class="btn-row"><button class="btn small" type="button" id="nb-export-pdf">PDF 複習講義</button><button class="btn small" type="button" id="nb-export-quiz">PDF 測驗卷</button><button class="btn ghost small" type="button" id="nb-export-csv">Excel（CSV）</button></div>
+        <p class="status" id="nb-export-status" role="status"></p>
+      </div>
     </div>
     <div id="nb-review" class="nb-review" hidden>
       <div class="q-mode"><span class="m">複習模式</span><span class="meta" id="rv-progress"></span></div>

@@ -66,12 +66,13 @@ describe('knowledge cards', () => {
     expect(got).toContain('k_stock'); expect(Daily.profile().titles).toContain('k_stock');
   });
   it('a duel win adds shards, and the first win of the day draws a card from the least collected kind', () => {
+    Daily.setClock(() => new Date('2030-01-10T12:00:00'));            // fixed days, independent of today's date
     const first = K.onDuelWin();
     expect(first.shards).toBe(K.DUEL_WIN_SHARDS); expect(Daily.profile().shards).toBe(K.DUEL_WIN_SHARDS);
     expect(first.card).toBeTruthy(); expect(K.lv(first.card.id)).toBe(1);
     expect(first.card.type).toBe('stock');                          // starters: 2 defense, 1 event, 1 trap → stock is emptiest
     expect(K.onDuelWin().card).toBeNull();                          // second win the same day: shards only
-    Daily.setClock(() => new Date('2026-10-14T12:00:00'));
+    Daily.setClock(() => new Date('2030-01-11T12:00:00'));
     expect(K.onDuelWin().card).toBeTruthy();
     Daily.setClock();
   });

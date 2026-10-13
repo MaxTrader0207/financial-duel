@@ -171,3 +171,13 @@ describe('題目品質 counts', () => {
     expect(Usage.state().q).toEqual({});
   });
 });
+
+import { arranged } from '../src/js/nbexport.js';
+describe('錯題本輸出: option order', () => {
+  it('keeps the right answer, spreads answer letters, and is the same every time', async () => {
+    const { BUILTIN } = await import('../src/js/bank.js');
+    const qs = BUILTIN.slice(0, 200), pos = [0, 0, 0, 0];
+    for (const q of qs) { const a = arranged(q); expect(a.options[a.answer]).toBe(q.options[q.answer]); expect(new Set(a.options)).toEqual(new Set(q.options)); pos[a.answer]++; expect(arranged(q)).toEqual(a); }
+    for (const n of pos) expect(n).toBeGreaterThan(25);                      // roughly a quarter each, not all A
+  });
+});
