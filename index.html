@@ -97,6 +97,7 @@
         <button class="btn ghost" id="btn-install" type="button" hidden>安裝到主畫面</button>
       </div>
       <div class="bank-note" id="bank-note"></div>
+      <button class="linkbtn ver-tag" id="ver-tag" type="button"></button>
     </div>
   </div>
 </section>
@@ -313,6 +314,9 @@
 <div id="kn-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-label="知識卡">
   <div class="care-card kn-dlg-card"><button class="kn-x" id="kn-close" type="button" aria-label="關閉">×</button><div id="kn-card"></div></div>
 </div>
+<div id="news-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-label="更新內容">
+  <div class="care-card"><div class="care-h"><div class="seal">新</div><h3>更新內容</h3></div><div id="news-body"></div><div class="btn-row"><button class="btn" id="news-ok" type="button">知道了</button></div></div>
+</div>
 <div id="season-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-label="賽季結算">
   <div class="care-card"><div id="season-body"></div><div class="btn-row"><button class="btn" id="season-ok" type="button">收下</button></div></div>
 </div>
@@ -335,6 +339,7 @@
       <div class="xfer-code" id="xfer-code" hidden></div>
       <div class="bd-form"><input id="xfer-in" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="9" placeholder="輸入轉移碼，例如 K7Q2-M9XD" aria-label="轉移碼"><button class="btn ghost small" id="xfer-use" type="button">接續進度</button></div>
       <p class="status" id="xfer-status" role="status"></p></div>
+    <p class="muted set-ver" id="set-version"></p>
     <div class="btn-row"><button class="btn small" id="set-ok" type="button">完成</button></div>
   </div>
 </div>

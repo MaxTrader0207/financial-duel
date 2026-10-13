@@ -967,3 +967,15 @@ html[data-back="season"] .card.back .mark span::after{content:var(--cb-mark);fon
 a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 .share-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0 4px}
 .share-row .status{font-size:13px}
+
+/* ---------- 版本資訊 ---------- */
+.ver-tag{display:block;margin:14px auto 0;font-size:12.5px;color:var(--muted)}
+.nv-list{display:grid;gap:8px;max-height:min(60vh,520px);overflow:auto;margin:6px 0 4px}
+.nv-rel{border:1px solid var(--line);background:#ffffff06;padding:8px 12px}
+.nv-rel summary{cursor:pointer;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.nv-rel summary b{color:var(--gold-hi);font-weight:600}
+.nv-rel summary span{flex:1 1 auto;font-weight:600}
+.nv-rel summary time{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.nv-rel ul{margin:8px 0 2px;padding-left:1.2em;font-size:13.5px;line-height:1.7}
+.nv-build{font-size:11.5px;color:var(--muted);margin:8px 0 0}
+.set-ver{font-size:12.5px;margin:10px 0 0}

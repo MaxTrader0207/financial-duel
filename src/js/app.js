@@ -44,6 +44,7 @@ import { init as init_boardui } from './boardui.js';
 import { init as init_usage } from './usage.js';
 import { init as init_challenge } from './challenge.js';
 import { init as init_challengeui } from './challengeui.js';
+import { init as init_version } from './version.js';
 import { init as init_boot } from './boot.js';
 
 export function initAll() {
@@ -92,5 +93,6 @@ export function initAll() {
   init_usage();
   init_challenge();
   init_challengeui();
+  init_version();
   init_boot();
 }
