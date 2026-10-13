@@ -6,6 +6,7 @@ import { $ } from './core.js';
 import { DIFF_LABEL } from './rules.js';
 import { nbEntries, nbCat, fmtDay } from './notebook.js';
 import { downloadsP, wrapText, pad2 } from './report.js';
+import { loadJsPDF } from './jspdf.js';
 
 const KEYS = ['A', 'B', 'C', 'D', 'E', 'F'];
 const PW = 1240, PH = 1754, MX = 90, MW = PW - MX * 2, TOP = 110, BOTTOM = PH - 100;   // A4 at 150 dpi
@@ -131,9 +132,8 @@ export async function exportNotebook(kind, btn) {
       await save(new Blob([toCSV(list)], { type: 'text/csv;charset=utf-8' }), name);
       say('ok', `已輸出 ${name}（${list.length} 題），可以用 Excel 或 Google 試算表開啟。`); return;
     }
-    const JsPDF = window.jspdf && window.jspdf.jsPDF;
-    if (!JsPDF) throw new Error('PDF 元件沒有載入，請重新整理頁面後再試');
     say('', '正在產生 PDF…');
+    const JsPDF = await loadJsPDF();
     const pages = await buildPages(list, kind);
     const doc = new JsPDF({ unit: 'pt', format: 'a4', compress: true });
     pages.forEach((c, i) => { if (i) doc.addPage(); doc.addImage(c.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 595.28, 841.89); });

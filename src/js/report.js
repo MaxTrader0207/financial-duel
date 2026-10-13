@@ -4,6 +4,7 @@ import { CATS } from './cards.js';
 import { $, LP_MAX } from './core.js';
 
 import { G } from './game.js';
+import { loadJsPDF } from './jspdf.js';
 
 let downloadsP, RC, RF, fnt, RW, RM_X, RCW, R_TOP, pad2, fmtDate, fmtNum, exporting;
 
@@ -208,8 +209,7 @@ async function exportReport(kind, btn) {
       data = await new Promise((res, rej) => canvases[0].toBlob(b => b ? res(b) : rej(new Error('圖片產生失敗')), 'image/png'));
       filename = base + '.png';
     } else {
-      const JsPDF = window.jspdf && window.jspdf.jsPDF;
-      if (!JsPDF) throw new Error('PDF 元件沒有載入，請重新整理頁面後再試');
+      const JsPDF = await loadJsPDF();
       const doc = new JsPDF({ unit: 'pt', format: 'a4', compress: true });
       canvases.forEach((c, i) => { if (i) doc.addPage(); doc.addImage(c.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 595.28, 841.89); });
       doc.setProperties({ title: '金融決鬥 對戰紀錄' });

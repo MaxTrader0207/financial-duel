@@ -1,5 +1,6 @@
 // app.js — initialises every module in the original source order (each module's init() holds its top-level setup)
 import { init as init_core } from './core.js';
+import { init as init_reading } from './reading.js';
 import { init as init_sound } from './sound.js';
 import { init as init_perf } from './perf.js';
 import { init as init_carddata } from './carddata.js';
@@ -50,6 +51,7 @@ import { init as init_boot } from './boot.js';
 
 export function initAll() {
   init_core();
+  init_reading();
   init_perf();
   init_sound();
   init_carddata();

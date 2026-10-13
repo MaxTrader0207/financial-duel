@@ -330,6 +330,10 @@
   <div class="care-card">
     <div class="care-h"><div class="seal">設</div><h3 id="set-title">設定</h3></div>
     <label class="set-row"><span><b>匿名使用統計</b><small>只送出每天開啟與對戰的次數，讓作者知道有多少人在玩；不含帳號、暱稱或任何個人資料</small></span><input type="checkbox" id="set-stats" class="sw"></label>
+    <div class="set-row set-fx"><span><b>文字大小</b><small>題目、選項、解說、錯題本與知識卡的文字</small></span>
+      <div class="seg" id="set-text" role="group" aria-label="文字大小"><button type="button" data-v="m">標準</button><button type="button" data-v="l">大</button><button type="button" data-v="xl">特大</button></div></div>
+    <p class="set-demo" id="set-text-demo" aria-hidden="true">本益比＝股價 ÷ 每股盈餘。本益比低，不一定代表便宜。</p>
+    <label class="set-row"><span><b>色弱友善配色</b><small>答對、答錯改用藍色與橘色，並在選項加上 ✓ ✗ 標記</small></span><input type="checkbox" id="set-cvd" class="sw"></label>
     <label class="set-row"><span><b>快速模式</b><small>縮短過場與戰鬥動畫，回合換手更快</small></span><input type="checkbox" id="set-fast" class="sw"></label>
     <div class="set-row set-fx"><span><b>簡化特效</b><small id="set-fx-note"></small></span>
       <div class="seg" id="set-fx" role="group" aria-label="簡化特效"><button type="button" data-v="auto">自動</button><button type="button" data-v="on">開</button><button type="button" data-v="off">關</button></div></div>
@@ -419,7 +423,6 @@
     </div>
   </div>
 </div>
-<script src="%VITE_JSPDF_URL%"></script>
 <script type="module" src="./src/js/main.js"></script>
 </body>
 </html>

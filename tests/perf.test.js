@@ -37,7 +37,27 @@ describe('web app build', () => {
     if (!existsSync('dist/sw.js')) return;
     const sw = readFileSync('dist/sw.js', 'utf8'), files = JSON.parse(sw.match(/const FILES = (\[[\s\S]*?\]);/)[1]);
     for (const f of ['./', 'index.html', 'manifest.webmanifest', 'data/cards.json', 'data/questions.json', 'icons/icon-512.png']) expect(files).toContain(f);
-    expect(files.some(f => /^assets\/fd-serif-.*\.woff2$/.test(f))).toBe(true);
+    for (const part of ['core', 'cards', 'rest']) for (const n of ['serif', 'sans']) expect(files.some(f => new RegExp(`^assets/fd-${n}-${part}-.*\\.woff2$`).test(f))).toBe(true);
+    expect(files).toContain('vendor/jspdf.umd.min.js');                         // cached for offline PDF export
     expect(sw).toMatch(/const VERSION = '[0-9a-f]{12}'/);
+  });
+});
+
+describe('first load', () => {
+  it('does not load jsPDF with the page (only on the first PDF export)', () => {
+    const html = readFileSync('index.html', 'utf8');
+    expect(html).not.toMatch(/jspdf|VITE_JSPDF_URL/i);
+  });
+  it('the display fonts are cut in parts that cover every card name and the title text', () => {
+    const css = readFileSync('src/fonts/fonts.css', 'utf8');
+    const faces = [...css.matchAll(/font-family:"(FD \w+)";src:url\("\.\/([\w-]+\.woff2)"\)[^}]*unicode-range:([^}]+)\}/g)];
+    expect(faces).toHaveLength(6);
+    for (const [, , file] of faces) expect(existsSync(`src/fonts/${file}`)).toBe(true);
+    const covered = fam => { const set = new Set(); for (const [, f, , r] of faces) if (f === fam) for (const part of r.split(',')) {
+      const [a, b] = part.replace('U+', '').split('-').map(h => parseInt(h, 16)); for (let c = a; c <= (b || a); c++) set.add(c); } return set; };
+    const serif = covered('FD Serif');
+    const cards = JSON.parse(readFileSync('public/data/cards.json', 'utf8')).cards;
+    for (const c of cards) for (const ch of c.name) expect(serif.has(ch.codePointAt(0)), `${ch} in ${c.name}`).toBe(true);
+    for (const ch of '金融決鬥') expect(serif.has(ch.codePointAt(0))).toBe(true);
   });
 });

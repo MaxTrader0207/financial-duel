@@ -100,6 +100,8 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
 | `challenge.js`、`challengeui.js` | 好友挑戰：種子固定雙方牌序、對手牌組與市場事件，分數＝勝利 500＋表現分×5＋剩餘資金（滿分 1500）；建立／接受（網址 `?c=代碼`）、排名、分享到 LINE |
 | `sharecard.js` | 分享戰績圖：1080×1350 的結算圖，手機用分享選單、其他裝置存成 PNG |
 | `nbexport.js` | 錯題本輸出：PDF 複習講義（附正解與解說）、PDF 測驗卷（解答在最後一頁）、CSV（Excel）；依目前的屬性篩選，可選擇包含已掌握。選項順序依題號固定打散，印出來的答案不會都是 A |
+| `reading.js` | 閱讀設定：文字大小（標準／大／特大，只放大題目、選項、解說等閱讀文字）、色弱友善配色（答對藍、答錯橘，加 ✓ ✗）；存在設定裡 |
+| `jspdf.js` | 第一次輸出 PDF 時才載入 jsPDF，不拖慢開啟 |
 | `version.js` | 版本資訊：`src/data/changelog.json`（最新在前）的目前版本與更新時間、更新內容視窗、更新後第一次開啟時的「這次更新了什麼」；建置時間與 commit 由 `vite.config.js` 寫入 |
 | `usage.js` | 匿名使用統計：隨機編號＋每天的開啟、對戰、每日挑戰次數，以及每一道內建題目的作答次數與選項分布（題目品質），送到排行榜伺服器加總；設定裡可關閉 |
 | `online.js`、`boardui.js` | 線上排行榜：加入／改名／退出、排位賽開局取憑證與結算、離線時暫存結果下次送出、排行榜畫面 |
@@ -108,6 +110,8 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
 | `daily.js`、`dailyui.js` | 每日 3 分鐘金融挑戰：依日期選情境、經驗值與碎片、連續天數、稱號、等級／畫面與標題卡片 |
 | `tutor.js`、`tutorial-script.js` | 新手引導的 8 個步驟與前幾場的出牌提示／教學對戰的設定（難度、資金、對手第一次答錯、保證相剋卡） |
 | 其他 | 背景、音效、設定、遊玩時間、新手引導與小提示、事件綁定（`wiring.js`） |
+
+**標題字型**：`src/fonts/` 的兩套字型只保留遊戲用到的字，再依用途切成三份（標題畫面、卡名、其他），用 `unicode-range` 讓瀏覽器只下載畫面需要的那份。新增卡牌或介面文字後，執行 `python3 tools/fonts.py <放 NotoSerifTC.ttf、NotoSansTC.ttf 的資料夾>` 重新產生（來源字型在 github.com/google/fonts 的 `ofl/notoseriftc`、`ofl/notosanstc`）。
 
 每個模組開頭第一行註解說明它負責什麼。模組最初是用 `tools/split.mjs` 從單一 HTML 自動拆出來的（工具留作紀錄）；之後已整理成上面的分層：跨模組修改變數的 `__set_X()` 改成有名字的函式（`setGame`、`setDeck`、`setDiffKey`、`clearRecords`…），互相引用改由 `game.js`、`actions.js`、`ui.js` 三個葉節點銜接。
 
