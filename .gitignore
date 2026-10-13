@@ -5,3 +5,4 @@ artifact/
 standalone/
 test-results/
 playwright-report/
+__pycache__/
