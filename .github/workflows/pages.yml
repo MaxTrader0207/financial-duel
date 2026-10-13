@@ -99,7 +99,14 @@ jobs:
       - name: Check the deployed API
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: |
-          for i in 1 2 3 4 5 6; do curl -fsS "$API_URL/v1/health" && exit 0; sleep 10; done; exit 1
+          ok=0; for i in 1 2 3 4 5 6; do curl -fsS "$API_URL/v1/health" && { ok=1; break; }; sleep 10; done; test $ok = 1
+          # write path against the real D1: join with a throwaway nickname, read it back, delete it
+          name="部署檢查$(date +%s | tail -c 5)"
+          reg=$(curl -fsS -X POST "$API_URL/v1/register" -H 'Content-Type: application/json' -d "{\"name\":\"$name\"}")
+          auth=$(echo "$reg" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const r=JSON.parse(s);process.stdout.write(r.id+'.'+r.token)})")
+          curl -fsS "$API_URL/v1/me" -H "Authorization: Bearer $auth" | grep -q "$name"
+          curl -fsS -X DELETE "$API_URL/v1/me" -H "Authorization: Bearer $auth"
+          echo; echo "API OK: register / me / delete
   build:
     needs: test
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
