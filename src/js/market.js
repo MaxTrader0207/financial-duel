@@ -35,8 +35,9 @@ export function attackMult(cat) {
 /* turn start: draw a new event on turn 2, 5, 8 …; never the same one twice in a row. Returns the new event or null */
 export function onTurn(turn, rnd = Math.random) {
   if (!G || !G.market || turn < FIRST_TURN || (turn - FIRST_TURN) % EVERY) return null;
+  const plan = G.marketPlan;                             // 好友挑戰: the events were fixed by the challenge seed
   const pool = EVENTS.filter(e => e.id !== G.market.id);
-  const e = pool[Math.floor(rnd() * pool.length)];
+  const e = plan && plan.length ? byId(plan[(G.market.seen || 0) % plan.length]) : pool[Math.floor(rnd() * pool.length)];
   G.market.id = e.id; G.market.since = turn; G.market.seen = (G.market.seen || 0) + 1;
   return e;
 }

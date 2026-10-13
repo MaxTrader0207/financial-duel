@@ -10,5 +10,6 @@ export const Actions = {
   openDeck: missing('openDeck'),          // deckui.js
   openRanked: missing('openRanked'),      // rankedui.js
   openBoard: missing('openBoard'),        // boardui.js
+  openChallenge: missing('openChallenge'), // challengeui.js
 };
 export function register(fns) { Object.assign(Actions, fns); }

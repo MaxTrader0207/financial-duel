@@ -5,7 +5,7 @@ import { SET, Store, isObj, saveSet } from './core.js';
 import { apiBase } from './online.js';
 
 export const USAGE_KEY = 'soba-ketto.usage.v1', USAGE_V = 1;
-const EVENTS = ['open', 'duels', 'wins', 'casual', 'ranked', 'tutorial', 'daily'];
+const EVENTS = ['open', 'duels', 'wins', 'casual', 'ranked', 'tutorial', 'daily', 'challenge'];
 const SEND_DELAY = 4000;
 
 const pad = n => String(n).padStart(2, '0');

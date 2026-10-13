@@ -243,6 +243,44 @@ async function transferRedeem(req, env, now) {
   return json({ data: JSON.parse(row.data) }, 200, { 'Cache-Control': 'no-store' });
 }
 
+/* ---------- friend challenges ---------- */
+const CH_DAYS = 30, CH_MAX_SCORE = 1500;
+const newChallengeId = () => [...crypto.getRandomValues(new Uint8Array(6))].map(x => CODE_CHARS[x % CODE_CHARS.length]).join('');
+function cleanResult(b) {
+  const n = cleanName(b.name); if (n.error) fail(400, 'name', n.error);
+  if (!Number.isInteger(b.score) || b.score < 0 || b.score > CH_MAX_SCORE) fail(400, 'score', '分數不正確');
+  return { name: n.name, score: b.score, win: b.win === true ? 1 : 0 };
+}
+async function challengeView(env, id, now) {
+  const c = await env.DB.prepare('SELECT id, seed, deck, by_name, created, expires FROM challenges WHERE id = ?').bind(id).first();
+  if (!c || c.expires < now) fail(404, 'challenge', '找不到這個挑戰，可能已經過期');
+  const { results } = await env.DB.prepare('SELECT name, score, win, at FROM challenge_results WHERE cid = ? ORDER BY score DESC, at ASC LIMIT 50').bind(id).all();
+  return { id: c.id, seed: c.seed, deck: JSON.parse(c.deck), by: c.by_name, created: c.created, expires: c.expires, results: (results || []).map(r => ({ ...r, win: !!r.win })) };
+}
+async function challengeCreate(req, env, now) {
+  const b = await body(req, 4096);
+  if (!Number.isInteger(b.seed) || b.seed < 1 || b.seed > 2147483647) fail(400, 'seed', '挑戰資料不正確');
+  if (!Array.isArray(b.deck) || b.deck.length !== 40 || !b.deck.every(x => typeof x === 'string' && /^[a-z0-9_]{1,40}$/.test(x))) fail(400, 'deck', '牌組資料不正確');
+  const r = cleanResult(b);
+  const ip = await sha256(`ip:${req.headers.get('CF-Connecting-IP') || 'local'}`);
+  if (!await limit(env, `chcreate:${ip}`, 20, 864e5, now)) fail(429, 'slow', '今天建立的挑戰太多了，請明天再試');
+  const id = newChallengeId();
+  await env.DB.batch([
+    env.DB.prepare('INSERT INTO challenges (id, seed, deck, by_name, created, expires) VALUES (?, ?, ?, ?, ?, ?)').bind(id, b.seed, JSON.stringify(b.deck), r.name, now, now + CH_DAYS * 864e5),
+    env.DB.prepare('INSERT INTO challenge_results (cid, name, score, win, at) VALUES (?, ?, ?, ?, ?)').bind(id, r.name, r.score, r.win, now),
+  ]);
+  return json(await challengeView(env, id, now), 201);
+}
+async function challengeResult(req, env, now, id) {
+  const r = cleanResult(await body(req));
+  const ip = await sha256(`ip:${req.headers.get('CF-Connecting-IP') || 'local'}`);
+  if (!await limit(env, `chresult:${ip}`, 60, 3600e3, now)) fail(429, 'slow', '太頻繁了，請稍後再試');
+  await challengeView(env, id, now);                                   // exists and not expired
+  await env.DB.prepare(`INSERT INTO challenge_results (cid, name, score, win, at) VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT (cid, name) DO UPDATE SET score = excluded.score, win = excluded.win, at = excluded.at WHERE excluded.score > challenge_results.score`).bind(id, r.name, r.score, r.win, now).run();
+  return json(await challengeView(env, id, now));
+}
+
 async function route(req, env, now) {
   const url = new URL(req.url), path = url.pathname.replace(/\/+$/, ''), m = req.method;
   if (m === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
@@ -256,6 +294,10 @@ async function route(req, env, now) {
   if (m === 'POST' && path === '/v1/match/end') return matchEnd(req, env, now);
   if (m === 'POST' && path === '/v1/ping') return statsPing(req, env, now);
   if (m === 'POST' && path === '/v1/transfer') return transferCreate(req, env, now);
+  if (m === 'POST' && path === '/v1/challenge') return challengeCreate(req, env, now);
+  const ch = /^\/v1\/challenge\/([2-9A-HJKMNP-Z]{6})(\/result)?$/.exec(path);
+  if (ch && m === 'GET' && !ch[2]) return json(await challengeView(env, ch[1], now), 200, { 'Cache-Control': 'no-store' });
+  if (ch && m === 'POST' && ch[2]) return challengeResult(req, env, now, ch[1]);
   if (m === 'POST' && path === '/v1/transfer/redeem') return transferRedeem(req, env, now);
   if (m === 'GET' && path === '/v1/stats') return stats(req, env, now, url);
   fail(404, 'not_found', '找不到這個網址');

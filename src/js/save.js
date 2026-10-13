@@ -20,7 +20,7 @@ function serializeGame() {
   return { v: SAVE_V, savedAt: new Date().toISOString(), diffKey: Object.keys(DIFFS).find(k => DIFFS[k] === G.diff) || 'normal',
     lp: G.lp, deck: G.deck, hand: G.hand, turn: G.turn, phase: G.phase, used: [...G.used], streak: G.streak, maxStreak: G.maxStreak,
     stats: G.stats, missed: G.missed, history: G.history, dealt: G.dealt, taken: G.taken, mods: G.mods, flags: G.flags,
-    extraUsed: G.extraUsed, nbAdded: G.nbAdded || 0, bg: G.bg || null, deckList: G.deckList || null, weak: G.weak || null, foe: G.foeCard ? G.foeCard.id : null, foeProf: G.foeProf || null, foeStats: G.foeStats || null, foeBoost: G.foeBoost || 0, kb: G.kb || null, mode: G.mode || 'casual', market: G.market || null, perf: G.perf || null, startedAt: G.startedAt.toISOString() };
+    extraUsed: G.extraUsed, nbAdded: G.nbAdded || 0, bg: G.bg || null, deckList: G.deckList || null, weak: G.weak || null, foe: G.foeCard ? G.foeCard.id : null, foeProf: G.foeProf || null, foeStats: G.foeStats || null, foeBoost: G.foeBoost || 0, kb: G.kb || null, challenge: G.challenge || null, marketPlan: G.marketPlan || null, mode: G.mode || 'casual', market: G.market || null, perf: G.perf || null, startedAt: G.startedAt.toISOString() };
 }
 function saveGame() {
   if (!G || G.over || (G.phase !== 'attack' && G.phase !== 'defend')) return false;

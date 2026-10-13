@@ -948,3 +948,22 @@ html[data-back="season"] .card.back .mark span::after{content:var(--cb-mark);fon
 .xfer-code b{font-size:26px;font-weight:600;letter-spacing:.12em;color:var(--gold-hi);font-variant-numeric:tabular-nums}
 .xfer-code small{font-size:12px;color:var(--muted)}
 #xfer .bd-form{margin-top:6px}
+
+/* ---------- 好友挑戰 ---------- */
+.ch-rules{margin:4px 0 8px;padding-left:1.2em;font-size:13px;line-height:1.7;color:var(--muted)}
+.ch-head{gap:4px}
+.ch-top{font-size:18px;font-weight:700;color:var(--gold-hi)}
+.ch-head small{color:var(--muted);font-size:12.5px}
+.ch-list{margin:0 0 12px}
+.ch-mark{display:inline-grid;place-items:center;width:22px;height:22px;font-size:12px;font-weight:700;color:#fff}
+.ch-mark.w{background:#2f8f7a}.ch-mark.l{background:#6b6f8a}
+.ch-mine{display:grid;gap:6px;margin-bottom:12px}
+.ch-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;font:inherit;color:var(--text);text-align:left;background:var(--ink2);border:1px solid var(--line);cursor:pointer}
+.ch-row:hover{border-color:var(--gold)}
+.ch-row span{display:grid;gap:2px}
+.ch-row b{font-weight:600}.ch-row small{font-size:12px;color:var(--muted)}
+.ch-go{color:var(--gold-hi);font-size:13px}
+.ch-res .btn-row{margin:8px 0 0}
+a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.share-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0 4px}
+.share-row .status{font-size:13px}

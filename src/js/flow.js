@@ -9,7 +9,7 @@ import { showFoeAnswer } from './foequiz.js';
 import { foeQuestion } from './quiz.js';
 import { BG } from './backgrounds.js';
 import { CATS, MON } from './cards.js';
-import { COL, DECK, colSave, cpuDeckList, rewardOffer } from './collection.js';
+import { COL, DECK, autoDeck, colSave, cpuDeckList, rewardOffer } from './collection.js';
 import { $, DIFFS, LP_MAX, esc, foeAtkOf, sleep } from './core.js';
 import { clearField, damage, floatText, log, lunge, placeField, shatter } from './fx.js';
 import { RECS, recordGame } from './records.js';
@@ -31,6 +31,8 @@ import * as Market from './market.js';
 import * as Ranked from './ranked.js';
 import * as Online from './online.js';
 import * as Usage from './usage.js';
+import * as Ch from './challenge.js';
+import { afterDuel as challengeAfterDuel } from './challengeui.js';
 import { refreshRankResult } from './rankedui.js';
 
 
@@ -49,6 +51,18 @@ function setupRanked() {
   G.diff = DIFFS[o.diff]; G.foeBoost = o.block; G.deckList.c = cpuDeckList(o.diff, { grow: false, boost: o.boost }); G.deck.c = makeDeck(G.deckList.c);
   const rd = Ranked.deckForRanked(DECK);                 // over the point cap: a legal deck for this duel only
   G.deckList.p = rd.list; G.deck.p = makeDeck(rd.list); G.rankedAuto = rd.auto;
+}
+/* 好友挑戰: the seed fixes both decks' order, the opponent's deck and profile, and the market events */
+function setupChallenge(ch) {
+  const deck = Array.isArray(ch.deck) && ch.deck.filter(id => MON[id]).length === 40 ? ch.deck.slice(0, 40) : autoDeck();
+  G.challenge = { id: ch.id || null, seed: ch.seed, deck, by: ch.by || null };
+  G.diff = DIFFS.normal; G.weak = null; G.kb = null;                // the same conditions for everyone
+  Ch.withSeed(ch.seed, r => {
+    G.deckList = { p: G.challenge.deck, c: cpuDeckList('normal', { grow: false }) };
+    G.deck = { p: makeDeck(G.deckList.p), c: makeDeck(G.deckList.c) };
+    G.foeProf = foeProfile(r);
+    G.marketPlan = Ch.marketPlan(r);
+  });
 }
 /* strategy: attacking with an attribute the opponent is weak in or the market favours; blocking with advantage when you could */
 function trackPlay(mode, m, hand) {
@@ -72,7 +86,7 @@ async function resumeDuel() {
         stats: d.stats, missed: d.missed || [], foeCard: d.foe ? MON[d.foe] : null, over: false, dealt: d.dealt || 0, taken: d.taken || 0,
         mods: { myAtk: 0, foeAtk: 0, skipFoe: false, skipMe: false, ...(d.mods || {}) }, flags: d.flags || {}, extraUsed: !!d.extraUsed, nbAdded: d.nbAdded || 0, bg: d.bg || BG.pick(),
         deckList: d.deckList && Array.isArray(d.deckList.p) ? d.deckList : null, weak: d.weak && CATS[d.weak] ? d.weak : null,
-        mode: ['casual', 'ranked'].includes(d.mode) ? d.mode : 'casual', market: d.market && typeof d.market === 'object' ? d.market : null,
+        mode: ['casual', 'ranked', 'challenge'].includes(d.mode) && (d.mode !== 'challenge' || d.challenge) ? d.mode : 'casual', challenge: d.challenge || null, marketPlan: Array.isArray(d.marketPlan) ? d.marketPlan : null, market: d.market && typeof d.market === 'object' ? d.market : null,
         perf: d.perf && typeof d.perf === 'object' ? d.perf : { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 },
         foeProf: okProf(d.foeProf) ? d.foeProf : foeProfile(), foeStats: d.foeStats && Number.isInteger(d.foeStats.t) ? d.foeStats : { t: 0, c: 0 }, foeBoost: typeof d.foeBoost === 'number' ? Math.min(0.3, Math.max(0, d.foeBoost)) : 0, kb: d.kb && typeof d.kb === 'object' ? d.kb : null });
   const g = G;
@@ -102,8 +116,8 @@ async function resumeDuel() {
 async function startDuel(opts = {}) {
   const forfeited = Ranked.forfeitIfActive();          // a ranked duel left unfinished counts as a loss
   newGame();
-  const tutorial = !!opts.tutorial || !Tutor.done();
-  G.mode = tutorial ? 'tutorial' : opts.mode === 'ranked' ? 'ranked' : 'casual';
+  const tutorial = !!opts.tutorial || (!Tutor.done() && opts.mode !== 'challenge');   // a friend's challenge link is never blocked by the tutorial
+  G.mode = tutorial ? 'tutorial' : ['ranked', 'challenge'].includes(opts.mode) ? opts.mode : 'casual';
   G.perf = { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 };
   G.fsm.go('intro');
   G.bg = BG.pick(); BG.apply(G.bg);
@@ -111,6 +125,7 @@ async function startDuel(opts = {}) {
   else {
     Market.enable();
     G.kb = bonusLevels();                                 // 知識加成, fixed for this duel
+    if (G.mode === 'challenge') setupChallenge(opts.challenge);
     if (G.mode === 'ranked') {
       setupRanked(); Ranked.begin();
       if (Online.joined()) { const g = G; Online.startMatch().then(r => { if (r && !r.ok && g === G) log(`線上排行榜：${r.error}。這場只計入這台裝置。`); }); }
@@ -118,13 +133,14 @@ async function startDuel(opts = {}) {
   }
   Tutor.begin(tutorial); show('duel'); Sound.startBGM(); clearField('p'); clearField('c');
   log(tutorial ? `教學對戰：難度固定為簡易，只出初階題，對手資金 ${tutorialFoeLp()}。`
+    : G.mode === 'challenge' ? `好友挑戰${G.challenge.by ? `：${G.challenge.by} 出的題` : '：你先打，打完把連結傳給朋友'}。同一副牌、同一個對手、同樣的市場事件。`
     : G.mode === 'ranked' ? `排位賽：${Ranked.tier().name}，對手「${Ranked.LEVEL_NAME[Ranked.tier().level]}」。從第 2 回合起每 3 回合發生一次市場事件。`
     : '雙方洗牌完畢。從第 2 回合起每 3 回合發生一次市場事件。');
   if (G.rankedAuto) toast(`這場排位賽自動使用符合上限的牌組（${Ranked.deckCost(G.deckList.p)} / ${Ranked.DECK_CAP} 點），你儲存的牌組沒有變動。`);
   if (forfeited) log(`上一場排位賽未完成，以敗場計（${forfeited.delta} 分）。`);
   setPhase('idle', '待機', ''); renderAll(); renderMarket();
   const g0 = G;
-  await transition(G.mode === 'ranked' ? '排位對決' : '對決開始', G.mode === 'ranked' ? Ranked.tier().name : '雙方準備就緒', 'gold');
+  await transition(G.mode === 'ranked' ? '排位對決' : G.mode === 'challenge' ? '好友挑戰' : '對決開始', G.mode === 'ranked' ? Ranked.tier().name : G.mode === 'challenge' ? '同一副牌，比分數' : '雙方準備就緒', 'gold');
   if (stale(g0)) return;
   playerTurn();
 }
@@ -291,6 +307,10 @@ async function checkEnd() {
   G.over = true; const win = G.lp.c <= 0; G.win = win; G.endedAt = new Date(); clearSave(); Tutor.end();
   recordGame(false); Usage.duel(G.mode, win);
   if (win) { const w = onDuelWin(); G.shardsWon = w.shards; G.knowWon = w.card; }   // shards, and the day's first win draws a knowledge card
+  if (G.mode === 'challenge') {
+    G.perfResult = Ranked.performance(perfStats()); G.chScore = Ch.score({ win, perf: G.perfResult.score, lpLeft: G.lp.p });
+    challengeAfterDuel(G);
+  }
   if (G.mode === 'ranked') {
     G.perfResult = Ranked.performance(perfStats()); G.rank = Ranked.applyMatch(win, G.perfResult.score);
     if (Online.joined()) {                                 // the server scores it again; its answer replaces ours

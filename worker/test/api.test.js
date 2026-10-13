@@ -208,3 +208,37 @@ test('transfer codes: upload progress, redeem once on another device, expire aft
   const old = await call('POST', '/v1/transfer', { body: { data } });
   assert.equal((await call('POST', '/v1/transfer/redeem', { body: { code: old.body.code }, now: clock + 25 * 3600e3 })).status, 404);  // expired
 });
+
+test('statistics: next-day and 7-day retention of new players, tutorial completion', async () => {
+  clock = Date.UTC(2027, 0, 20, 4);                                        // 2027-01-20, a fresh month for this test
+  const pid = n => (1000 + n).toString(16).padStart(32, '0');
+  const send = (p, days) => call('POST', '/v1/ping', { body: { pid: p, days } });
+  for (let i = 0; i < 4; i++) await send(pid(i), { '2027-01-10': { open: 1, tutorial: i < 3 ? 1 : 0 } });   // 4 new on the 10th, 3 finish the tutorial
+  await send(pid(0), { '2027-01-11': { open: 1 } });                     // 1 comes back the next day
+  await send(pid(1), { '2027-01-15': { open: 1 } });                     // 1 more within a week
+  const r = await call('GET', '/v1/stats?key=test-stats-key&format=json');
+  const d = r.body.rows.find(x => x.day === '2027-01-10');
+  assert.deepEqual([d.newPlayers, d.d1, d.d7], [4, 1, 2]);
+  assert.equal(d.d1Rate, 0.25); assert.equal(d.d7Rate, 0.5);
+  assert.equal(r.body.rows.find(x => x.day === '2027-01-20').d1Rate, null);     // today's cohort is not known yet
+  assert.equal(r.body.summary.d7, 0.5);
+});
+
+test('friend challenges: create with a score, others add theirs, best score per nickname, expiry', async () => {
+  clock = Date.UTC(2027, 1, 1, 4);
+  const deck = Array.from({ length: 40 }, (_, i) => `card_${i % 20}`);
+  const c = await call('POST', '/v1/challenge', { body: { seed: 12345, deck, name: '出題者', score: 900, win: true } });
+  assert.equal(c.status, 201, JSON.stringify(c.body));
+  assert.match(c.body.id, /^[2-9A-HJKMNP-Z]{6}$/);
+  assert.deepEqual([c.body.seed, c.body.deck.length, c.body.by, c.body.results.length], [12345, 40, '出題者', 1]);
+  assert.equal((await call('POST', '/v1/challenge', { body: { seed: 1, deck: deck.slice(0, 5), name: '某人', score: 1 } })).status, 400);
+  assert.equal((await call('POST', '/v1/challenge', { body: { seed: 1, deck, name: '某人', score: 99999 } })).status, 400);
+  const id = c.body.id;
+  await call('POST', `/v1/challenge/${id}/result`, { body: { name: '朋友A', score: 1100, win: true } });
+  await call('POST', `/v1/challenge/${id}/result`, { body: { name: '朋友B', score: 300, win: false } });
+  await call('POST', `/v1/challenge/${id}/result`, { body: { name: '朋友A', score: 500, win: false } });   // a worse replay is ignored
+  const v = await call('GET', `/v1/challenge/${id}`);
+  assert.deepEqual(v.body.results.map(r => [r.name, r.score]), [['朋友A', 1100], ['出題者', 900], ['朋友B', 300]]);
+  assert.equal((await call('GET', `/v1/challenge/${id}`, { now: clock + 31 * 864e5 })).status, 404);
+  assert.equal((await call('GET', '/v1/challenge/ZZZZZZ')).status, 404);
+});
