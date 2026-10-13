@@ -106,7 +106,7 @@ jobs:
           auth=$(echo "$reg" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const r=JSON.parse(s);process.stdout.write(r.id+'.'+r.token)})")
           curl -fsS "$API_URL/v1/me" -H "Authorization: Bearer $auth" | grep -q "$name"
           curl -fsS -X DELETE "$API_URL/v1/me" -H "Authorization: Bearer $auth"
-          echo; echo "API OK: register / me / delete
+          echo; echo "API OK: register / me / delete"
   build:
     needs: test
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
