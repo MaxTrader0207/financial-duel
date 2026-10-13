@@ -52,6 +52,8 @@ function order(n) {
 }
 export function scenarioFor(key) {
   const list = DATA.daily || []; if (!list.length) return null;
+  /* a day already started keeps its scenario, even if an update added scenarios and moved the rotation */
+  const rec = D.days[key]; if (rec) { const s = list.find(x => x.id === rec.id); if (s) return s; }
   const o = order(list.length);
   return list[o[((dayNum(key) % list.length) + list.length) % list.length]];
 }

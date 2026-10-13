@@ -48,7 +48,7 @@ cd worker && npm ci && npm test   # 線上排行榜 API 的整合測試（本機
 | `public/data/cards.json` | 160 張卡：`id`、`name`、`cat`（tech fund deriv risk chips fx crypto etf）、`rank` 1–4、`atk`、`def`、`race`、`sigil`、`text` |
 | `public/data/questions.json` | 400 題，格式與遊戲內「題庫管理」的匯入格式相同 |
 | `public/data/knowledge.json` | 100 張金融知識卡（四種各 25 張）：`type`（stock 股票卡、defense 防禦卡、event 事件卡、trap 陷阱卡）、`name`、`sigil`、`summary`、`levels`（Lv1–Lv3 的說明：是什麼、實際例子、常見誤區）、`quiz`（升 Lv2、Lv3 的檢定題）；`starter` 是新玩家一開始擁有的卡 |
-| `public/data/daily.json` | 每日挑戰的生活金融情境（目前 30 個 × 3 題）：`id`、`theme`、`title`、`scene`、`questions`（`q`、4 個 `options`、`answer`、`explain`）、`takeaway`、`card`（完成這天會解鎖的知識卡），有時效的數字可加 `asOf`／`reviewBy`。依日期輪替，30 天一輪；直接加情境就會排進輪替 |
+| `public/data/daily.json` | 每日挑戰的生活金融情境（目前 98 個 × 3 題，100 張知識卡中有 85 張連到情境）：`id`、`theme`、`title`、`scene`、`questions`（`q`、4 個 `options`、`answer`、`explain`）、`takeaway`、`card`（完成這天會解鎖的知識卡），有時效的數字可加 `asOf`／`reviewBy`。依日期輪替，98 天一輪；直接加情境就會排進輪替（已經開始的那一天不會被換掉） |
 
 GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要重新建置。
 

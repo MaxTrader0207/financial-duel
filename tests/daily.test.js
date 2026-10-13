@@ -94,3 +94,23 @@ describe('daily challenge', () => {
     expect(r[5]).toMatchObject({ key: '2026-10-12', done: true, perfect: true }); expect(r[0].done).toBe(false);
   });
 });
+
+describe('daily challenge: content updates', () => {
+  it('every knowledge card added after the first 32 is linked from a daily scenario', () => {
+    const linked = new Set(DATA.daily.map(s => s.card));
+    const added = DATA.knowledge.cards.slice().filter(c => !['stk_growth', 'def_diversify', 'evt_rate_hike', 'trap_leverage'].includes(c.id));
+    expect(DATA.daily.length).toBe(98);
+    for (const id of ['stk_pe', 'def_bucket', 'evt_blackswan', 'trap_yieldtrap', 'trap_romance']) expect(linked.has(id), id).toBe(true);
+    expect(added.filter(c => linked.has(c.id)).length).toBeGreaterThanOrEqual(68);
+  });
+  it('a day already started keeps its scenario when scenarios are added', () => {
+    localStorage.removeItem(Daily.DAILY_KEY); Daily.load();
+    const key = '2026-10-20', before = Daily.scenarioFor(key);
+    Daily.answer(0, 0, key);
+    const extra = { ...before, id: 'zz-new' };
+    DATA.daily.push(extra);
+    try { expect(Daily.scenarioFor(key).id).toBe(before.id); expect(Daily.today(key).next).toBe(1); }
+    finally { DATA.daily.pop(); }
+  });
+});
+
