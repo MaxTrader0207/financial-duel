@@ -9,7 +9,8 @@ test('opening the game sends an anonymous count, and the setting turns it off', 
   const today = Object.keys(pings[0].days)[0];
   expect(pings[0].pid).toMatch(/^[0-9a-f]{32}$/);
   expect(pings[0].days[today]).toEqual({ open: 1 });
-  expect(Object.keys(pings[0])).toEqual(['pid', 'days']);               // nothing else leaves the device
+  expect(Object.keys(pings[0])).toEqual(['pid', 'days', 'q']);          // nothing else leaves the device
+  expect(pings[0].q).toEqual({});                                       // no question answered yet
   await expect.poll(() => page.evaluate(() => window.__T.usage.state().pending)).toEqual({});
   await page.click('#btn-set');
   await expect(page.locator('#set-stats')).toBeChecked();

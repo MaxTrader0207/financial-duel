@@ -60,7 +60,7 @@ test('the feedback step explains the 錯題本 before the attack resolves', asyn
   await page.click('#hand .hand-card >> nth=0');
   await waitStep(page, 'quiz'); await page.click('#tut-ok');
   await until(page, () => document.querySelector('#q-opts .q-opt:not([disabled])'));
-  await page.locator('#q-opts .q-opt').first().dispatchEvent('click');
+  await page.locator('#q-opts .q-opt:not([disabled])').first().dispatchEvent('click');   // a card skill may have removed option 1
   await waitStep(page, 'feedback');
   await expect(page.locator('#tut-text')).toContainText('錯題本');
   await page.click('#tut-ok'); await expect(page.locator('#tutor')).toBeHidden();

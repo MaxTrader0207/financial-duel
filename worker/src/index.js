@@ -10,6 +10,9 @@
 // their maximums; at most MAX_MATCHES_PER_HOUR duels; leaving a duel open (starting another) counts as a loss.
 import { TIERS, tierOf, scoreMatch, seasonStart, checkPerf, seasonOf, prevSeason } from '../../src/js/rankrules.js';
 import { cleanPing, ping, report, reportHTML } from './stats.js';
+import { judge } from './judge.js';
+import { cleanName } from './names.js';
+export { cleanName };
 
 const MAX_MATCHES_PER_HOUR = 30;
 const REGISTER_PER_IP_PER_DAY = 5;
@@ -37,19 +40,6 @@ async function body(req, max = 2048) {
   if (text.length > max) fail(413, 'too_large', '資料太大');
   if (!text) return {};
   try { const v = JSON.parse(text); return v && typeof v === 'object' ? v : {}; } catch { fail(400, 'bad_json', '資料格式錯誤'); }
-}
-
-/* nicknames: 2–12 letters or digits (any script), with _ - · allowed inside; a small list of words is refused */
-const BLOCK = ['幹你', '操你', '靠北', '雞巴', '屌你', '王八', 'fuck', 'shit', 'bitch', 'admin', '管理員', '官方', '客服'];
-export function cleanName(raw) {
-  if (typeof raw !== 'string') return { error: '請輸入暱稱' };
-  const name = raw.normalize('NFKC').trim().replace(/\s+/g, ' ');
-  const len = [...name].length;
-  if (len < 2 || len > 12) return { error: '暱稱需要 2～12 個字' };
-  if (!/^[\p{L}\p{N}](?:[\p{L}\p{N}_\-· ]*[\p{L}\p{N}])?$/u.test(name)) return { error: '暱稱只能用文字、數字，中間可以有 _ - · 或空格' };
-  const low = name.toLowerCase().replace(/[\s_\-·]/g, '');
-  if (BLOCK.some(w => low.includes(w))) return { error: '這個暱稱不能使用，請換一個' };
-  return { name };
 }
 
 /* fixed-window rate limit; returns false when over the limit */
@@ -158,23 +148,28 @@ async function matchStart(req, env, now) {
 }
 
 async function matchEnd(req, env, now) {
-  const p = await mustAuth(req, env), b = await body(req);
+  const p = await mustAuth(req, env), b = await body(req, 32768);
   if (typeof b.ticket !== 'string' || !/^[0-9a-f]{32}$/.test(b.ticket)) fail(400, 'ticket', '缺少對戰憑證');
   const m = await env.DB.prepare('SELECT ticket, season, started, ended FROM matches WHERE ticket = ? AND player = ?').bind(b.ticket, p.id).first();
   if (!m) fail(404, 'ticket', '找不到這場對戰');
   if (m.ended) fail(409, 'used', '這場對戰已經結算過了');
   const surrender = b.surrender === true, win = !surrender && b.win === true;
-  let perf = { score: 0 };
+  let perf = { score: 0 }, judged = null;
   if (!surrender) {
     perf = checkPerf(b.perf); if (!perf) fail(400, 'perf', '表現分資料不正確');
     const minMs = Number(env.MIN_MATCH_MS ?? 45000);
     if (now - m.started < minMs) fail(422, 'too_fast', '對戰時間太短，這場不列入排行榜');
     if (now - m.started > MAX_MATCH_MS) { const r = await settle(env, p.id, m, false, 0, now); return json(result(r, await rankOf(env, m.season, r.standing), true)); }
+    /* the server judges the answers itself: its knowledge score replaces the browser's */
+    judged = judge(b.answers, { elapsed: now - m.started, win });
+    if (judged.error) fail(422, 'answers', judged.error);
+    perf = { ...perf, knowledge: judged.knowledge, score: judged.knowledge + perf.strategy + perf.risk };
   }
   const r = await settle(env, p.id, m, win, perf.score, now);
-  return json(result(r, await rankOf(env, m.season, r.standing), false));
+  if (judged) await env.DB.prepare('UPDATE matches SET q_total = ?, q_correct = ? WHERE ticket = ?').bind(judged.total, judged.correct, m.ticket).run();
+  return json(result(r, await rankOf(env, m.season, r.standing), false, judged ? { ...perf, judged: { total: judged.total, correct: judged.correct } } : null));
 }
-const result = (r, rank, expired) => ({ delta: r.delta, before: r.before, after: r.after, tierBefore: r.tierBefore, tierAfter: r.tierAfter, shielded: r.shielded, promoted: r.promoted, demoted: r.demoted, expired, me: view(r.standing, rank) });
+const result = (r, rank, expired, perf) => ({ perf: perf || null, delta: r.delta, before: r.before, after: r.after, tierBefore: r.tierBefore, tierAfter: r.tierAfter, shielded: r.shielded, promoted: r.promoted, demoted: r.demoted, expired, me: view(r.standing, rank) });
 
 async function board(req, env, now, url) {
   const season = /^\d{4}-\d{2}$/.test(url.searchParams.get('season') || '') ? url.searchParams.get('season') : seasonOf(now);

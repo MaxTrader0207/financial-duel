@@ -154,3 +154,20 @@ describe('anonymous usage statistics', () => {
     expect(Usage.dayKey(Date.UTC(2026, 9, 13, 16, 0))).toBe('2026-10-14');
   });
 });
+
+describe('題目品質 counts', () => {
+  beforeEach(() => { localStorage.removeItem(Usage.USAGE_KEY); SET.stats = true; Usage.load(); });
+  it('adds up answers per question and sends them with the next ping', async () => {
+    const sent = [];
+    globalThis.fetch = vi.fn(async (url, opt) => { sent.push(JSON.parse(opt.body)); return { ok: true, status: 200, json: async () => ({}) }; });
+    Usage.question('t01', 0, 0); Usage.question('t01', 2, 0); Usage.question('t01', -1, 0);
+    expect(Usage.state().q.t01).toEqual([3, 1, 1, 0, 1, 0, 1]);
+    await Usage.flush();
+    expect(sent[0].q.t01).toEqual([3, 1, 1, 0, 1, 0, 1]);
+    expect(Usage.state().q).toEqual({});
+  });
+  it('nothing is counted when anonymous statistics are off', () => {
+    Usage.setEnabled(false); Usage.question('t01', 0, 0);
+    expect(Usage.state().q).toEqual({});
+  });
+});

@@ -1,5 +1,5 @@
 // quiz.js — choosing questions: by attribute and card rank, never asked before first, due notebook questions mixed in, and the opponent's block question.
-import { allQuestions } from './bank.js';
+import { allQuestions, BUILTIN } from './bank.js';
 import { nbDueList } from './notebook.js';
 import { G } from './game.js';
 import { QS } from './records.js';
@@ -7,15 +7,19 @@ import { QS } from './records.js';
 let NB_MIX, quizState;
 
    // chance that a due notebook question replaces a fresh one
+/* ranked duels use the built-in bank only: the server judges ranked answers against its copy of it,
+   and custom questions (題庫管理) could otherwise make ranked easier */
+const bankFor = () => (G.mode === 'ranked' ? BUILTIN : allQuestions());
 function pickQuestion(cat, rank) {
   G.lastFromNb = false;
-  const due = nbDueList(cat).filter(q => !G.used.has(q.id));
+  const builtinIds = G.mode === 'ranked' ? new Set(BUILTIN.map(q => q.id)) : null;
+  const due = nbDueList(cat).filter(q => !G.used.has(q.id) && (!builtinIds || builtinIds.has(q.id)));
   if (due.length && Math.random() < NB_MIX) {
     const q = due[Math.floor(Math.random() * due.length)];
     G.used.add(q.id); G.lastFromNb = true; if (import.meta.env.MODE === 'test') window.__lastQ = q; return q;
   }
-  const pool = allQuestions().filter(q => q.category === cat);
-  const src = pool.length ? pool : allQuestions();
+  const pool = bankFor().filter(q => q.category === cat);
+  const src = pool.length ? pool : bankFor();
   const pref = G.tutorial ? [1] : { 1: [1], 2: [1, 2], 3: [2], 4: [3, 2] }[rank] || [1, 2, 3];   // the tutorial asks 初階 only
   let cand = src.filter(q => pref.includes(q.difficulty) && !G.used.has(q.id));
   if (!cand.length) cand = src.filter(q => !G.used.has(q.id));

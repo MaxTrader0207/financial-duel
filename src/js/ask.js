@@ -11,6 +11,9 @@ import { SKILLS, skillLine } from './skills.js';
 import { Sound } from './sound.js';
 import { G } from './game.js';
 import { renderStreak } from './board.js';
+import * as Usage from './usage.js';
+import { BUILTIN } from './bank.js';
+let builtinSet = null;                                    // the bank's own question objects (custom edits are not counted)
 import { Tutor } from './tutor.js';
 
 function ask(m, mode, foe) {
@@ -77,6 +80,8 @@ function ask(m, mode, foe) {
       const nbBefore = !!(NB[q.id] && !NB[q.id].mastered);
       nbRecord(q, correct && !retried); qsRecord(q, correct && !retried);
       if (!(correct && !retried) && !nbBefore) G.nbAdded = (G.nbAdded || 0) + 1;
+      if ((builtinSet || (builtinSet = new Set(BUILTIN))).has(q)) Usage.question(q.id, pos === -1 ? -1 : order[pos], q.answer);
+      if (G.mode === 'ranked') (G.answerLog || (G.answerLog = [])).push({ qid: q.id, pick: pos === -1 ? -1 : order[pos], ms: Math.round(time * 1000), mode });   // judged again by the server
       G.history.push({ turn: G.turn, mode, card: m.name, cat: q.category, diff: q.difficulty, q: q.q,
         chosen: pos === -1 ? null : q.options[order[pos]], answer: q.options[q.answer], correct, time, timeout: pos === -1, explain: q.explain, retried, fromNb });
       renderStreak();

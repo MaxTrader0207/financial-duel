@@ -117,7 +117,8 @@ function onlineResult(o) {
   if (!o) return '';
   if (o.pending) return '<div class="rr-online">線上排行榜：結算中…</div>';
   if (!o.ok) return `<div class="rr-online bad">線上排行榜：${esc(o.error)}</div>`;
-  return `<div class="rr-online ok">線上排行榜：本季第 <b>${o.me.rank}</b> 名 · <button class="linkbtn" type="button" data-act="board">查看排行榜</button></div>`;
+  const j = o.perf && o.perf.judged;
+  return `<div class="rr-online ok">線上排行榜：本季第 <b>${o.me.rank}</b> 名${j ? ` · 伺服器判分 答對 ${j.correct}/${j.total}` : ''} · <button class="linkbtn" type="button" data-act="board">查看排行榜</button></div>`;
 }
 /* the server answered after the result screen was drawn: redraw just the ranked block */
 export function refreshRankResult(G) {

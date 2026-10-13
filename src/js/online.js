@@ -112,7 +112,7 @@ export async function endMatch(result) {
   if (starting) await starting;
   if (!joined() || !O.ticket) return null;
   const payload = result.surrender ? { ticket: O.ticket, surrender: true }
-    : { ticket: O.ticket, win: !!result.win, perf: { knowledge: result.perf.knowledge, strategy: result.perf.strategy, risk: result.perf.risk } };
+    : { ticket: O.ticket, win: !!result.win, perf: { knowledge: result.perf.knowledge, strategy: result.perf.strategy, risk: result.perf.risk }, answers: (result.answers || []).slice(0, 150) };
   O.ticket = null; save(); gen++;
   const r = await request('POST', '/v1/match/end', payload);
   if (r.status === 0 || r.status >= 500) { O.outbox = payload; save(); return { ok: false, queued: true, error: '連不上排行榜伺服器，結果會在下次連線時送出' }; }

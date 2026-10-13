@@ -86,7 +86,7 @@ async function resumeDuel() {
         stats: d.stats, missed: d.missed || [], foeCard: d.foe ? MON[d.foe] : null, over: false, dealt: d.dealt || 0, taken: d.taken || 0,
         mods: { myAtk: 0, foeAtk: 0, skipFoe: false, skipMe: false, ...(d.mods || {}) }, flags: d.flags || {}, extraUsed: !!d.extraUsed, nbAdded: d.nbAdded || 0, bg: d.bg || BG.pick(),
         deckList: d.deckList && Array.isArray(d.deckList.p) ? d.deckList : null, weak: d.weak && CATS[d.weak] ? d.weak : null,
-        mode: ['casual', 'ranked', 'challenge'].includes(d.mode) && (d.mode !== 'challenge' || d.challenge) ? d.mode : 'casual', challenge: d.challenge || null, marketPlan: Array.isArray(d.marketPlan) ? d.marketPlan : null, market: d.market && typeof d.market === 'object' ? d.market : null,
+        mode: ['casual', 'ranked', 'challenge'].includes(d.mode) && (d.mode !== 'challenge' || d.challenge) ? d.mode : 'casual', challenge: d.challenge || null, answerLog: Array.isArray(d.answerLog) ? d.answerLog : [], marketPlan: Array.isArray(d.marketPlan) ? d.marketPlan : null, market: d.market && typeof d.market === 'object' ? d.market : null,
         perf: d.perf && typeof d.perf === 'object' ? d.perf : { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 },
         foeProf: okProf(d.foeProf) ? d.foeProf : foeProfile(), foeStats: d.foeStats && Number.isInteger(d.foeStats.t) ? d.foeStats : { t: 0, c: 0 }, foeBoost: typeof d.foeBoost === 'number' ? Math.min(0.3, Math.max(0, d.foeBoost)) : 0, kb: d.kb && typeof d.kb === 'object' ? d.kb : null });
   const g = G;
@@ -315,8 +315,9 @@ async function checkEnd() {
     G.perfResult = Ranked.performance(perfStats()); G.rank = Ranked.applyMatch(win, G.perfResult.score);
     if (Online.joined()) {                                 // the server scores it again; its answer replaces ours
       const g = G; g.online = { pending: true };
-      Online.endMatch({ win, perf: g.perfResult }).then(r => {
+      Online.endMatch({ win, perf: g.perfResult, answers: g.answerLog || [] }).then(r => {
         g.online = r || { ok: false, error: '這場開始時沒有連上排行榜，只計入這台裝置' };
+        if (r && r.ok && r.perf) g.perfResult = { ...g.perfResult, knowledge: r.perf.knowledge, score: r.perf.score, judged: r.perf.judged };   // the server's own judgement
         if (r && r.ok) g.rank = { ...g.rank, delta: r.delta, before: r.before, after: r.after, tierBefore: r.tierBefore, tierAfter: r.tierAfter, shielded: r.shielded, promoted: r.promoted, demoted: r.demoted };
         refreshRankResult(g);
       });

@@ -4,7 +4,12 @@ import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, execFileSync } from 'node:child_process';
 import { rmSync } from 'node:fs';
-import { cleanName } from '../src/index.js';
+import { cleanName } from '../src/names.js';
+import { readFileSync } from 'node:fs';
+
+/* answer logs for ranked results: 10 real questions from the bank, `right` of them answered correctly */
+const BANK = JSON.parse(readFileSync(new URL('../../public/data/questions.json', import.meta.url), 'utf8')).questions;
+const answers = (right, { ms = 3000, n = 10 } = {}) => BANK.slice(0, n).map((q, i) => ({ qid: q.id, pick: i < right ? q.answer : (q.answer + 1) % 4, ms, mode: i % 2 ? 'defend' : 'attack' }));
 
 const PORT = 8790, BASE = `http://127.0.0.1:${PORT}`;
 let dev;
@@ -15,6 +20,8 @@ const MIN = 60e3;
 let ipN = 0;
 async function call(method, path, { body, auth, now = clock, ip } = {}) {
   const headers = { 'X-Test-Now': String(now), 'CF-Connecting-IP': ip || `10.0.0.${++ipN}` };
+  /* a result with a performance and no answer log gets one whose knowledge part matches perf.knowledge */
+  if (path === '/v1/match/end' && body && body.perf && !body.answers && body.perf.knowledge <= 40) body = { ...body, answers: answers(Math.round(body.perf.knowledge / 4)) };
   if (body) headers['Content-Type'] = 'application/json';
   if (auth) headers.Authorization = `Bearer ${auth.id}.${auth.token}`;
   const res = await fetch(BASE + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
@@ -241,4 +248,34 @@ test('friend challenges: create with a score, others add theirs, best score per 
   assert.deepEqual(v.body.results.map(r => [r.name, r.score]), [['朋友A', 1100], ['出題者', 900], ['朋友B', 300]]);
   assert.equal((await call('GET', `/v1/challenge/${id}`, { now: clock + 31 * 864e5 })).status, 404);
   assert.equal((await call('GET', '/v1/challenge/ZZZZZZ')).status, 404);
+});
+
+test('the server judges ranked answers: knowledge comes from its own check, implausible logs are refused', async () => {
+  clock = Date.UTC(2027, 2, 1, 4);
+  const p = await join('判分測試');
+  const end = async (body, ms = 5 * MIN) => { const s = await call('POST', '/v1/match/start', { auth: p }); clock += ms; return call('POST', '/v1/match/end', { auth: p, body: { ticket: s.body.ticket, ...body } }); };
+  const r = await end({ win: true, perf: { knowledge: 40, strategy: 35, risk: 25 }, answers: answers(5) });     // the browser claims 40, the server finds 5/10
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(r.body.perf.knowledge, 20); assert.equal(r.body.perf.score, 80); assert.deepEqual(r.body.perf.judged, { total: 10, correct: 5 });
+  assert.equal((await end({ win: true, perf: { knowledge: 0, strategy: 0, risk: 0 }, answers: answers(1) })).status, 422);          // a win with one right answer
+  assert.equal((await end({ win: false, perf: { knowledge: 0, strategy: 0, risk: 0 }, answers: answers(2, { ms: 100 }) })).status, 422);   // 0.1 s answers
+  assert.equal((await end({ win: false, perf: { knowledge: 0, strategy: 0, risk: 0 }, answers: answers(2, { ms: 59000 }) }, 2 * MIN)).status, 422);   // longer than the duel
+  assert.equal((await end({ win: true, perf: { knowledge: 40, strategy: 0, risk: 0 }, answers: [{ qid: 'nope', pick: 0, ms: 3000, mode: 'attack' }] })).status, 422);
+  assert.equal((await end({ win: true, perf: { knowledge: 40, strategy: 0, risk: 0 }, answers: [] })).status, 422);
+});
+
+test('題目品質: answer counts per built-in question, and the disputed / hardest / easiest lists', async () => {
+  clock = Date.UTC(2027, 3, 1, 4);
+  const [a, b, c] = BANK;
+  const wrongOf = q => (q.answer + 1) % 4;
+  const counts = (q, right, wrong) => { const v = [right + wrong, right, 0, 0, 0, 0, 0]; v[2 + q.answer] += right; v[2 + wrongOf(q)] += wrong; return v; };
+  for (let i = 0; i < 3; i++) await call('POST', '/v1/ping', { body: { pid: (5000 + i).toString(16).padStart(32, '0'), days: { '2027-04-01': { open: 1 } },
+    q: { [a.id]: counts(a, 3, 7), [b.id]: counts(b, 10, 0), [c.id]: counts(c, 1, 0), nope: [1, 1, 1, 0, 0, 0, 0] } } });
+  const r = await call('GET', '/v1/stats?key=test-stats-key&format=json');
+  const Q = r.body.quality;
+  assert.equal(Q.enough, 2);                                             // c has only 3 answers
+  assert.equal(Q.disputed[0].qid, a.id); assert.equal(Q.disputed[0].rate, 0.3); assert.equal(Q.disputed[0].topWrong.n, 21);
+  assert.equal(Q.hardest[0].qid, a.id); assert.equal(Q.easiest[0].qid, b.id);
+  const html = await (await fetch(`${BASE}/v1/stats?key=test-stats-key`, { headers: { 'X-Test-Now': String(clock) } })).text();
+  assert.match(html, /題目品質/); assert.match(html, /可能有爭議/);
 });

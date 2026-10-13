@@ -40,6 +40,7 @@ function mockApi() {
     if (path === '/v1/me' && method === 'DELETE') { players.delete(p.id); return reply(200, { ok: true }); }
     if (path === '/v1/match/start') { const t = 'a'.repeat(31) + tickets.size; tickets.set(t, { player: p.id, open: true }); return reply(200, { ticket: t, season: S, forfeited: null }); }
     if (path === '/v1/match/end') {
+      api.lastEnd = body;
       const t = tickets.get(body.ticket);
       if (!t || t.player !== p.id) return reply(404, { error: '找不到這場對戰', code: 'ticket' });
       if (!t.open) return reply(409, { error: '這場對戰已經結算過了', code: 'used' });
@@ -52,7 +53,8 @@ function mockApi() {
     }
     return reply(404, { error: '找不到這個網址', code: 'not_found' });
   }
-  return { handle, calls, players, state };
+  const api = { handle, calls, players, state, lastEnd: null };
+  return api;
 }
 
 async function withApi(page) {
@@ -103,6 +105,9 @@ test('a ranked duel is scored by the server and shows the online rank', async ({
   await quickWin(page);
   await expect(page.locator('.rr-online')).toContainText('本季第 3 名');
   expect(api.calls).toEqual(expect.arrayContaining(['POST /v1/match/start', 'POST /v1/match/end']));
+  const log = api.lastEnd.answers;                                   // the answer log the server judges
+  expect(log.length).toBeGreaterThanOrEqual(1);
+  expect(log[0]).toEqual(expect.objectContaining({ qid: expect.any(String), pick: expect.any(Number), ms: expect.any(Number), mode: 'attack' }));
   const server = [...api.players.values()].find(x => x.name === '阿華');
   expect(server.w).toBe(1);
   expect(await page.evaluate(() => window.__T.ranked.state().rp)).toBe(server.rp);
