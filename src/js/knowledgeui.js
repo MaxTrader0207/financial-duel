@@ -1,4 +1,4 @@
-// knowledgeui.js — the 知識圖鑑 screen: collection progress, the 32 knowledge cards by kind, and a card's detail
+// knowledgeui.js — the 知識圖鑑 screen: collection progress, the 100 knowledge cards by kind, and a card's detail
 // (its explanation by level, how to get it, unlocking with shards, and the check question that levels it up).
 import { Actions } from './actions.js';
 import { $, KEYS, esc, shuffle } from './core.js';

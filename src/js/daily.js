@@ -27,10 +27,10 @@ export const TITLES = [
   { id: 's30', name: '月度金融通', desc: '連續 30 天完成每日挑戰', test: s => s.best >= 30 },
   { id: 's100', name: '百日理財達人', desc: '連續 100 天完成每日挑戰', test: s => s.best >= 100 },
   /* knowledge-card titles: k = knowledge.js stats, passed in by checkTitles() (absent when a daily challenge finishes) */
-  { id: 'k_stock', name: '選股入門', desc: '收集全部 8 張股票卡', test: (s, k) => !!k && k.byType.stock.owned >= k.byType.stock.total },
-  { id: 'k_defense', name: '穩健守護者', desc: '收集全部 8 張防禦卡', test: (s, k) => !!k && k.byType.defense.owned >= k.byType.defense.total },
-  { id: 'k_event', name: '景氣觀察家', desc: '收集全部 8 張事件卡', test: (s, k) => !!k && k.byType.event.owned >= k.byType.event.total },
-  { id: 'k_trap', name: '識破陷阱', desc: '收集全部 8 張陷阱卡', test: (s, k) => !!k && k.byType.trap.owned >= k.byType.trap.total },
+  { id: 'k_stock', name: '選股入門', desc: '收集全部 25 張股票卡', test: (s, k) => !!k && k.byType.stock.owned >= k.byType.stock.total },
+  { id: 'k_defense', name: '穩健守護者', desc: '收集全部 25 張防禦卡', test: (s, k) => !!k && k.byType.defense.owned >= k.byType.defense.total },
+  { id: 'k_event', name: '景氣觀察家', desc: '收集全部 25 張事件卡', test: (s, k) => !!k && k.byType.event.owned >= k.byType.event.total },
+  { id: 'k_trap', name: '識破陷阱', desc: '收集全部 25 張陷阱卡', test: (s, k) => !!k && k.byType.trap.owned >= k.byType.trap.total },
   { id: 'k_master', name: '金融百科', desc: '全部知識卡升到 Lv3（精通）', test: (s, k) => !!k && k.total > 0 && k.mastered >= k.total },
 ];
 

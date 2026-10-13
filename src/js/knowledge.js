@@ -1,7 +1,7 @@
 // knowledge.js — 金融知識卡: a collectible encyclopedia of finance concepts (rules only; the screen is knowledgeui.js).
-// 32 cards in 4 kinds — 股票卡, 防禦卡, 事件卡, 陷阱卡 — from public/data/knowledge.json. Each card has 3 levels;
+// 100 cards in 4 kinds (25 each) — 股票卡, 防禦卡, 事件卡, 陷阱卡 — from public/data/knowledge.json. Each card has 3 levels;
 // a level unlocks the next section of its explanation (是什麼 → 實際例子 → 常見誤區). Getting cards: 4 starters,
-// finishing a daily challenge unlocks its linked card, or spend shards. Levelling up costs shards and a right answer
+// finishing a daily challenge unlocks its linked card, the first duel win of each day draws one, or spend shards. Levelling up costs shards and a right answer
 // to that card's check question, so collecting a card fully means having learned it.
 import { Store, isObj } from './core.js';
 import { DATA } from './data.js';
@@ -13,7 +13,7 @@ export const UNLOCK_COST = 20;               // shards to unlock a card directly
 export const UPGRADE_COST = [15, 30];        // shards for Lv1 → 2 and Lv2 → 3 (charged only when the check is passed)
 export const DUEL_WIN_SHARDS = 4;            // a duel win also feeds the shard pool
 
-let K = { cards: {}, starter: false };
+let K = { cards: {}, starter: false, dropDay: null };
 export function load() {
   K = { cards: {}, starter: false, ...Store.load(KNOW_KEY, { version: KNOW_V, fallback: () => ({}), validate: isObj }) };
   if (!K.starter) { (DATA.knowledge.starter || []).forEach(id => byId(id) && (K.cards[id] = { lv: 1, src: 'starter', seen: false })); K.starter = true; save(); }
@@ -70,6 +70,21 @@ export function upgrade(id, pick) {
   K.cards[id].lv++; save();
   return { ok: true, lv: K.cards[id].lv, titles: Daily.checkTitles(stats()) };
 }
-export function onDuelWin() { Daily.addShards(DUEL_WIN_SHARDS); return DUEL_WIN_SHARDS; }
+/* a duel win: shards, and the first win of the day also unlocks one uncollected card — from the kind the player has
+   the fewest of, so the four kinds fill up together. Returns { shards, card, titles } */
+export function onDuelWin(rnd = Math.random) {
+  Daily.addShards(DUEL_WIN_SHARDS);
+  const out = { shards: DUEL_WIN_SHARDS, card: null, titles: [] };
+  const today = Daily.dayKey();
+  if (K.dropDay === today) return out;
+  const locked = all().filter(c => !K.cards[c.id]); if (!locked.length) return out;
+  const s = stats().byType;
+  const ratio = t => (s[t] ? s[t].owned / s[t].total : 1);
+  const kind = [...new Set(locked.map(c => c.type))].sort((a, b) => ratio(a) - ratio(b))[0];
+  const pool = locked.filter(c => c.type === kind), c = pool[Math.floor(rnd() * pool.length)];
+  K.dropDay = today;
+  out.titles = unlock(c.id, 'duel') || []; out.card = c;
+  return out;
+}
 
 export function init() { load(); }

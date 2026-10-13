@@ -289,7 +289,7 @@ async function checkEnd() {
   G.fsm.go('over');
   G.over = true; const win = G.lp.c <= 0; G.win = win; G.endedAt = new Date(); clearSave(); Tutor.end();
   recordGame(false); Usage.duel(G.mode, win);
-  if (win) G.shardsWon = onDuelWin();                     // shards for knowledge cards and reward picks
+  if (win) { const w = onDuelWin(); G.shardsWon = w.shards; G.knowWon = w.card; }   // shards, and the day's first win draws a knowledge card
   if (G.mode === 'ranked') {
     G.perfResult = Ranked.performance(perfStats()); G.rank = Ranked.applyMatch(win, G.perfResult.score);
     if (Online.joined()) {                                 // the server scores it again; its answer replaces ours

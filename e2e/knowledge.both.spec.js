@@ -58,7 +58,7 @@ test('finishing the daily challenge hands out its knowledge card', async ({ page
   expect(await page.evaluate(c => window.__T.knowledge.lv(c), card)).toBe(1);
 });
 
-test('a duel win adds shards, shown on the result screen', async ({ page, errors }) => {
+test('a duel win adds shards, and the first win of the day a knowledge card', async ({ page, errors }) => {
   await open(page);
   await page.click('#btn-start');
   await until(page, () => window.__T.G && window.__T.G.phase === 'attack' && !window.__T.G.busy);
@@ -66,5 +66,8 @@ test('a duel win adds shards, shown on the result screen', async ({ page, errors
   await page.click('#hand .hand-card >> nth=0');
   await answer(page, true);
   await expect(page.locator('#scr-result')).toBeVisible({ timeout: 30_000 });
-  await expect(page.locator('.shard-line')).toContainText('+4');
+  await expect(page.locator('.shard-line').first()).toContainText('+4');
+  const card = await page.evaluate(() => window.__T.G.knowWon.name);
+  await expect(page.locator('.shard-line').nth(1)).toContainText(`今日首勝，收集到知識卡【${card}】`);
+  expect(await page.evaluate(() => window.__T.knowledge.stats().owned)).toBe(5);
 });

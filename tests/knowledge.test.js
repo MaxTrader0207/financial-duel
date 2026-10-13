@@ -10,11 +10,13 @@ beforeEach(() => {
 });
 
 describe('knowledge.json', () => {
-  it('has 8 cards of each kind, 3 explanation levels and 2 check questions each', () => {
+  it('has 25 cards of each kind, 3 explanation levels and 2 check questions each', () => {
     const cards = DATA.knowledge.cards;
-    expect(cards).toHaveLength(32);
-    for (const t of ['stock', 'defense', 'event', 'trap']) expect(cards.filter(c => c.type === t)).toHaveLength(8);
-    expect(new Set(cards.map(c => c.id)).size).toBe(32);
+    expect(cards).toHaveLength(100);
+    for (const t of ['stock', 'defense', 'event', 'trap']) expect(cards.filter(c => c.type === t)).toHaveLength(25);
+    expect(new Set(cards.map(c => c.id)).size).toBe(100);
+    expect(new Set(cards.map(c => c.name)).size).toBe(100);
+    for (const c of cards) expect(c.id.startsWith({ stock: 'stk_', defense: 'def_', event: 'evt_', trap: 'trap_' }[c.type]), c.id).toBe(true);
     for (const c of cards) {
       expect(c.levels.map(l => l.title), c.id).toEqual(['是什麼', '實際例子', '常見誤區']);
       expect(c.levels.every(l => l.text.length > 40), c.id).toBe(true);
@@ -63,7 +65,14 @@ describe('knowledge cards', () => {
     const got = stocks.map(id => K.buy(id).titles).flat();
     expect(got).toContain('k_stock'); expect(Daily.profile().titles).toContain('k_stock');
   });
-  it('a duel win adds shards', () => {
-    expect(K.onDuelWin()).toBe(K.DUEL_WIN_SHARDS); expect(Daily.profile().shards).toBe(K.DUEL_WIN_SHARDS);
+  it('a duel win adds shards, and the first win of the day draws a card from the least collected kind', () => {
+    const first = K.onDuelWin();
+    expect(first.shards).toBe(K.DUEL_WIN_SHARDS); expect(Daily.profile().shards).toBe(K.DUEL_WIN_SHARDS);
+    expect(first.card).toBeTruthy(); expect(K.lv(first.card.id)).toBe(1);
+    expect(first.card.type).toBe('stock');                          // starters: 2 defense, 1 event, 1 trap → stock is emptiest
+    expect(K.onDuelWin().card).toBeNull();                          // second win the same day: shards only
+    Daily.setClock(() => new Date('2026-10-14T12:00:00'));
+    expect(K.onDuelWin().card).toBeTruthy();
+    Daily.setClock();
   });
 });

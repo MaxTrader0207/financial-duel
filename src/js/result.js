@@ -14,6 +14,8 @@ import { WEAK_MULT } from './rules.js';
 import { renderTitle } from './screens.js';
 import { show } from './view.js';
 import { G } from './game.js';
+import * as K from './knowledge.js';
+import { openKnow } from './knowledgeui.js';
 
 
 /* ---------- result ---------- */
@@ -35,6 +37,7 @@ function renderResult(win) {
     </div>
     ${rankResultHTML(G)}
     ${G.shardsWon ? `<p class="lead shard-line">勝利額外獲得卡牌碎片 <b>+${G.shardsWon}</b>，可以到「知識圖鑑」解鎖、升級知識卡。</p>` : ''}
+    ${G.knowWon ? `<p class="lead shard-line">今日首勝，收集到知識卡<b>【${esc(G.knowWon.name)}】</b>（${esc(K.TYPES()[G.knowWon.type] || '')}）。<button class="linkbtn" type="button" id="res-know">去圖鑑看看</button></p>` : ''}
     ${G.foeStats && G.foeStats.t ? `<p class="lead foe-line">對手防禦答題 <b>${G.foeStats.c}/${G.foeStats.t}</b>${G.foeProf ? `（這場擅長 ${G.foeProf.strong.map(k => CATS[k].name).join('、')}，不擅長 ${G.foeProf.weak.map(k => CATS[k].name).join('、')}）` : ''}。</p>` : ''}
     ${win ? rewardHTML() : ''}
     ${bars ? `<h3 class="sec">各屬性表現</h3><div class="catbars">${bars}</div>` : ''}
@@ -49,6 +52,7 @@ function renderResult(win) {
     </div>
     <div class="btn-row"><button class="btn" type="button" id="btn-again">再戰一場</button><button class="btn ghost" type="button" id="btn-res-rec">學習紀錄</button><button class="btn ghost" type="button" id="btn-home">回標題</button></div>`;
   wireReward();
+  if ($('#res-know')) $('#res-know').onclick = () => openKnow(G.knowWon.id);
   if (!Tutor.tip(win && COL.pending ? 'reward' : 'record')) Tutor.tip('record');
   $('#btn-res-rec').onclick = () => { renderRecord(); show('record'); };
   $('#btn-pdf').onclick = e => exportReport('pdf', e.currentTarget);

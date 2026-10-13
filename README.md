@@ -4,7 +4,7 @@
 
 **▶ 線上遊玩：https://maxtrader0207.github.io/financial-duel/**
 
-每天還有一則 3 分鐘的生活金融挑戰（信用卡、詐騙、保險、儲蓄…），完成可以拿經驗值、卡牌碎片和稱號；排位賽依段位與表現計分，每月賽季發放限定稱號與卡背，也可以取個暱稱加入線上排行榜（後端在 `worker/`，Cloudflare Workers + D1）；還有 32 張「金融知識卡」可以收集、升級，集成一套金融知識圖鑑。
+每天還有一則 3 分鐘的生活金融挑戰（信用卡、詐騙、保險、儲蓄…），完成可以拿經驗值、卡牌碎片和稱號；排位賽依段位與表現計分，每月賽季發放限定稱號與卡背，也可以取個暱稱加入線上排行榜（後端在 `worker/`，Cloudflare Workers + D1）；還有 100 張「金融知識卡」（股票、防禦、事件、陷阱各 25 張）可以收集、升級，集成一套金融知識圖鑑。
 
 免安裝、免登入，電腦與手機都能玩。手機可以「安裝到主畫面」，像 App 一樣全螢幕開啟，離線也能玩。
 
@@ -47,7 +47,7 @@ cd worker && npm ci && npm test   # 線上排行榜 API 的整合測試（本機
 |---|---|
 | `public/data/cards.json` | 160 張卡：`id`、`name`、`cat`（tech fund deriv risk chips fx crypto etf）、`rank` 1–4、`atk`、`def`、`race`、`sigil`、`text` |
 | `public/data/questions.json` | 400 題，格式與遊戲內「題庫管理」的匯入格式相同 |
-| `public/data/knowledge.json` | 32 張金融知識卡：`type`（stock 股票卡、defense 防禦卡、event 事件卡、trap 陷阱卡）、`name`、`sigil`、`summary`、`levels`（Lv1–Lv3 的說明：是什麼、實際例子、常見誤區）、`quiz`（升 Lv2、Lv3 的檢定題）；`starter` 是新玩家一開始擁有的卡 |
+| `public/data/knowledge.json` | 100 張金融知識卡（四種各 25 張）：`type`（stock 股票卡、defense 防禦卡、event 事件卡、trap 陷阱卡）、`name`、`sigil`、`summary`、`levels`（Lv1–Lv3 的說明：是什麼、實際例子、常見誤區）、`quiz`（升 Lv2、Lv3 的檢定題）；`starter` 是新玩家一開始擁有的卡 |
 | `public/data/daily.json` | 每日挑戰的生活金融情境（目前 30 個 × 3 題）：`id`、`theme`、`title`、`scene`、`questions`（`q`、4 個 `options`、`answer`、`explain`）、`takeaway`、`card`（完成這天會解鎖的知識卡），有時效的數字可加 `asOf`／`reviewBy`。依日期輪替，30 天一輪；直接加情境就會排進輪替 |
 
 GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要重新建置。
@@ -93,7 +93,7 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
 | `usage.js` | 匿名使用統計：隨機編號＋每天的開啟、對戰、每日挑戰次數，送到排行榜伺服器加總；設定裡可關閉 |
 | `online.js`、`boardui.js` | 線上排行榜：加入／改名／退出、排位賽開局取憑證與結算、離線時暫存結果下次送出、排行榜畫面 |
 | `ranked.js`、`rankedui.js` | 排位賽：段位、依勝負與表現計分、段位保護、牌組點數上限與排位自動組牌、每月賽季與獎勵、卡背／排位畫面、賽季結算、結算畫面的排位區塊 |
-| `knowledge.js`、`knowledgeui.js` | 金融知識卡：收集（新手卡、每日挑戰、碎片）、檢定升級、收集稱號、對戰勝利碎片／知識圖鑑畫面與卡片詳情 |
+| `knowledge.js`、`knowledgeui.js` | 金融知識卡：收集（新手卡、每日挑戰、每天第一場勝利、碎片）、檢定升級、收集稱號、對戰勝利碎片／知識圖鑑畫面與卡片詳情 |
 | `daily.js`、`dailyui.js` | 每日 3 分鐘金融挑戰：依日期選情境、經驗值與碎片、連續天數、稱號、等級／畫面與標題卡片 |
 | `tutor.js`、`tutorial-script.js` | 新手引導的 8 個步驟與前幾場的出牌提示／教學對戰的設定（難度、資金、對手第一次答錯、保證相剋卡） |
 | 其他 | 背景、音效、設定、遊玩時間、新手引導與小提示、事件綁定（`wiring.js`） |

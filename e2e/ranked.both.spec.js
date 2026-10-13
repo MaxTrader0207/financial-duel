@@ -21,6 +21,11 @@ test('a ranked win earns points scored by performance', async ({ page, errors })
   await quickWin(page);
   await expect(page.locator('.rank-res')).toBeVisible();
   await expect(page.locator('.rank-res .catbars')).toContainText('風險管理');
+  await expect(page.locator('.shard-line').filter({ hasText: '今日首勝' })).toBeVisible();     // the day's first win draws a knowledge card
+  await page.click('#res-know');
+  await expect(page.locator('#kn-dlg')).toBeVisible();
+  await page.click('#kn-close');
+  await page.evaluate(() => window.__T.openRanked());
   const r = await page.evaluate(() => window.__T.G.rank);
   expect(r.delta).toBeGreaterThanOrEqual(15); expect(r.delta).toBeLessThanOrEqual(30);
   expect(await page.evaluate(() => window.__T.ranked.state().rp)).toBe(r.after);
