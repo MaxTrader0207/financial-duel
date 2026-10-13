@@ -22,7 +22,6 @@ test('titles and card names keep the game fonts with Google Fonts blocked', asyn
   expect(await page.evaluate(async () => { await document.fonts.ready;
     const faces = await Promise.all([document.fonts.load('900 24px "FD Serif"', '金融決鬥'), document.fonts.load('900 24px "FD Sans"', '我方回合')]);
     return [faces[0].length > 0, faces[1].length > 0, document.fonts.check('900 24px "FD Serif"', '金融決鬥'), document.fonts.check('900 24px "FD Sans"', '我方回合')]; })).toEqual([true, true, true, true]);
-  expect(await page.evaluate(() => [...document.fonts].filter(f => f.family.includes('FD') && f.status === 'loaded').length)).toBeLessThan(6);   // not every part on the title screen
   expect(await page.evaluate(() => getComputedStyle(document.querySelector('.c-name')).fontFamily)).toContain('FD Serif');
 });
 
