@@ -16,19 +16,26 @@ Tutor = (() => {
   const ORDER = ['goal', 'hand', 'quiz', 'feedback', 'foe', 'defend', 'skill', 'done'];
   const STEPS = {
     goal: { title: '目標', sel: '.bar.foe', btn: '下一步',
-      text: '把對手的資金打到 0 就獲勝；你的資金在下方，先歸零就輸了。這是教學對戰：難度固定為簡易（每題 30 秒）、只出初階題，對手資金只有一半。' },
+      text: '把對手的資金打到 0 就贏了。',
+      more: '你的資金在下方，先歸零就輸。教學對戰固定簡易難度（每題 30 秒）、只出初階題，對手資金只有一半。' },
     hand: { title: '出牌', sel: '#hand',
-      text: '點一張手牌召喚。卡的屬性決定題目類型，攻擊力就是答對時造成的傷害。發光的這張攻擊力最高，先出它試試。' },
+      text: '點發光的這張卡召喚，答對題目就能攻擊。',
+      more: '卡的屬性決定題目類型，攻擊力就是答對時造成的傷害。發光的這張攻擊力最高。' },
     quiz: { title: '答題', sel: '#quiz .q-main', btn: '開始計時',
-      text: '在時限內選出正確答案，也可以按鍵盤 1–4。答對才會發動攻擊，越快答對還有速攻 +300，連續答對 3 題起再加連鎖加成。這一題會等你按下「開始計時」。' },
+      text: '選出正確答案，答對才會發動攻擊。',
+      more: '也可以按鍵盤 1–4。越快答對還有速攻 +300，連續答對 3 題起再加連鎖加成。這一題會等你按下「開始計時」。' },
     feedback: { title: '看解析', sel: '#q-feedback', btn: '知道了',
-      text: '每題都有解析，答對答錯都值得看一眼。答錯的題目會自動收進「錯題本」，之後的對戰會再出給你複習，直到你掌握為止。' },
+      text: '答錯的題目會自動收進「錯題本」，之後會再出給你複習。',
+      more: '每題都有解析，答對答錯都值得看一眼。錯題本會依間隔複習，直到你真正掌握為止。' },
     foe: { title: '對手也會答題', sel: '#foe-quiz', btn: '繼續',
-      text: '你答對後，對手會派一張卡抵擋，並當場回答同屬性的題目。這次它答錯了，你的攻擊全額命中！它答對時只會讓「攻擊力 − 守備力」穿過。對手資金下方寫著它這場擅長和不擅長的屬性，用它不擅長的屬性攻擊比較容易打穿。' },
+      text: '對手會派卡抵擋並答題；這次它答錯，你全額命中！',
+      more: '它答對時只會讓「攻擊力 − 守備力」穿過。對手資金下方寫著它這場擅長和不擅長的屬性，用它不擅長的屬性攻擊比較容易打穿。' },
     defend: { title: '防禦', sel: '#hand',
-      text: '對手攻擊了！選一張手牌抵擋，題目會出攻擊方的屬性。答對只承受「攻擊力 − 守備力」，守備比較高還會反彈；答錯就全額承受。標著「相剋 ×1.5」的卡守備力更高，發光的這張就是。' },
+      text: '對手攻擊了！點發光的這張卡抵擋。',
+      more: '題目會出攻擊方的屬性。答對只承受「攻擊力 − 守備力」，守備比較高還會反彈；答錯就全額承受。標著「相剋 ×1.5」的卡守備力更高。對戰中可以隨時按右上角的「?」查看相剋圖和傷害規則。' },
     skill: { title: '技能', sel: '#hand', btn: '知道了',
-      text: '每張卡都有專屬技能，寫在卡片下方的【】裡，例如攻擊命中時加傷害、防禦失敗時減傷。長按卡片（電腦可直接點住不放）能放大看全文，答題視窗上方也會顯示這張卡的技能。' },
+      text: '每張卡都有專屬技能，長按卡片可以看全文。',
+      more: '技能寫在卡片下方的【】裡，例如攻擊命中時加傷害、防禦失敗時減傷。電腦可以直接點住不放；答題視窗上方也會顯示這張卡的技能。' },
     done: { title: '教學完成', sel: null, btn: '繼續對戰', html: true,
       text: `<ul class="tut-list">
         <li>出牌：屬性決定題目，攻擊力就是傷害</li><li>答題：限時作答，越快越好</li><li>解析與錯題本：答錯的題目會再出現</li>
@@ -70,7 +77,10 @@ Tutor = (() => {
     const s = STEPS[id]; shown.add(id); current = id; target = s.sel;
     $('#tut-step').textContent = `新手引導 ${shown.size} / ${ORDER.length}`;
     $('#tut-title').textContent = s.title;
-    if (s.html) $('#tut-text').innerHTML = s.text; else $('#tut-text').textContent = s.text;
+    const tx = $('#tut-text');
+    if (s.html) tx.innerHTML = s.text;
+    else { tx.textContent = ''; const p = document.createElement('p'); p.textContent = s.text; tx.appendChild(p);
+      if (s.more) { const d = document.createElement('details'); d.className = 'tut-more'; d.innerHTML = '<summary>看更多</summary><p></p>'; d.querySelector('p').textContent = s.more; d.ontoggle = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(place); }; tx.appendChild(d); } }
     $('#tut-ok').hidden = !s.btn; if (s.btn) $('#tut-ok').textContent = s.btn;
     $('#tut-skip').hidden = id === 'done';
     $('#tutor').hidden = false; $('#tutor').classList.toggle('center', !s.sel);

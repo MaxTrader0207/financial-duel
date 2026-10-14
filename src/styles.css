@@ -1197,3 +1197,47 @@ html[data-back="hall"] .card.back .mark{color:#ffe08a;border-color:#ffe08a;box-s
 @media (max-width:640px){ .title-hook{font-size:15px;margin-top:-8px} }
 .rec-export{margin-top:6px}
 .rec-export[hidden]{display:none}
+/* tutorial bubble: one key line, details on demand */
+.tut-text{display:grid;gap:6px}
+.tut-text > p:first-child{font-size:16px;font-weight:600;line-height:1.55}
+.tut-more summary{cursor:pointer;font-size:13px;color:#7a1d10;width:max-content}
+.tut-more p{margin-top:6px !important;color:#4a4030}
+/* 規則速查 */
+.rules-btn{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border:1px solid var(--gold);background:color-mix(in oklab,var(--gold) 14%,var(--ink2));color:var(--gold-hi);font:inherit;font-size:13px;cursor:pointer;border-radius:999px;line-height:1.2}
+.rules-btn > span{color:var(--text)}
+.rules-btn:hover{background:color-mix(in oklab,var(--gold) 26%,var(--ink2))}
+.rules-card{width:min(620px,100%)}
+#rules-body{display:grid;gap:14px}
+#rules-body h4{margin:0 0 6px;font-weight:600;font-size:16px;color:var(--gold-hi)}
+#rules-body p{margin:6px 0 0;font-size:14px;line-height:1.6;color:var(--muted)}
+#rules-body p b{color:var(--text)}
+.rr-list{margin:0;padding-left:1.2em;display:grid;gap:6px;font-size:14px;line-height:1.6;color:var(--muted)}
+.rr-list b{color:var(--text);font-weight:600}
+.rw{display:block;width:100%;max-width:420px;margin:0 auto}
+.rw-arrow{stroke:var(--muted);stroke-width:2}
+.rw-arrow.on{stroke:var(--gold-hi);stroke-width:3}
+.rw-head{fill:var(--muted)} .rw-head.on{fill:var(--gold-hi)}
+.rw-node circle{stroke:#fff;stroke-width:1.5}
+.rw-node.hi circle{stroke:var(--gold-hi);stroke-width:4}
+.rw-badge{fill:#fff;font-family:var(--f-name);font-size:20px;text-anchor:middle;dominant-baseline:middle}
+.rw-name{fill:var(--text);font-size:15px;dominant-baseline:middle}
+.rw-mid{fill:var(--muted);font-size:14px;text-anchor:middle}
+.rules-btn i{font-style:normal;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--gold);color:var(--ink);font-weight:700;font-size:13px}
+/* 新手任務 */
+.quest-card{display:grid;gap:10px;padding:14px 16px;background:linear-gradient(135deg,color-mix(in oklab,var(--gold) 12%,var(--ink2)),var(--ink2));border:1px solid color-mix(in oklab,var(--gold) 60%,var(--line))}
+.quest-card[hidden]{display:none}
+.qc-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.qc-head .seal-s{flex:none;display:grid;place-items:center;width:30px;height:30px;background:var(--gold);color:var(--ink);font-family:var(--f-name);font-weight:600;font-size:16px}
+.qc-head b{font-weight:600;font-size:15px;letter-spacing:.08em;color:var(--gold-hi)}
+.qc-head small{margin-left:auto;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.qc-dots{display:flex;gap:5px}
+.qc-dots i{width:18px;height:6px;background:var(--line)}
+.qc-dots i.on{background:var(--gold)}
+.qc-dots i.now{background:color-mix(in oklab,var(--gold) 45%,var(--line));box-shadow:0 0 0 1px var(--gold)}
+.qc-now{display:flex;align-items:center;gap:12px}
+.qc-t{display:grid;gap:2px;min-width:0;flex:1}
+.qc-t b{font-size:16px;font-weight:600}
+.qc-t small{font-size:13px;color:var(--muted);line-height:1.5}
+.qc-now .btn{flex:none}
+.qc-reward{font-size:12px;color:var(--muted)}
+.toast{pointer-events:none}

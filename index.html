@@ -58,6 +58,11 @@
       <p class="title-hook" id="title-hook"></p>
       <button class="daily-card" id="daily-card" type="button" hidden></button>
       <button class="nb-due" id="nb-due" type="button" hidden><span class="seal-s">複</span><span class="t"><b id="nb-due-n"></b><small>錯題本到期了，花一兩分鐘把它們打回去</small></span><span class="go">開始 ▶</span></button>
+      <div class="quest-card" id="quest-card" hidden>
+        <div class="qc-head"><span class="seal-s">任</span><b>新手任務</b><span class="qc-dots" id="qc-dots" aria-hidden="true"></span><small id="qc-prog"></small></div>
+        <div class="qc-now"><div class="qc-t"><b id="qc-title"></b><small id="qc-desc"></small></div><button class="btn small" id="qc-go" type="button">前往</button></div>
+        <small class="qc-reward">每完成一項得 30 碎片，全部完成獲得稱號「新手畢業生」</small>
+      </div>
       <div class="fan" id="fan"></div>
       <ol class="steps3" aria-label="三步驟玩法">
         <li><span class="n">壹</span><b>出牌</b><span>從手牌選一張卡召喚</span></li>
@@ -117,7 +122,7 @@
 <!-- DUEL -->
 <section class="screen" id="scr-duel" hidden>
   <div class="duel" id="duel">
-    <div class="topline"><span class="turn" id="turn-label">第 1 回合</span><span id="streak-label" class="streak-label"></span></div>
+    <div class="topline"><span class="turn" id="turn-label">第 1 回合</span><span id="streak-label" class="streak-label"></span><button class="rules-btn" id="btn-rules" type="button" aria-label="規則速查" title="規則速查：相剋圖、傷害怎麼算"><i aria-hidden="true">?</i><span>規則</span></button></div>
     <div class="market-label" id="market-label" hidden></div>
     <div class="bar foe">
       <div class="seal">對手</div>
@@ -369,6 +374,13 @@
 <div id="season-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-label="賽季結算">
   <div class="care-card"><div id="season-body"></div><div class="btn-row"><button class="btn" id="season-ok" type="button">收下</button></div></div>
 </div>
+<div id="rules-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="rules-title">
+  <div class="care-card rules-card">
+    <div class="care-h"><div class="seal">規</div><h3 id="rules-title">規則速查</h3></div>
+    <div id="rules-body"></div>
+    <div class="btn-row"><button class="btn small" id="rules-close" type="button">回到對戰</button></div>
+  </div>
+</div>
 <div id="settings" class="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="set-title">
   <div class="care-card">
     <div class="care-h"><div class="seal">設</div><h3 id="set-title">設定</h3></div>
@@ -425,7 +437,7 @@
   <div class="tut-bubble" id="tut-bubble" role="dialog" aria-live="polite" aria-labelledby="tut-title">
     <div class="tut-step" id="tut-step"></div>
     <h4 id="tut-title"></h4>
-    <p id="tut-text"></p>
+    <div class="tut-text" id="tut-text"></div>
     <div class="tut-actions"><button class="btn small" id="tut-ok" type="button" hidden>知道了，開始計時</button><button class="linkbtn" id="tut-skip" type="button">略過引導</button></div>
   </div>
 </div>

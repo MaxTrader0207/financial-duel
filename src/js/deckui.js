@@ -1,4 +1,5 @@
 // deckui.js — the 牌組編輯 screen and the 學習紀錄 back / clear buttons.
+import * as Quests from './quests.js';
 import { register } from './actions.js';
 import { DECK_CAP, deckCost } from './ranked.js';
 import { CATS, MON, MONSTERS, RARITY, RARITY_FULL, cardHTML, cardSlot, fillLazy } from './cards.js';
@@ -66,7 +67,7 @@ $('#deck-weak').onclick = () => { const w = weakCat(); if (!w) return; deckDraft
 $('#deck-clear').onclick = () => { deckDraft = []; renderDeck(); };
 $('#deck-save').onclick = () => {
   if (!deckValid(deckDraft)) { renderDeck(`牌組需要剛好 ${DECK_SIZE} 張已收集的卡，每種最多 ${DECK_COPY} 張。`); return; }
-  setDeck(deckDraft.slice()); renderDeck(deckSave() ? '牌組已儲存，下一場對戰開始生效。' : '這個瀏覽器無法儲存，牌組只在這次開啟期間有效。');
+  setDeck(deckDraft.slice()); Quests.mark('deck'); renderDeck(deckSave() ? '牌組已儲存，下一場對戰開始生效。' : '這個瀏覽器無法儲存，牌組只在這次開啟期間有效。');
 };
 $('#btn-deck').onclick = openDeck;
 $('#btn-deck-back').onclick = () => {

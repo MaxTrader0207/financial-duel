@@ -1,4 +1,5 @@
 // notebook.js — the 錯題本: wrong answers with spaced review (now, 1 day, 3 days), its screen and review mode.
+import * as Quests from './quests.js';
 import { DIFF_LABEL } from './rules.js';
 import { allQuestions } from './bank.js';
 import { CATS } from './cards.js';
@@ -83,7 +84,7 @@ function answerReview(pos) {
   if (!RV || RV.done) return;
   const q = RV.list[RV.i], cp = RV.order.indexOf(q.answer), ok = pos === cp;
   RV.done = true; if (ok) RV.right++;
-  const res = nbRecord(q, ok, ok ? undefined : q.options[RV.order[pos]]);
+  const res = nbRecord(q, ok, ok ? undefined : q.options[RV.order[pos]]); Quests.mark('nb');
   [...$('#rv-opts').children].forEach((b, i) => { b.disabled = true; if (i === cp) b.classList.add('right'); else if (i === pos) b.classList.add('wrong'); });
   ok ? Sound.correct() : Sound.wrong();
   const e = NB[q.id];

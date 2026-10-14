@@ -14,6 +14,7 @@ import { SKILLS } from './skills.js';
 import { Sound } from './sound.js';
 import { Tutor } from './tutor.js';
 import { currentHook } from './titlehook.js';
+import { renderQuests } from './quests.js';
 
 let dexCat;
 
@@ -41,7 +42,7 @@ function renderTitle() {
     $('#nb-due').hidden = !c.due || !Tutor.done(); $('#nb-due-n').textContent = `${c.due} 題正在等你復仇`; }
   $('#bank-note').textContent = `題庫共 ${all.length} 題（內建 ${BUILTIN.length}、自訂 ${customMem.length}）· 收藏 ${COL.owned.length}/${MONSTERS.length} 種${COL.pending ? ' · 有一張獎勵卡待領取' : ''}`;
   { const h = currentHook({ questions: all.length, cards: MONSTERS.length }), el = $('#title-hook'); el.textContent = h.text; el.dataset.kind = h.kind; }
-  renderDailyCard(); renderKnowButton(); renderRankedButton();
+  renderDailyCard(); renderKnowButton(); renderRankedButton(); renderQuests();
 }
 export function init() {
 register({ renderTitle });

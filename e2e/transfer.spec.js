@@ -25,7 +25,7 @@ test('a transfer code moves progress to another browser', async ({ browser, page
 
   const other = await browser.newContext(); const p2 = await other.newPage();
   await p2.route(/fonts\./, r => r.abort()); await p2.route(/financial-duel-api\./, api);
-  await p2.addInitScript(() => { localStorage.setItem('soba-ketto.e2e.fast', '1'); localStorage.setItem('soba-ketto.tutorial.v1', 'done'); });
+  await p2.addInitScript(() => { localStorage.setItem('soba-ketto.e2e.fast', '1'); localStorage.setItem('soba-ketto.tutorial.v1', 'done'); localStorage.setItem('soba-ketto.quests.v1', JSON.stringify({ claimed: ['tut', 'win', 'deck', 'daily', 'nb', 'ranked'], marks: {}, grad: true })); });
   await open(p2);
   expect(await p2.evaluate(() => window.__T.daily.profile().shards)).toBe(0);
   await p2.click('#btn-set');

@@ -50,6 +50,8 @@ import { init as init_nbexport } from './nbexport.js';
 import { init as init_tree } from './treeui.js';
 import { init as init_backbar } from './backbar.js';
 import { init as init_recexport } from './recexport.js';
+import { init as init_rulesref } from './rulesref.js';
+import { init as init_quests } from './quests.js';
 import { init as init_boot } from './boot.js';
 
 export function initAll() {
@@ -104,5 +106,7 @@ export function initAll() {
   init_tree();
   init_backbar();
   init_recexport();
+  init_rulesref();
+  init_quests();
   init_boot();
 }
