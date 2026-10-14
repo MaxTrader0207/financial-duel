@@ -57,7 +57,8 @@ function askWith(m, mode, foe, srv) {
     const removed = srv ? srv.removed || [] : qz.remove ? shuffle(order.map((_, i) => i).filter(i => i !== correctPos)).slice(0, Math.min(qz.remove, order.length - 2)) : [];
     removed.forEach(i => { const b = $('#q-opts').children[i]; if (b) { b.disabled = true; b.classList.add('removed'); } });
     $('#q-feedback').hidden = true;
-    const timerBox = $('#q-timer'), bar = $('#q-timer-bar'); timerBox.classList.remove('hurry');
+    const timerBox = $('#q-timer'), bar = $('#q-timer-bar'), secEl = $('#q-sec'); timerBox.classList.remove('hurry');
+    secEl.className = 'q-sec'; secEl.textContent = `${Math.ceil(limit)} 秒`;
     $('#quiz').hidden = false;
     Sound.duck(true); Sound.open();
     const panel = $('#quiz .q-panel');
@@ -71,7 +72,7 @@ function askWith(m, mode, foe, srv) {
       bar.style.transform = `scaleX(${left / limit})`;
       timerBox.classList.toggle('hurry', left < limit * 0.3);
       const sec = Math.ceil(left);
-      if (sec !== lastSec) { lastSec = sec; if (left > 0 && left < limit * 0.3) Sound.tick(); }
+      if (sec !== lastSec) { lastSec = sec; secEl.textContent = `${sec} 秒`; secEl.classList.toggle('last', sec <= 3); if (left > 0 && left < limit * 0.3) Sound.tick(); }
       if (left <= 0) return finish(-1);
       raf = requestAnimationFrame(tick);
     };

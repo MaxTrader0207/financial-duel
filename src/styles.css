@@ -551,7 +551,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   .mute{padding:6px 10px}
   .bar .seal{width:auto;min-width:34px;padding:0 5px}
   .log{font-size:12px;-webkit-line-clamp:5}
-  .dueltools .muted{display:none}
+  .dueltools .kbd-hint{display:none}
 }
 
 /* one-time tips */
@@ -1149,3 +1149,45 @@ html[data-back="hall"] .card.back .mark{color:#ffe08a;border-color:#ffe08a;box-s
 .bar{background:color-mix(in oklab,var(--ink2) 97%,transparent)}
 .field{background:radial-gradient(ellipse at center,color-mix(in oklab,var(--ink3) 97%,transparent),color-mix(in oklab,var(--ink2) 97%,transparent) 72%)}
 .phase{background:color-mix(in oklab,var(--ink) 70%,transparent);padding:4px 10px}
+/* duel layout v3.23: the top line keeps only turn, difficulty and streak; save time, play time and scene move to the
+   foot next to 記錄並退出 */
+.topline{justify-content:flex-start;gap:4px 16px}
+.streak-label{color:var(--gold-hi)}
+.duel-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:12px;color:var(--muted);min-width:0}
+.duel-meta .bg-label{color:var(--muted)}
+/* a shallower field: the summoned card is shown large in the quiz panel anyway */
+.slot{--cw:100px}
+.field{padding:10px 12px}
+@media (max-width:640px){
+  .slot{--cw:70px}
+  .field{padding:8px 8px;gap:6px}
+  .slot .ph{font-size:10px;letter-spacing:.1em}
+  .vs .kanji{font-size:18px}
+}
+/* hand cards: attribute badge and both ATK and DEF; the number that counts this phase is bright, the other dim */
+@container card (max-width:95px){
+  .phase-attack .hand-card .c-stats span:last-child,.phase-defend .hand-card .c-stats span:first-child{display:flex;opacity:.55;font-size:.86em}
+  .phase-attack .hand-card .c-stats,.phase-defend .hand-card .c-stats{font-size:1.25em}
+}
+/* quiz: a smaller card beside the question on phones, and the seconds left next to the timer bar */
+.q-timer-row{display:flex;align-items:center;gap:10px}
+.q-timer-row .q-timer{flex:1}
+.q-sec{flex:none;min-width:3.4em;text-align:right;font-size:14px;color:var(--gold-hi);font-variant-numeric:tabular-nums}
+.q-sec.last{color:var(--shu);font-weight:600;animation:qsec .5s ease-in-out infinite alternate}
+@keyframes qsec{to{transform:scale(1.18)}}
+@media (prefers-reduced-motion:reduce){ .q-sec.last{animation:none} }
+.q-cards{--cw:150px}
+.q-mode .m{letter-spacing:.06em}
+@media (max-width:660px){
+  .q-panel{gap:12px}
+  .q-cards{--cw:68px;gap:8px}
+  .q-cards .vs-l{font-size:14px}
+}
+/* the attribute badge over the art of each hand card (the card's own badge is hidden on small cards) */
+.hand-badge{display:none;position:absolute;z-index:4;top:24%;left:9%;width:22%;aspect-ratio:1;border-radius:50%;place-items:center;background:var(--cc);color:#fff;
+  font-family:var(--f-name);font-weight:600;font-size:calc(var(--cw) * .14);line-height:1;box-shadow:0 0 0 1.5px #fff,0 1px 3px #0008;pointer-events:none}
+@media (max-width:640px){ .hand-badge{display:grid} }
+@media (max-width:640px){ .hand-card .tag-weak,.hand-card .tag-adv{top:52%} }
+.dueltools{flex-wrap:nowrap}
+.dueltools .btn-row{flex:none}
+@media (max-width:640px){ .dueltools{flex-wrap:wrap} }

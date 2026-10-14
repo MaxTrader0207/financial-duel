@@ -116,7 +116,7 @@
 <!-- DUEL -->
 <section class="screen" id="scr-duel" hidden>
   <div class="duel" id="duel">
-    <div class="topline"><span class="turn" id="turn-label">第 1 回合</span><span id="streak-label"></span><span id="bg-label" class="bg-label"></span><span id="save-label" class="save-label"></span><span id="pt-label" class="pt-label"></span></div>
+    <div class="topline"><span class="turn" id="turn-label">第 1 回合</span><span id="streak-label" class="streak-label"></span></div>
     <div class="market-label" id="market-label" hidden></div>
     <div class="bar foe">
       <div class="seal">對手</div>
@@ -145,7 +145,7 @@
     <div class="phase" id="phase"><span class="tag" id="phase-tag">待機</span><span class="msg" id="phase-msg"></span></div>
     <div class="hand" id="hand"></div>
     <div class="skill-tip" id="skill-tip">將游標移到手牌上，可以查看卡牌技能。</div>
-    <div class="dueltools"><span class="muted" style="font-size:12px">鍵盤：答題時按 1–4 選擇甲乙丙丁，Enter 繼續</span><span class="btn-row"><button class="btn ghost small" id="btn-save" type="button" disabled>記錄並退出</button><button class="btn ghost small" id="btn-quit" type="button">投降回標題</button></span></div>
+    <div class="dueltools"><span class="duel-meta"><span id="save-label" class="save-label"></span><span id="pt-label" class="pt-label"></span><span id="bg-label" class="bg-label"></span><span class="kbd-hint">鍵盤 1–4 作答、Enter 繼續</span></span><span class="btn-row"><button class="btn ghost small" id="btn-save" type="button" disabled>記錄並退出</button><button class="btn ghost small" id="btn-quit" type="button">投降回標題</button></span></div>
   </div>
 </section>
 
@@ -436,7 +436,7 @@
       <div class="q-mode"><span class="m" id="q-mode"></span><span class="meta" id="q-meta"></span></div>
       <div class="q-skill" id="q-skill"></div>
       <div class="q-adv" id="q-adv" hidden></div>
-      <div class="q-timer" id="q-timer"><i id="q-timer-bar"></i></div>
+      <div class="q-timer-row"><div class="q-timer" id="q-timer"><i id="q-timer-bar"></i></div><span class="q-sec" id="q-sec" aria-hidden="true"></span></div>
       <p class="q-text" id="q-text"></p>
       <div class="q-opts" id="q-opts"></div>
       <div class="q-feedback" id="q-feedback" hidden>

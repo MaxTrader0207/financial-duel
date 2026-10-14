@@ -23,7 +23,7 @@ function handTag(m) {
 function renderHands() {
   const enabled = (G.phase === 'attack' || G.phase === 'defend') && !G.busy;
   $('#hand').innerHTML = G.hand.p.map(inst => { const m = MON[inst.id], sk = SKILLS[m.id];
-    return `<button class="hand-card" type="button" data-uid="${inst.uid}" title="${esc(m.name)}【${esc(sk.name)}】${esc(sk.text)}" ${enabled ? '' : 'disabled'}>${cardHTML(m)}${handTag(m)}</button>`; }).join('');
+    return `<button class="hand-card" type="button" data-uid="${inst.uid}" title="${esc(m.name)}【${esc(sk.name)}】${esc(sk.text)}" ${enabled ? '' : 'disabled'}>${cardHTML(m)}<span class="hand-badge" style="--cc:${CATS[m.cat].color}" aria-hidden="true">${CATS[m.cat].badge}</span>${handTag(m)}</button>`; }).join('');
   $('#cpu-hand').innerHTML = G.hand.c.map(() => backHTML()).join('');
   $('#deck-p').textContent = `牌組 ${G.deck.p.length}`;
   $('#deck-c').textContent = `牌組 ${G.deck.c.length}`;

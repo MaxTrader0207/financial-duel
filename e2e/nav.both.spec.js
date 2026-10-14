@@ -1,6 +1,6 @@
 // 標題與導覽: the play buttons come before the grouped menu, returning players skip the intro, and every menu screen
 // has a pinned 「‹ 回標題」 bar that still runs the screen's own back button
-import { test, expect, open } from './fixtures.js';
+import { test, expect, open, until } from './fixtures.js';
 
 test('returning players get the play buttons without the intro; the menu is grouped', async ({ page, errors }) => {
   await open(page);
@@ -37,4 +37,15 @@ test('the pinned back bar stays on screen while scrolling and returns to the tit
     await page.locator(`#scr-${scr} .backbar button`).click();
     await expect(page.locator('#scr-title')).toBeVisible();
   }
+});
+
+test('duel: the top line only shows the turn, the quiz counts down in seconds, hand cards show both numbers', async ({ page, errors }, ti) => {
+  await open(page); await page.click('#btn-start');
+  await until(page, () => window.__T.G && window.__T.G.phase === 'attack' && !window.__T.G.busy);
+  await expect(page.locator('.topline #save-label')).toHaveCount(0);
+  await expect(page.locator('.dueltools #pt-label')).toContainText('連續遊玩');
+  await expect(page.locator('#hand .hand-card').first().locator('.c-stats')).toContainText('守');
+  if (ti.project.name === 'phone') await expect(page.locator('#hand .hand-badge').first()).toBeVisible();
+  await page.click('#hand .hand-card >> nth=0');
+  await expect(page.locator('#q-sec')).toHaveText(/^\d+ 秒$/);
 });
