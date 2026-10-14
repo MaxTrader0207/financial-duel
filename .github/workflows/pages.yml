@@ -107,7 +107,8 @@ jobs:
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: |
           ok=0; for i in 1 2 3 4 5 6; do curl -fsS "$API_URL/v1/health" && { ok=1; break; }; sleep 10; done; test $ok = 1
-          echo; echo "ranked private questions: $(curl -fsS "$API_URL/v1/health" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(String(JSON.parse(s).rankedPool)))")"
+          pool=$(curl -fsS "$API_URL/v1/health" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(String(JSON.parse(s).rankedPool)))")
+          echo; echo "::notice title=排位題庫::伺服器出題已上線；不公開題 $pool 題（0 = 還沒有 RANKED_POOL_KEY，改用公開題庫與計算題）"
           # write path against the real D1: join with a throwaway nickname, read it back, delete it
           name="部署檢查$(date +%s | tail -c 5)"
           reg=$(curl -fsS -X POST "$API_URL/v1/register" -H 'Content-Type: application/json' -d "{\"name\":\"$name\"}")
