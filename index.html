@@ -50,7 +50,7 @@
 
 <!-- TITLE -->
 <section class="screen" id="scr-title">
-  <div class="title-wrap">
+  <div class="title-wrap" id="title-wrap">
     <h1 class="title-v" aria-label="金融決鬥"><span aria-hidden="true">金</span><span aria-hidden="true">融</span><span aria-hidden="true">決</span><span aria-hidden="true">鬥</span></h1>
     <div class="title-info">
       <div class="eyebrow">金融知識卡牌對決</div>
@@ -64,7 +64,36 @@
         <li><span class="n">參</span><b>防禦</b><span>對手攻擊時選卡抵擋</span></li>
       </ol>
       <p class="tut-hint" id="tut-hint"></p>
-      <details class="rules-more"><summary>完整規則</summary>
+      <fieldset class="diff" id="diff">
+        <legend>難易度 · 答題秒數</legend>
+        <label><input type="radio" name="diff" value="easy"><span><b>簡易</b><small>每題 30 秒<i class="sep"> · </i>速攻 12 秒<span class="more"><br>對手攻擊 ×1.0 · 擋下 45%</span></small></span></label>
+        <label><input type="radio" name="diff" value="normal"><span><b>適中</b><small>每題 20 秒<i class="sep"> · </i>速攻 9 秒<span class="more"><br>對手攻擊 ×1.15 · 擋下 50%</span></small></span></label>
+        <label><input type="radio" name="diff" value="hard"><span><b>困難</b><small>每題 10 秒<i class="sep"> · </i>速攻 6 秒<span class="more"><br>對手攻擊 ×1.3 · 擋下 55%</span></small></span></label>
+      </fieldset>
+      <div class="resume" id="resume" hidden></div>
+      <div class="title-btns title-play">
+        <button class="btn" id="btn-start" type="button">休閒對戰</button>
+        <button class="btn rk-btn" id="btn-ranked" type="button">排位賽<small id="rk-badge"></small></button>
+      </div>
+      <nav class="tgroups" aria-label="更多功能">
+        <div class="tgroup"><span class="tg-h">對戰</span><div class="tg-btns">
+          <button class="btn ghost" id="btn-challenge" type="button">好友挑戰</button>
+          <button class="btn ghost" id="btn-tut" type="button">新手場</button>
+        </div></div>
+        <div class="tgroup"><span class="tg-h">收藏</span><div class="tg-btns">
+          <button class="btn ghost" id="btn-deck" type="button">牌組編輯</button>
+          <button class="btn ghost" id="btn-dex" type="button">卡牌圖鑑</button>
+          <button class="btn ghost" id="btn-tree" type="button">卡牌族譜</button>
+          <button class="btn ghost" id="btn-know" type="button">知識圖鑑<span class="badge" id="kn-badge" hidden></span></button>
+        </div></div>
+        <div class="tgroup"><span class="tg-h">學習</span><div class="tg-btns">
+          <button class="btn ghost" id="btn-nb" type="button">錯題本<span class="badge" id="nb-badge" hidden></span></button>
+          <button class="btn ghost" id="btn-rec" type="button">學習紀錄</button>
+          <button class="btn ghost" id="btn-bank" type="button">題庫管理</button>
+        </div></div>
+        <button class="btn ghost" id="btn-install" type="button" hidden>安裝到主畫面</button>
+      </nav>
+      <details class="rules-more"><summary>玩法與完整規則</summary>
       <ul class="rules">
         <li><span class="k">攻</span><span><b>我方回合：</b>從手牌選一張卡召喚。答對該卡屬性的題目，就能以攻擊力直擊對手資金。在難易度的速攻秒數內答對另加 300，連續答對 3 題起再加 500。</span></li>
         <li><span class="k">擋</span><span><b>對手防禦：</b>你答對後，對手會派一張手牌抵擋，並當場回答一題你攻擊卡屬性的題目。它答對時你只造成「傷害 − 守備力」（不會反彈）。對手的答對率依難易度為 45%／50%／55%，每場另有 2 個擅長屬性（+15%）與 2 個不擅長屬性（−15%），寫在對手資金下方。對手防禦時不發動技能。</span></li>
@@ -78,27 +107,6 @@
         <li><span class="k">勝</span><span><b>勝負：</b>雙方資金各 10000，手牌 5 張，先歸零者落敗。答題限時依難易度而定，結算畫面會列出答錯題目與解析。</span></li>
       </ul>
       </details>
-      <fieldset class="diff" id="diff">
-        <legend>難易度 · 答題秒數</legend>
-        <label><input type="radio" name="diff" value="easy"><span><b>簡易</b><small>每題 30 秒 · 速攻 12 秒<br>對手攻擊 ×1.0 · 擋下 45%</small></span></label>
-        <label><input type="radio" name="diff" value="normal"><span><b>適中</b><small>每題 20 秒 · 速攻 9 秒<br>對手攻擊 ×1.15 · 擋下 50%</small></span></label>
-        <label><input type="radio" name="diff" value="hard"><span><b>困難</b><small>每題 10 秒 · 速攻 6 秒<br>對手攻擊 ×1.3 · 擋下 55%</small></span></label>
-      </fieldset>
-      <div class="resume" id="resume" hidden></div>
-      <div class="title-btns">
-        <button class="btn" id="btn-start" type="button">休閒對戰</button>
-        <button class="btn rk-btn" id="btn-ranked" type="button">排位賽<small id="rk-badge"></small></button>
-        <button class="btn ghost" id="btn-challenge" type="button">好友挑戰</button>
-        <button class="btn ghost" id="btn-tut" type="button">新手場</button>
-        <button class="btn ghost" id="btn-deck" type="button">牌組編輯</button>
-        <button class="btn ghost" id="btn-nb" type="button">錯題本<span class="badge" id="nb-badge" hidden></span></button>
-        <button class="btn ghost" id="btn-rec" type="button">學習紀錄</button>
-        <button class="btn ghost" id="btn-know" type="button">知識圖鑑<span class="badge" id="kn-badge" hidden></span></button>
-        <button class="btn ghost" id="btn-dex" type="button">卡牌圖鑑</button>
-        <button class="btn ghost" id="btn-tree" type="button">卡牌族譜</button>
-        <button class="btn ghost" id="btn-bank" type="button">題庫管理</button>
-        <button class="btn ghost" id="btn-install" type="button" hidden>安裝到主畫面</button>
-      </div>
       <div class="bank-note" id="bank-note"></div>
       <button class="linkbtn ver-tag" id="ver-tag" type="button"></button>
     </div>

@@ -34,6 +34,7 @@ function renderTitle() {
   $('#fan').innerHTML = picks.map(id => cardHTML(MON[id])).join('');
   const all = allQuestions();
   renderResume();
+  $('#title-wrap').classList.toggle('returning', Tutor.done());
   $('#tut-hint').textContent = Tutor.done() ? '' : '第一場對戰是「新手場」教學對戰，帶你一步步完成出牌、答題和防禦。';
   { const c = nbCounts(), b = $('#nb-badge'); b.hidden = !c.due; b.textContent = c.due;
     $('#nb-due').hidden = !c.due || !Tutor.done(); $('#nb-due-n').textContent = `${c.due} 題該複習了`; }

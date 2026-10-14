@@ -48,6 +48,7 @@ import { init as init_challengeui } from './challengeui.js';
 import { init as init_version } from './version.js';
 import { init as init_nbexport } from './nbexport.js';
 import { init as init_tree } from './treeui.js';
+import { init as init_backbar } from './backbar.js';
 import { init as init_boot } from './boot.js';
 
 export function initAll() {
@@ -100,5 +101,6 @@ export function initAll() {
   init_version();
   init_nbexport();
   init_tree();
+  init_backbar();
   init_boot();
 }

@@ -1104,3 +1104,38 @@ html[data-back="hall"] .card.back .mark{color:#ffe08a;border-color:#ffe08a;box-s
 .tr-nm small{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tr-leaf em{flex:none;font-style:normal;font-size:11px;color:var(--muted)}
 .tr-leaf.indeck em{color:var(--gold-hi)}
+/* title: play buttons first, the rest grouped; returning players skip the intro */
+.title-play .btn{min-width:9em;justify-content:center}
+.tgroups{display:grid;gap:10px}
+.tgroup{display:grid;grid-template-columns:3.2em minmax(0,1fr);gap:10px;align-items:center}
+.tg-h{font-size:12px;letter-spacing:.24em;color:var(--gold);border-right:1px solid var(--line);padding:4px 0}
+.tg-btns{display:flex;flex-wrap:wrap;gap:8px}
+.tg-btns .btn{padding:.55em 1.1em;font-size:14px}
+#btn-install{justify-self:start}
+.title-wrap.returning .steps3,.title-wrap.returning .tut-hint:empty{display:none}
+.title-wrap.returning .diff .more{display:none}
+@media (max-width:640px){
+  .title-wrap.returning .fan{display:none}
+  .title-play{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .title-play .btn{min-width:0}
+  .diff label{flex:1 1 28%;min-width:0}
+  .diff span{min-width:0;padding:8px 10px;height:100%;box-sizing:border-box}
+  .diff b{font-size:17px;letter-spacing:.12em}
+  .diff small{font-size:11px}
+  .tgroup{grid-template-columns:1fr;gap:6px}
+  .tg-h{border-right:0;border-bottom:1px solid var(--line);padding:0 0 4px}
+  .tg-btns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .tg-btns .btn{padding:.6em .4em;justify-content:center}
+}
+/* the bar pinned to the top of menu screens */
+.backbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:12px;margin:-16px -16px 0;padding:calc(env(safe-area-inset-top,0px) + 10px) 220px 10px 16px;
+  background:color-mix(in oklab,var(--ink) 90%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.backbar-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border:1px solid var(--line);background:var(--ink2);color:var(--text);font:inherit;font-size:14px;cursor:pointer}
+.backbar-btn span{font-size:20px;line-height:1;color:var(--gold)}
+.backbar-btn:hover{border-color:var(--gold)}
+.backbar-t{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media (max-width:640px){ .backbar{padding-right:110px} }
+.diff span.more{display:inline;padding:0;border:0;background:none;min-width:0;height:auto}
+@media (max-width:640px){ .diff span.more{display:none} }
+.diff i.sep{font-style:normal}
+@media (max-width:640px){ .diff i.sep{display:block;height:0;overflow:hidden} }
