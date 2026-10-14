@@ -11,9 +11,9 @@ let downloadsP, RC, RF, fnt, RW, RM_X, RCW, R_TOP, pad2, fmtDate, fmtNum, export
 async function fontsReady() {
   try {
     await Promise.all([
-      document.fonts.load(fnt(800, 40, RF.mincho), '金融決鬥'),
-      document.fonts.load(fnt(800, 120, RF.mincho), '勝利敗北決勝'),
-      document.fonts.load(fnt(900, 28, RF.name), '答題紀錄各屬性表現'),
+      document.fonts.load(fnt(600, 40, RF.mincho), '金融決鬥'),
+      document.fonts.load(fnt(600, 120, RF.mincho), '勝利敗北決勝'),
+      document.fonts.load(fnt(700, 28, RF.name), '答題紀錄各屬性表現'),
       document.fonts.load(fnt(700, 22, RF.body), '技術分析答對'),
       document.fonts.load(fnt(400, 18, RF.body), '正解解析'),
     ]);
@@ -51,7 +51,7 @@ function drawBackground(ctx, W, H) {
 function sectionBlock(title) {
   return { h: 52, keepNext: true, draw(ctx, x, y) {
     ctx.save(); ctx.translate(x + 8, y + 24); ctx.rotate(Math.PI / 4); ctx.fillStyle = RC.gold; ctx.fillRect(-6, -6, 12, 12); ctx.restore();
-    ctx.fillStyle = RC.washi; ctx.font = fnt(900, 28, RF.name); ctx.textBaseline = 'middle'; ctx.fillText(title, x + 28, y + 25);
+    ctx.fillStyle = RC.washi; ctx.font = fnt(700, 28, RF.name); ctx.textBaseline = 'middle'; ctx.fillText(title, x + 28, y + 25);
     ctx.strokeStyle = RC.line; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, y + 50); ctx.lineTo(x + RCW, y + 50); ctx.stroke();
   } };
 }
@@ -64,7 +64,7 @@ function buildReportBlocks(m) {
   blocks.push({ h: 330, draw(ctx, x, y) {
     ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = RC.gold; ctx.font = fnt(700, 16); ctx.fillText('金融知識卡牌對決 · 對戰紀錄', x, y + 18);
-    ctx.fillStyle = RC.goldHi; ctx.font = fnt(800, 44, RF.mincho); ctx.fillText('金融決鬥', x, y + 72);
+    ctx.fillStyle = RC.goldHi; ctx.font = fnt(600, 44, RF.mincho); ctx.fillText('金融決鬥', x, y + 72);
     ctx.textAlign = 'right'; ctx.fillStyle = RC.muted; ctx.font = fnt(400, 18);
     ctx.fillText(fmtDate(G.endedAt || new Date()), x + RCW, y + 26);
     ctx.fillText(`難易度 ${G.diff.name}（每題 ${G.diff.time} 秒 · 對手攻擊 ×${(G.diff.foeMult || 1).toFixed(1)}）`, x + RCW, y + 52);
@@ -73,7 +73,7 @@ function buildReportBlocks(m) {
     const vy = y + 250, win = G.win;
     const word = win ? '勝利' : '敗北';
     ctx.fillStyle = win ? RC.gold : '#6b6782'; ctx.fillRect(x, vy - 128, 4, 150);
-    ctx.font = fnt(800, 128, RF.mincho);
+    ctx.font = fnt(600, 128, RF.mincho);
     if ('letterSpacing' in ctx) ctx.letterSpacing = '14px';
     ctx.fillStyle = '#000000a0'; ctx.fillText(word, x + 26, vy + 4);
     const gr = ctx.createLinearGradient(0, vy - 120, 0, vy + 10);
@@ -84,7 +84,7 @@ function buildReportBlocks(m) {
     const lx = x + 400, lw = RCW - 400;
     [['我方資金', G.lp.p, RC.gold, y + 130], ['對手資金', G.lp.c, RC.shu, y + 220]].forEach(([label, v, col, ly]) => {
       ctx.fillStyle = RC.muted; ctx.font = fnt(400, 18); ctx.fillText(label, lx, ly);
-      ctx.fillStyle = RC.text; ctx.font = fnt(900, 40, RF.jp); const vs = fmtNum(v); ctx.fillText(vs, lx, ly + 46);
+      ctx.fillStyle = RC.text; ctx.font = fnt(700, 40, RF.jp); const vs = fmtNum(v); ctx.fillText(vs, lx, ly + 46);
       const vw = ctx.measureText(vs).width; ctx.fillStyle = RC.muted; ctx.font = fnt(400, 20); ctx.fillText(` / ${fmtNum(LP_MAX)}`, lx + vw + 4, ly + 46);
       ctx.fillStyle = RC.ink; ctx.fillRect(lx, ly + 58, lw, 10); ctx.strokeStyle = RC.line; ctx.lineWidth = 1; ctx.strokeRect(lx, ly + 58, lw, 10);
       ctx.fillStyle = col; ctx.fillRect(lx, ly + 58, lw * Math.max(0, v) / LP_MAX, 10);
@@ -99,7 +99,7 @@ function buildReportBlocks(m) {
     tiles.forEach(([l, v], i) => {
       const tx = x + (i % 3) * (tw + 16), ty = y + Math.floor(i / 3) * 120;
       ctx.fillStyle = RC.ink2; ctx.fillRect(tx, ty, tw, 104); ctx.strokeStyle = RC.line; ctx.lineWidth = 1; ctx.strokeRect(tx + .5, ty + .5, tw - 1, 103);
-      ctx.fillStyle = RC.text; ctx.font = fnt(900, 36, RF.jp); ctx.textBaseline = 'alphabetic'; ctx.fillText(v, tx + 20, ty + 56);
+      ctx.fillStyle = RC.text; ctx.font = fnt(700, 36, RF.jp); ctx.textBaseline = 'alphabetic'; ctx.fillText(v, tx + 20, ty + 56);
       ctx.fillStyle = RC.muted; ctx.font = fnt(400, 16); ctx.fillText(l, tx + 20, ty + 86);
     });
   } });
@@ -138,7 +138,7 @@ function buildReportBlocks(m) {
       ctx.fillStyle = RC.ink2; ctx.fillRect(x, y, RCW, height);
       ctx.fillStyle = h.correct ? RC.good : RC.bad; ctx.fillRect(x, y, 5, height);
       let cy = y + 20; ctx.textBaseline = 'top';
-      ctx.fillStyle = RC.gold; ctx.font = fnt(900, 20, RF.jp); ctx.fillText(`#${pad2(i + 1)}`, x + IN, cy + 2);
+      ctx.fillStyle = RC.gold; ctx.font = fnt(700, 20, RF.jp); ctx.fillText(`#${pad2(i + 1)}`, x + IN, cy + 2);
       let cx = x + IN + 64;
       ctx.font = fnt(700, 15); const chip = CATS[h.cat].name; const cw = ctx.measureText(chip).width + 18;
       ctx.fillStyle = RC.cat[h.cat]; ctx.fillRect(cx, cy, cw, 26); ctx.fillStyle = '#ffffff'; ctx.fillText(chip, cx + 9, cy + 4); cx += cw + 12;

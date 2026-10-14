@@ -23,7 +23,7 @@ from fontTools import subset
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 CJK = re.compile(r'[⺀-鿿豈-﫿＀-￯　-〿‐-‧←-⇿■-◿]')
 FULL = os.path.join(HERE, 'font-full'); DST = os.path.join(ROOT, 'src/fonts')
-FACES = [('FD Serif', 'fd-serif', 'NotoSerifTC.ttf', 600, 900), ('FD Sans', 'fd-sans', 'NotoSansTC.ttf', 700, 900)]
+FACES = [('FD Serif', 'fd-serif', 'NotoSerifTC.ttf', 500, 700), ('FD Sans', 'fd-sans', 'NotoSansTC.ttf', 500, 700)]
 
 def card_chars():
     s = set()

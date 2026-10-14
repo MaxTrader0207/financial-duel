@@ -51,7 +51,7 @@ export async function drawCard(g = G) {
   /* verdict */
   const vg = x.createLinearGradient(0, 320, 0, 560);
   if (d.win) { vg.addColorStop(0, '#fff3c8'); vg.addColorStop(1, '#c99a3a'); } else { vg.addColorStop(0, '#d8dcef'); vg.addColorStop(1, '#6b7398'); }
-  text(d.win ? '勝利' : '敗北', 104, 540, `900 230px ${SERIF}`, vg);
+  text(d.win ? '勝利' : '敗北', 104, 540, `700 230px ${SERIF}`, vg);
   text(d.win ? '大獲全勝' : '再接再厲', W - 110, 540, `700 40px ${SANS}`, d.win ? GOLD : MUTED, 'right');
   /* stats 2 × 2 */
   d.stats.forEach(([label, v], i) => {
@@ -66,7 +66,7 @@ export async function drawCard(g = G) {
     x.strokeStyle = GOLD; x.lineWidth = 3; x.strokeRect(110, 980, W - 220, 150);
     text(d.big.label, 150, 1050, `700 34px ${SANS}`, MUTED);
     text(d.big.sub, 150, 1100, `700 30px ${SANS}`, MUTED);
-    text(d.big.value, W - 150, 1095, `900 96px ${SERIF}`, GOLD, 'right');
+    text(d.big.value, W - 150, 1095, `700 96px ${SERIF}`, GOLD, 'right');
   }
   text('用卡牌對戰學金融知識', 110, 1215, `700 32px ${SANS}`, TEXT);
   text(d.url.replace(/^https?:\/\//, ''), 110, 1262, `700 26px ${SANS}`, MUTED);
