@@ -1,0 +1,341 @@
+{
+ "note": "整合測試用的假題庫；正式題庫在 pool/pool.enc.json（加密）",
+ "questions": [
+  {
+   "id": "p-test-tech1",
+   "category": "tech",
+   "difficulty": 1,
+   "q": "測試用題目（tech 第 1 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-tech2",
+   "category": "tech",
+   "difficulty": 2,
+   "q": "測試用題目（tech 第 2 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-tech3",
+   "category": "tech",
+   "difficulty": 3,
+   "q": "測試用題目（tech 第 3 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-fund1",
+   "category": "fund",
+   "difficulty": 1,
+   "q": "測試用題目（fund 第 1 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-fund2",
+   "category": "fund",
+   "difficulty": 2,
+   "q": "測試用題目（fund 第 2 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-fund3",
+   "category": "fund",
+   "difficulty": 3,
+   "q": "測試用題目（fund 第 3 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-deriv1",
+   "category": "deriv",
+   "difficulty": 1,
+   "q": "測試用題目（deriv 第 1 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-deriv2",
+   "category": "deriv",
+   "difficulty": 2,
+   "q": "測試用題目（deriv 第 2 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-deriv3",
+   "category": "deriv",
+   "difficulty": 3,
+   "q": "測試用題目（deriv 第 3 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-risk1",
+   "category": "risk",
+   "difficulty": 1,
+   "q": "測試用題目（risk 第 1 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-risk2",
+   "category": "risk",
+   "difficulty": 2,
+   "q": "測試用題目（risk 第 2 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-risk3",
+   "category": "risk",
+   "difficulty": 3,
+   "q": "測試用題目（risk 第 3 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-chips1",
+   "category": "chips",
+   "difficulty": 1,
+   "q": "測試用題目（chips 第 1 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-chips2",
+   "category": "chips",
+   "difficulty": 2,
+   "q": "測試用題目（chips 第 2 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-chips3",
+   "category": "chips",
+   "difficulty": 3,
+   "q": "測試用題目（chips 第 3 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-fx1",
+   "category": "fx",
+   "difficulty": 1,
+   "q": "測試用題目（fx 第 1 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-fx2",
+   "category": "fx",
+   "difficulty": 2,
+   "q": "測試用題目（fx 第 2 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-fx3",
+   "category": "fx",
+   "difficulty": 3,
+   "q": "測試用題目（fx 第 3 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-crypto1",
+   "category": "crypto",
+   "difficulty": 1,
+   "q": "測試用題目（crypto 第 1 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-crypto2",
+   "category": "crypto",
+   "difficulty": 2,
+   "q": "測試用題目（crypto 第 2 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-crypto3",
+   "category": "crypto",
+   "difficulty": 3,
+   "q": "測試用題目（crypto 第 3 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-etf1",
+   "category": "etf",
+   "difficulty": 1,
+   "q": "測試用題目（etf 第 1 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-etf2",
+   "category": "etf",
+   "difficulty": 2,
+   "q": "測試用題目（etf 第 2 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-etf3",
+   "category": "etf",
+   "difficulty": 3,
+   "q": "測試用題目（etf 第 3 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  }
+ ]
+}

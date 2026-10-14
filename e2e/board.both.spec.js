@@ -2,6 +2,8 @@
 // the server cannot be reached. The API is a small in-memory stand-in (the real Worker has its own tests in worker/test).
 import { test, expect, open, answer, until } from './fixtures.js';
 import { scoreMatch, seasonOf, prevSeason, tierOf, checkPerf } from '../src/js/rankrules.js';
+import { readFileSync } from 'node:fs';
+const BANK = JSON.parse(readFileSync(new URL('../public/data/questions.json', import.meta.url), 'utf8')).questions;
 
 function mockApi() {
   const players = new Map(), tickets = new Map(), calls = [];
@@ -39,6 +41,16 @@ function mockApi() {
     if (path === '/v1/me' && method === 'POST') { p.name = body.name; return reply(200, { name: p.name }); }
     if (path === '/v1/me' && method === 'DELETE') { players.delete(p.id); return reply(200, { ok: true }); }
     if (path === '/v1/match/start') { const t = 'a'.repeat(31) + tickets.size; tickets.set(t, { player: p.id, open: true }); return reply(200, { ticket: t, season: S, forfeited: null }); }
+    if (path === '/v1/match/q') {                                    // the server asks: the answer stays here
+      const t = tickets.get(body.ticket); if (!t || t.player !== p.id || !t.open) return reply(404, { error: '找不到這場對戰', code: 'ticket' });
+      const pool = BANK.filter(q => q.category === body.cat), b = pool[(t.asked = (t.asked || 0) + 1) % pool.length];
+      (t.qs || (t.qs = [])).push(b); api.asked++;
+      return reply(200, { n: t.qs.length, q: `【伺服器】${b.q}`, options: b.options, removed: [], category: b.category, difficulty: b.difficulty, limit: body.limit, calc: false, testAnswer: b.answer });
+    }
+    if (path === '/v1/match/a') {
+      const t = tickets.get(body.ticket), b = t && t.qs && t.qs[body.n - 1]; if (!b) return reply(404, { error: '找不到這一題', code: 'question' });
+      return reply(200, { correct: body.pick === b.answer, answer: b.answer, explain: b.explain });
+    }
     if (path === '/v1/match/end') {
       api.lastEnd = body;
       const t = tickets.get(body.ticket);
@@ -53,7 +65,7 @@ function mockApi() {
     }
     return reply(404, { error: '找不到這個網址', code: 'not_found' });
   }
-  const api = { handle, calls, players, state, lastEnd: null };
+  const api = { handle, calls, players, state, lastEnd: null, asked: 0 };
   return api;
 }
 
@@ -105,9 +117,9 @@ test('a ranked duel is scored by the server and shows the online rank', async ({
   await quickWin(page);
   await expect(page.locator('.rr-online')).toContainText('本季第 3 名');
   expect(api.calls).toEqual(expect.arrayContaining(['POST /v1/match/start', 'POST /v1/match/end']));
-  const log = api.lastEnd.answers;                                   // the answer log the server judges
-  expect(log.length).toBeGreaterThanOrEqual(1);
-  expect(log[0]).toEqual(expect.objectContaining({ qid: expect.any(String), pick: expect.any(Number), ms: expect.any(Number), mode: 'attack' }));
+  expect(api.asked).toBeGreaterThanOrEqual(1);                      // the server asked the questions…
+  expect(api.calls).toContain('POST /v1/match/a');
+  expect(api.lastEnd.answers).toEqual([]);                           // …so nothing is left for the browser to report
   const server = [...api.players.values()].find(x => x.name === '阿華');
   expect(server.w).toBe(1);
   expect(await page.evaluate(() => window.__T.ranked.state().rp)).toBe(server.rp);
@@ -150,8 +162,10 @@ test('leaving the board deletes the nickname', async ({ page, errors }) => {
   const api = await withApi(page);
   await open(page);
   await joinAs(page, '要離開的人');
-  await page.click('#bd-leave');
-  await expect(page.locator('#bd-leave')).toContainText('再按一次');
+  await expect(async () => {                                         // the board may still re-render once after joining
+    if (!(await page.locator('#bd-leave').textContent()).includes('再按一次')) await page.click('#bd-leave');
+    await expect(page.locator('#bd-leave')).toContainText('再按一次', { timeout: 1000 });
+  }).toPass({ timeout: 10_000 });
   await page.click('#bd-leave');
   await expect(page.locator('.bd-join')).toBeVisible();
   expect(api.calls).toContain('DELETE /v1/me');

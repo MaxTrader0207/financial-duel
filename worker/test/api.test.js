@@ -20,12 +20,28 @@ const MIN = 60e3;
 let ipN = 0;
 async function call(method, path, { body, auth, now = clock, ip } = {}) {
   const headers = { 'X-Test-Now': String(now), 'CF-Connecting-IP': ip || `10.0.0.${++ipN}` };
-  /* a result with a performance and no answer log gets one whose knowledge part matches perf.knowledge */
-  if (path === '/v1/match/end' && body && body.perf && !body.answers && body.perf.knowledge <= 40) body = { ...body, answers: answers(Math.round(body.perf.knowledge / 4)) };
+  /* a result with a performance and no answer log first answers 10 server questions so that the knowledge part
+     matches perf.knowledge */
+  if (path === '/v1/match/end' && body && body.perf && !body.answers && body.perf.knowledge <= 40 && auth) { await play(auth, body.ticket, Math.round(body.perf.knowledge / 4), 10, now - 4 * MIN); body = { ...body, answers: [] }; }
   if (body) headers['Content-Type'] = 'application/json';
   if (auth) headers.Authorization = `Bearer ${auth.id}.${auth.token}`;
   const res = await fetch(BASE + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
   return { status: res.status, body: await res.json().catch(() => null), headers: res.headers };
+}
+/* answer n questions asked by the server, `right` of them correctly, 3 s each, starting at time t */
+const CATS = ['tech', 'fund', 'deriv', 'risk', 'chips', 'fx', 'crypto', 'etf'];
+async function play(auth, ticket, right, n = 10, t = clock, opts = {}) {
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const q = await call('POST', '/v1/match/q', { auth, now: t, body: { ticket, cat: CATS[i % 8], rank: 1 + (i % 4), limit: 20, ...opts } });
+    if (q.status !== 200) return out;
+    t += opts.ms ?? 3000;
+    const pick = i < right ? q.body.testAnswer : (q.body.testAnswer + 1) % 4;
+    const a = await call('POST', '/v1/match/a', { auth, now: t, body: { ticket, n: q.body.n, pick } });
+    out.push({ q: q.body, a: a.body, status: a.status });
+    t += 1000;
+  }
+  return out;
 }
 const join = async (name, extra = {}) => { const r = await call('POST', '/v1/register', { body: { name, ...extra } }); assert.equal(r.status, 201, JSON.stringify(r.body)); return r.body; };
 const perf = (k, s, r) => ({ knowledge: k, strategy: s, risk: r });
@@ -253,15 +269,77 @@ test('friend challenges: create with a score, others add theirs, best score per 
 test('the server judges ranked answers: knowledge comes from its own check, implausible logs are refused', async () => {
   clock = Date.UTC(2027, 2, 1, 4);
   const p = await join('判分測試');
-  const end = async (body, ms = 5 * MIN) => { const s = await call('POST', '/v1/match/start', { auth: p }); clock += ms; return call('POST', '/v1/match/end', { auth: p, body: { ticket: s.body.ticket, ...body } }); };
-  const r = await end({ win: true, perf: { knowledge: 40, strategy: 35, risk: 25 }, answers: answers(5) });     // the browser claims 40, the server finds 5/10
+  const start = async () => (await call('POST', '/v1/match/start', { auth: p })).body.ticket;
+  const end = (ticket, body) => call('POST', '/v1/match/end', { auth: p, body: { ticket, ...body } });
+  const z = { knowledge: 0, strategy: 0, risk: 0 };
+  /* the browser claims 40; the server asked 10 and found 5 right */
+  let t = await start(); await play(p, t, 5, 10, clock + 1000); clock += 5 * MIN;
+  const r = await end(t, { win: true, perf: { knowledge: 40, strategy: 35, risk: 25 }, answers: [] });
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.equal(r.body.perf.knowledge, 20); assert.equal(r.body.perf.score, 80); assert.deepEqual(r.body.perf.judged, { total: 10, correct: 5 });
-  assert.equal((await end({ win: true, perf: { knowledge: 0, strategy: 0, risk: 0 }, answers: answers(1) })).status, 422);          // a win with one right answer
-  assert.equal((await end({ win: false, perf: { knowledge: 0, strategy: 0, risk: 0 }, answers: answers(2, { ms: 100 }) })).status, 422);   // 0.1 s answers
-  assert.equal((await end({ win: false, perf: { knowledge: 0, strategy: 0, risk: 0 }, answers: answers(2, { ms: 59000 }) }, 2 * MIN)).status, 422);   // longer than the duel
-  assert.equal((await end({ win: true, perf: { knowledge: 40, strategy: 0, risk: 0 }, answers: [{ qid: 'nope', pick: 0, ms: 3000, mode: 'attack' }] })).status, 422);
-  assert.equal((await end({ win: true, perf: { knowledge: 40, strategy: 0, risk: 0 }, answers: [] })).status, 422);
+  /* up to 3 fallback answers from the public bank (a dropped connection) are added in */
+  t = await start(); await play(p, t, 4, 8, clock + 1000); clock += 5 * MIN;
+  const mix = await end(t, { win: true, perf: { knowledge: 0, strategy: 0, risk: 0 }, answers: answers(2, { n: 2 }) });
+  assert.equal(mix.status, 200, JSON.stringify(mix.body)); assert.deepEqual(mix.body.perf.judged, { total: 10, correct: 6 });
+  /* an old game that answers everything from the public bank is asked to update */
+  t = await start(); clock += 5 * MIN;
+  const old = await end(t, { win: true, perf: z, answers: answers(10) });
+  assert.equal(old.status, 422); assert.match(old.body.error, /更新遊戲/);
+  /* a win with one right answer, answers faster than 0.4 s, nothing answered at all */
+  t = await start(); await play(p, t, 1, 6, clock + 1000); clock += 5 * MIN;
+  assert.equal((await end(t, { win: true, perf: z, answers: [] })).status, 422);
+  t = await start(); await play(p, t, 6, 6, clock + 1000, { ms: 100 }); clock += 5 * MIN;
+  assert.equal((await end(t, { win: false, perf: z, answers: [] })).status, 422);
+  t = await start(); clock += 5 * MIN;
+  assert.equal((await end(t, { win: true, perf: z, answers: [] })).status, 422);
+  t = await start(); clock += 5 * MIN;
+  assert.equal((await end(t, { win: true, perf: z, answers: [{ qid: 'nope', pick: 0, ms: 3000, mode: 'attack' }] })).status, 422);
+});
+
+test('server questions: no answer before picking, skills (remove, retry), late answers, unanswered ones, repeats', async () => {
+  clock = Date.UTC(2027, 2, 10, 4);
+  const p = await join('出題測試'), other = await join('旁觀者');
+  const t = (await call('POST', '/v1/match/start', { auth: p })).body.ticket;
+  const ask = (body, now = clock) => call('POST', '/v1/match/q', { auth: p, now, body: { ticket: t, cat: 'risk', rank: 2, limit: 20, ...body } });
+  const answer = (n, pick, now) => call('POST', '/v1/match/a', { auth: p, now, body: { ticket: t, n, pick } });
+  /* a question: four options, no answer in the reply (testAnswer is only sent under TEST_CLOCK) */
+  let q = await ask({ remove: 2 });
+  assert.equal(q.status, 200, JSON.stringify(q.body)); assert.equal(q.body.options.length, 4); assert.equal(q.body.category, 'risk');
+  assert.equal(q.body.answer, undefined); assert.equal(q.body.explain, undefined);
+  assert.equal(q.body.removed.length, 2); assert.ok(!q.body.removed.includes(q.body.testAnswer));
+  assert.equal((await answer(q.body.n, q.body.removed[0], clock + 2000)).status, 400);           // a removed option
+  let a = await answer(q.body.n, q.body.testAnswer, clock + 2000);
+  assert.deepEqual([a.status, a.body.correct, a.body.answer], [200, true, q.body.testAnswer]); assert.ok(a.body.explain.length > 5);
+  assert.equal((await answer(q.body.n, (q.body.testAnswer + 1) % 4, clock + 3000)).body.correct, true);   // asking again: same result
+  /* 再答一次: the first wrong pick keeps the question open */
+  q = await ask({ retry: true }, clock + 5000);
+  a = await answer(q.body.n, (q.body.testAnswer + 1) % 4, clock + 7000); assert.deepEqual(a.body, { retry: true });
+  a = await answer(q.body.n, q.body.testAnswer, clock + 9000); assert.equal(a.body.correct, true);
+  /* a right pick after the time limit (+ grace) is a time-out */
+  q = await ask({ limit: 10 }, clock + 10000);
+  a = await answer(q.body.n, q.body.testAnswer, clock + 10000 + 15000); assert.equal(a.body.correct, false);
+  /* the time limit is capped at 35 s whatever the browser asks */
+  q = await ask({ limit: 999 }, clock + 30000); assert.equal(q.body.limit, 35);
+  /* left unanswered: asking the next one closes it as a time-out */
+  const q5 = await ask({}, clock + 40000);
+  assert.equal((await answer(q.body.n, q.body.testAnswer, clock + 41000)).body.correct, false);
+  assert.equal((await answer(q5.body.n, q5.body.testAnswer, clock + 42000)).body.correct, true);
+  /* someone else cannot use the ticket */
+  assert.equal((await call('POST', '/v1/match/q', { auth: other, body: { ticket: t, cat: 'fx', rank: 1, limit: 20 } })).status, 404);
+  assert.equal((await ask({ cat: 'nope' })).status, 400);
+  /* the server counts 5 asked, 3 right; one more is asked and left open at the end (a time-out) */
+  await ask({}, clock + 50000);
+  clock += 5 * MIN;
+  const r = await call('POST', '/v1/match/end', { auth: p, body: { ticket: t, win: true, perf: { knowledge: 0, strategy: 10, risk: 10 }, answers: [] } });
+  assert.equal(r.status, 200, JSON.stringify(r.body)); assert.deepEqual(r.body.perf.judged, { total: 6, correct: 3 });
+  assert.equal((await ask({})).status, 409);                                                       // the duel is over
+  /* a duel never repeats a question of a small set while others are left; private bank questions are asked */
+  const t2 = (await call('POST', '/v1/match/start', { auth: p })).body.ticket;
+  const seen = [];
+  for (let i = 0; i < 8; i++) { const x = await call('POST', '/v1/match/q', { auth: p, body: { ticket: t2, cat: 'etf', rank: 2, limit: 20 } }); seen.push(x.body.q); }
+  assert.ok(seen.some(x => x.startsWith('測試用題目')), 'a private question was asked');
+  assert.equal(new Set(seen.filter(x => x.startsWith('測試用題目'))).size, seen.filter(x => x.startsWith('測試用題目')).length);
+  const h = await call('GET', '/v1/health'); assert.equal(h.body.rankedPool, 24);
 });
 
 test('題目品質: answer counts per built-in question, and the disputed / hardest / easiest lists', async () => {

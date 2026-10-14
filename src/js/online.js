@@ -121,6 +121,28 @@ export async function endMatch(result) {
   return { ok: true, ...r.data };
 }
 
+/* ---------- ranked questions asked by the server ---------- */
+/* is a ranked ticket open (or on its way)? */
+export const matchOpen = () => joined() && (!!O.ticket || !!starting);
+/* → { n, q, options, removed, category, difficulty, limit, calc } or null (no ticket, offline, refused) */
+export async function askQuestion({ cat, rank, limit, remove = 0, retry = false }) {
+  if (starting) await starting;
+  if (!joined() || !O.ticket) return null;
+  const r = await request('POST', '/v1/match/q', { ticket: O.ticket, cat, rank, limit, remove, retry });
+  return r.ok && r.data && Array.isArray(r.data.options) ? r.data : null;
+}
+/* → { correct, answer, explain } | { retry: true } | null. A lost reply is asked again: the server answers a repeat the same way. */
+export async function sendAnswer(n, pick) {
+  const ticket = O.ticket;
+  for (let i = 0; i < 3 && ticket; i++) {
+    const r = await request('POST', '/v1/match/a', { ticket, n, pick });
+    if (r.ok && r.data) return r.data;
+    if (r.status && r.status < 500) return null;
+    await new Promise(res => setTimeout(res, 400 * (i + 1)));
+  }
+  return null;
+}
+
 export async function board(season) {
   const r = await request('GET', `/v1/board${season ? `?season=${encodeURIComponent(season)}` : ''}`);
   return r.ok ? { ok: true, ...r.data } : { ok: false, error: errorText(r) };

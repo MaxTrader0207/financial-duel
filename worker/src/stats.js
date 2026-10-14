@@ -2,7 +2,8 @@
 // The game keeps a random id (no account, no IP, no personal data) and, per Taiwan calendar day, counts a few events;
 // POST /v1/ping sends the counts not yet sent. GET /v1/stats?key=… shows the last 30 days (STATS_KEY secret).
 
-import { hasQuestion, questionById } from './judge.js';
+import { hasQuestion } from './judge.js';
+import { questionInfo } from './pool.js';
 
 export const EVENTS = ['open', 'duels', 'wins', 'casual', 'ranked', 'tutorial', 'daily', 'challenge'];
 export const EVENT_NAME = { open: '開啟次數', duels: '對戰', wins: '勝場', casual: '休閒', ranked: '排位', tutorial: '新手場', daily: '每日挑戰', challenge: '好友挑戰' };
@@ -90,7 +91,9 @@ export async function report(env, now, days = 30) {
      (a wrong option picked more often than the right one usually means a confusing question or a wrong answer key) */
   const QMIN = 20;
   const qrows = (await q('SELECT qid, n, c, p0, p1, p2, p3, timeouts FROM question_stats WHERE n >= ?', QMIN)).map(r => {
-    const bank = questionById(r.qid); if (!bank) return null;
+    const bank = questionInfo(r.qid); if (!bank) return null;
+    if (bank.src === 'tpl') return { qid: r.qid, q: bank.q, category: bank.category, difficulty: bank.difficulty, n: r.n, rate: r.c / r.n, timeouts: r.timeouts,
+      answer: '（計算題，每次數字不同）', topWrong: null, disputed: false };
     const picks = [r.p0, r.p1, r.p2, r.p3], wrong = picks.map((v, i) => [v, i]).filter(([, i]) => i !== bank.answer).sort((a, b) => b[0] - a[0])[0];
     return { qid: r.qid, q: bank.q, category: bank.category, difficulty: bank.difficulty, n: r.n, rate: r.c / r.n, timeouts: r.timeouts,
       answer: bank.options[bank.answer], topWrong: wrong ? { text: bank.options[wrong[1]], n: wrong[0] } : null, disputed: !!wrong && wrong[0] > picks[bank.answer] };

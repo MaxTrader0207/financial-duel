@@ -15,7 +15,8 @@ function nbRecord(q, correct, pick) {
   const now = Date.now(), e = NB[q.id];
   if (!correct) {
     NB[q.id] = { box: 1, wrong: (e ? e.wrong : 0) + 1, right: e ? e.right : 0, due: now, last: now, added: e ? e.added : now, mastered: false,
-      ...(typeof pick === 'string' ? { pick } : e && e.pick !== undefined ? { pick: e.pick } : {}) };
+      ...(typeof pick === 'string' ? { pick } : e && e.pick !== undefined ? { pick: e.pick } : {}),
+      ...(q.snap ? { snap: snapOf(q) } : e && e.snap ? { snap: e.snap } : {}) };
     nbSave(); return !e ? 'new' : e.box > 1 || e.mastered ? 'down' : 'again';
   }
   if (!e || e.mastered) return null;
@@ -25,9 +26,11 @@ function nbRecord(q, correct, pick) {
   else if (e.box >= 3) { e.mastered = true; res = 'mastered'; } else { e.box++; e.due = now + NB_WAIT[e.box] * DAY; res = 'up'; }
   nbSave(); return res;
 }
+/* 排位賽的題目由伺服器出題，不在本機題庫裡：答錯時把題目本身存進錯題本（snap），之後一樣能複習與輸出 */
+const snapOf = q => ({ category: q.category, difficulty: q.difficulty, q: q.q, options: q.options.slice(), answer: q.answer, explain: q.explain || '', ranked: true });
 function nbEntries() {
   const byId = new Map(allQuestions().map(q => [q.id, q]));
-  return Object.entries(NB).filter(([id]) => byId.has(id)).map(([id, e]) => ({ q: byId.get(id), e }));
+  return Object.entries(NB).map(([id, e]) => ({ q: byId.get(id) || (e.snap && e.snap.answer >= 0 ? { id, ...e.snap } : null), e })).filter(x => x.q);
 }
 function nbDueList(cat) {
   const now = Date.now();

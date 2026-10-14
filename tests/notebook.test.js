@@ -33,6 +33,18 @@ describe('spaced review', () => {
   });
 });
 
+describe('ranked questions from the server', () => {
+  it('a wrong answer keeps the question itself, so it can be reviewed and exported without the bank', () => {
+    const q = { id: 'r-test1', category: 'risk', difficulty: 2, q: '伺服器出的題目', options: ['甲', '乙', '丙', '丁'], answer: 2, explain: '因為丙。', snap: true };
+    NBm.nbRecord(q, false, '甲');
+    const e = NBm.nbEntries().find(x => x.q.id === 'r-test1');
+    expect(e.q).toMatchObject({ q: '伺服器出的題目', options: ['甲', '乙', '丙', '丁'], answer: 2, category: 'risk' });
+    expect(e.e.pick).toBe('甲');
+    expect(NBm.nbRecord(e.q, true)).toBe('up');                         // reviewing it keeps the copy
+    expect(NBm.NB['r-test1'].snap.q).toBe('伺服器出的題目');
+  });
+});
+
 describe('review mode', () => {
   it('shows a result list and what is due next', () => {
     const [a, b] = Q();

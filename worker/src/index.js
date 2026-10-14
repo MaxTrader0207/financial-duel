@@ -5,12 +5,15 @@
 // with its result (POST /v1/match/end). The server recomputes the points with the same rules as the game
 // (src/js/rankrules.js) from its own stored points, so a browser cannot send "I have 9999 points".
 //
-// The duel itself still runs in the browser, so the server cannot see every answer. What it does check: the ticket
-// belongs to the player and is used once; the duel lasted at least MIN_MATCH_MS; the performance parts are within
-// their maximums; at most MAX_MATCHES_PER_HOUR duels; leaving a duel open (starting another) counts as a loss.
+// The duel itself runs in the browser, but its questions come from the server (POST /v1/match/q and /v1/match/a):
+// the server picks each question — a calculation with fresh numbers, or one from a private bank that is not in the
+// public code — keeps the answer, times the reply and judges it. What else it checks: the ticket belongs to the
+// player and is used once; the duel lasted at least MIN_MATCH_MS; the performance parts are within their maximums;
+// at most MAX_MATCHES_PER_HOUR duels; leaving a duel open (starting another) counts as a loss.
 import { TIERS, tierOf, scoreMatch, seasonStart, checkPerf, seasonOf, prevSeason } from '../../src/js/rankrules.js';
 import { cleanPing, ping, report, reportHTML } from './stats.js';
-import { judge } from './judge.js';
+import { combine, MIN_MS } from './judge.js';
+import { draw, poolSize } from './pool.js';
 import { cleanName } from './names.js';
 export { cleanName };
 
@@ -19,6 +22,11 @@ const REGISTER_PER_IP_PER_DAY = 5;
 const MAX_MATCH_MS = 3 * 3600e3;        // an unfinished ticket older than this is a forfeited loss
 const SEED_CAP = TIERS[2].at;           // points carried over from offline play when joining (up to 資深分析師)
 const BOARD_SIZE = 100;
+const CATS = ['tech', 'fund', 'deriv', 'risk', 'chips', 'fx', 'crypto', 'etf'];
+const MAX_QUESTIONS = 150;              // per ranked duel
+const LIMIT_CAP_S = 35;                 // the longest answer time a ranked question can have (簡易 30 s + skills)
+const ANSWER_GRACE_MS = 4000;           // network delay allowed on top of the time limit
+const KEEP_QUESTIONS_MS = 7 * 864e5;    // asked questions are kept a week (then only the match row stays)
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',   // bearer tokens, no cookies: any page may call the API
@@ -129,6 +137,7 @@ async function rename(req, env, now) {
 async function leave(req, env) {
   const p = await mustAuth(req, env);
   await env.DB.batch([
+    env.DB.prepare('DELETE FROM match_questions WHERE ticket IN (SELECT ticket FROM matches WHERE player = ?)').bind(p.id),
     env.DB.prepare('DELETE FROM matches WHERE player = ?').bind(p.id),
     env.DB.prepare('DELETE FROM standings WHERE player = ?').bind(p.id),
     env.DB.prepare('DELETE FROM ratelimit WHERE k = ?').bind(`match:${p.id}`),
@@ -144,7 +153,8 @@ async function matchStart(req, env, now) {
   const season = seasonOf(now), ticket = randomHex(16);
   await standing(env, p.id, season, now);
   await env.DB.prepare('INSERT INTO matches (ticket, player, season, started) VALUES (?, ?, ?, ?)').bind(ticket, p.id, season, now).run();
-  return json({ ticket, season, forfeited: forfeited ? { delta: forfeited.delta } : null });
+  await env.DB.prepare('DELETE FROM match_questions WHERE issued < ?').bind(now - KEEP_QUESTIONS_MS).run();
+  return json({ ticket, season, forfeited: forfeited ? { delta: forfeited.delta } : null, questions: true });
 }
 
 async function matchEnd(req, env, now) {
@@ -161,13 +171,84 @@ async function matchEnd(req, env, now) {
     if (now - m.started < minMs) fail(422, 'too_fast', '對戰時間太短，這場不列入排行榜');
     if (now - m.started > MAX_MATCH_MS) { const r = await settle(env, p.id, m, false, 0, now); return json(result(r, await rankOf(env, m.season, r.standing), true)); }
     /* the server judges the answers itself: its knowledge score replaces the browser's */
-    judged = judge(b.answers, { elapsed: now - m.started, win });
+    judged = combine(await serverAnswers(env, m.ticket, now), b.answers, { elapsed: now - m.started, win });
     if (judged.error) fail(422, 'answers', judged.error);
     perf = { ...perf, knowledge: judged.knowledge, score: judged.knowledge + perf.strategy + perf.risk };
   }
   const r = await settle(env, p.id, m, win, perf.score, now);
   if (judged) await env.DB.prepare('UPDATE matches SET q_total = ?, q_correct = ? WHERE ticket = ?').bind(judged.total, judged.correct, m.ticket).run();
   return json(result(r, await rankOf(env, m.season, r.standing), false, judged ? { ...perf, judged: { total: judged.total, correct: judged.correct } } : null));
+}
+/* ---------- ranked questions asked by the server ---------- */
+async function openMatch(env, p, ticket, now) {
+  if (typeof ticket !== 'string' || !/^[0-9a-f]{32}$/.test(ticket)) fail(400, 'ticket', '缺少對戰憑證');
+  const m = await env.DB.prepare('SELECT ticket, started, ended FROM matches WHERE ticket = ? AND player = ?').bind(ticket, p.id).first();
+  if (!m) fail(404, 'ticket', '找不到這場對戰');
+  if (m.ended || now - m.started > MAX_MATCH_MS) fail(409, 'used', '這場對戰已經結束了');
+  return m;
+}
+/* POST /v1/match/q { ticket, cat, rank, limit, remove, retry } → { n, q, options, removed, category, difficulty, limit, calc }
+   An earlier question left unanswered counts as a time-out. The answer is not sent. */
+async function matchQuestion(req, env, now) {
+  const p = await mustAuth(req, env), b = await body(req, 1024);
+  const m = await openMatch(env, p, b.ticket, now);
+  if (!CATS.includes(b.cat)) fail(400, 'cat', '屬性不正確');
+  const rank = [1, 2, 3, 4].includes(b.rank) ? b.rank : 2;
+  const limitS = Math.min(LIMIT_CAP_S, Math.max(5, Number(b.limit) || 20));
+  const remove = [0, 1, 2].includes(b.remove) ? b.remove : 0;
+  const { results } = await env.DB.prepare('SELECT n, qid, answered FROM match_questions WHERE ticket = ? ORDER BY n').bind(m.ticket).all();
+  const rows = results || [];
+  if (rows.length >= MAX_QUESTIONS) fail(429, 'too_many', '這場的題目太多了');
+  const open = rows.filter(r => r.answered === null).map(r => r.n);
+  if (open.length) await env.DB.prepare(`UPDATE match_questions SET pick = -1, answered = ?, correct = 0 WHERE ticket = ? AND answered IS NULL`).bind(now, m.ticket).run();
+  const x = draw(b.cat, rank, new Set(rows.map(r => r.qid)));
+  const wrong = x.options.map((_, i) => i).filter(i => i !== x.answer);
+  const removed = wrong.sort(() => Math.random() - 0.5).slice(0, Math.min(remove, x.options.length - 2)).sort();
+  const n = rows.length + 1;
+  await env.DB.prepare('INSERT INTO match_questions (ticket, n, qid, src, data, issued, limit_ms, retry) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+    .bind(m.ticket, n, x.qid, x.src, JSON.stringify({ q: x.q, options: x.options, answer: x.answer, explain: x.explain, category: x.category, difficulty: x.difficulty, orig: x.orig, removed }), now, limitS * 1000, b.retry === true ? 1 : 0).run();
+  const out = { n, q: x.q, options: x.options, removed, category: x.category, difficulty: x.difficulty, limit: limitS, calc: x.src === 'tpl' };
+  if (env.TEST_CLOCK === '1') out.testAnswer = x.answer;              // integration tests only (never set in production)
+  return json(out, 200, { 'Cache-Control': 'no-store' });
+}
+/* POST /v1/match/a { ticket, n, pick } (pick: display index, −1 = time ran out)
+   → { correct, answer, explain } or { retry: true } (a retry skill's first wrong pick: the answer is not revealed yet).
+   Asking again for an answered question returns the same result. */
+async function matchAnswer(req, env, now) {
+  const p = await mustAuth(req, env), b = await body(req, 512);
+  const m = await openMatch(env, p, b.ticket, now);
+  if (!Number.isInteger(b.n) || b.n < 1 || !Number.isInteger(b.pick) || b.pick < -1 || b.pick > 3) fail(400, 'answer', '作答資料不正確');
+  const row = await env.DB.prepare('SELECT * FROM match_questions WHERE ticket = ? AND n = ?').bind(m.ticket, b.n).first();
+  if (!row) fail(404, 'question', '找不到這一題');
+  const d = JSON.parse(row.data);
+  const reveal = r => json({ correct: !!r, answer: d.answer, explain: d.explain }, 200, { 'Cache-Control': 'no-store' });
+  if (row.answered !== null) return reveal(row.correct);
+  if (b.pick >= d.options.length || d.removed.includes(b.pick)) fail(400, 'answer', '這個選項不能選');
+  const late = now - row.issued > row.limit_ms + ANSWER_GRACE_MS;
+  const pick = late ? -1 : b.pick, correct = pick === d.answer ? 1 : 0;
+  const fast = pick !== -1 && now - row.issued < MIN_MS ? 1 : 0;
+  if (!correct && pick !== -1 && row.retry === 1) {                     // 再答一次: keep the question open
+    await env.DB.prepare('UPDATE match_questions SET retry = 2, fast = MAX(fast, ?) WHERE ticket = ? AND n = ?').bind(fast, m.ticket, b.n).run();
+    return json({ retry: true }, 200, { 'Cache-Control': 'no-store' });
+  }
+  const done = await env.DB.prepare('UPDATE match_questions SET pick = ?, answered = ?, correct = ?, fast = MAX(fast, ?) WHERE ticket = ? AND n = ? AND answered IS NULL')
+    .bind(pick, now, correct, fast, m.ticket, b.n).run();
+  if (done.meta && done.meta.changes === 0) {                          // answered meanwhile by a repeated request
+    const again = await env.DB.prepare('SELECT correct FROM match_questions WHERE ticket = ? AND n = ?').bind(m.ticket, b.n).first();
+    return reveal(again && again.correct);
+  }
+  /* 題目品質 for the statistics page: picks in the bank's own option order (templates: answers and right only) */
+  const bank = d.orig && pick !== -1 ? d.orig[pick] : -1, col = ['p0', 'p1', 'p2', 'p3'][bank];
+  await env.DB.prepare(`INSERT INTO question_stats (qid, n, c, p0, p1, p2, p3, timeouts, updated) VALUES (?, 1, ?, ${[0, 1, 2, 3].map(i => (i === bank ? 1 : 0)).join(', ')}, ?, ?)
+    ON CONFLICT (qid) DO UPDATE SET n = n + 1, c = c + excluded.c${col ? `, ${col} = ${col} + 1` : ''}, timeouts = timeouts + excluded.timeouts, updated = excluded.updated`)
+    .bind(row.qid, correct, pick === -1 ? 1 : 0, now).run();
+  return reveal(correct);
+}
+/* what the server asked in this duel: questions never answered count as time-outs */
+async function serverAnswers(env, ticket, now) {
+  await env.DB.prepare('UPDATE match_questions SET pick = -1, answered = ?, correct = 0 WHERE ticket = ? AND answered IS NULL').bind(now, ticket).run();
+  const r = await env.DB.prepare('SELECT COUNT(*) AS total, COALESCE(SUM(correct), 0) AS correct, COALESCE(MAX(fast), 0) AS fast FROM match_questions WHERE ticket = ?').bind(ticket).first();
+  return { total: r ? r.total : 0, correct: r ? r.correct : 0, fast: !!(r && r.fast) };
 }
 const result = (r, rank, expired, perf) => ({ perf: perf || null, delta: r.delta, before: r.before, after: r.after, tierBefore: r.tierBefore, tierAfter: r.tierAfter, shielded: r.shielded, promoted: r.promoted, demoted: r.demoted, expired, me: view(r.standing, rank) });
 
@@ -279,7 +360,7 @@ async function challengeResult(req, env, now, id) {
 async function route(req, env, now) {
   const url = new URL(req.url), path = url.pathname.replace(/\/+$/, ''), m = req.method;
   if (m === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
-  if (m === 'GET' && (path === '' || path === '/v1/health')) return json({ ok: true, season: seasonOf(now), service: '金融決鬥排行榜' });
+  if (m === 'GET' && (path === '' || path === '/v1/health')) return json({ ok: true, season: seasonOf(now), service: '金融決鬥排行榜', rankedPool: poolSize() });
   if (m === 'GET' && path === '/v1/board') return board(req, env, now, url);
   if (m === 'POST' && path === '/v1/register') return register(req, env, now);
   if (m === 'GET' && path === '/v1/me') return me(req, env, now);
@@ -287,6 +368,8 @@ async function route(req, env, now) {
   if (m === 'DELETE' && path === '/v1/me') return leave(req, env);
   if (m === 'POST' && path === '/v1/match/start') return matchStart(req, env, now);
   if (m === 'POST' && path === '/v1/match/end') return matchEnd(req, env, now);
+  if (m === 'POST' && path === '/v1/match/q') return matchQuestion(req, env, now);
+  if (m === 'POST' && path === '/v1/match/a') return matchAnswer(req, env, now);
   if (m === 'POST' && path === '/v1/ping') return statsPing(req, env, now);
   if (m === 'POST' && path === '/v1/transfer') return transferCreate(req, env, now);
   if (m === 'POST' && path === '/v1/challenge') return challengeCreate(req, env, now);

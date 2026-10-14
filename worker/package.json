@@ -7,7 +7,13 @@
     "dev": "wrangler dev --local --port 8787",
     "migrate:local": "wrangler d1 migrations apply financial-duel --local",
     "test": "node --test --test-concurrency=1 test/api.test.js",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "pool:build": "node tools/pool.mjs build",
+    "pool:encrypt": "node tools/pool.mjs encrypt",
+    "pool:decrypt": "node tools/pool.mjs decrypt",
+    "predev": "node tools/pool.mjs build --fixture",
+    "pretest": "node tools/pool.mjs build --fixture",
+    "predeploy": "node tools/pool.mjs build"
   },
   "devDependencies": {
     "wrangler": "4.140.0"
