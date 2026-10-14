@@ -53,24 +53,28 @@ export const deckOk = list => deckCost(list) <= DECK_CAP;
    e.g. 1 UR + 1 R + 3 N, or 2 SR + 1 R + 2 N — using the best owned cards (falling back to a lower rank when
    short), and keeps the legal deck with the most total ATK + DEF. Simulations show these shapes beat 40 R by
    only a few points of win rate: the cap keeps a full collection from deciding ranked duels. */
-const SHAPES = [[1, 0, 1, 3], [0, 2, 1, 2], [1, 1, 0, 3], [0, 1, 3, 1], [0, 0, 5, 0]];      // [UR, SR, R, N] per attribute
+const SHAPES = [[1, 0, 1, 3], [0, 2, 1, 2], [1, 1, 0, 3], [0, 1, 3, 1], [0, 0, 5, 0], [1, 0, 0, 4], [0, 2, 0, 3], [0, 1, 1, 3]];   // [UR, SR, R, N] per attribute
 export function rankedDeck(cap = DECK_CAP) {
   const power = id => MON[id].atk + MON[id].def;
   const cats = [...new Set(Object.values(MON).map(m => m.cat))];
+  /* 40 cards over the attributes: 5 for some, 4 for the rest (a 4-card attribute drops the shape's last normal card) */
+  const per = Math.floor(40 / cats.length), extra = 40 - per * cats.length;
   const owned = (cat, rank) => Object.values(MON).filter(m => m.cat === cat && m.rank === rank && owns(m.id))
     .sort((a, b) => (b.atk + b.def) - (a.atk + a.def)).flatMap(m => Array(DECK_COPY).fill(m.id));
   let best = null;
   for (const shape of SHAPES) {
     const deck = [];
-    for (const cat of cats) {
+    cats.forEach((cat, ci) => {
       const pools = { 4: owned(cat, 4), 3: owned(cat, 3), 2: owned(cat, 2), 1: owned(cat, 1) };
+      const want = per + (ci < extra ? 1 : 0), sh = shape.slice();
+      for (let k = 3; sh.reduce((a, b) => a + b, 0) > want && k >= 0;) { if (sh[k] > 0) sh[k]--; else k--; }   // trim from the normal end
       [4, 3, 2, 1].forEach((rank, k) => {
-        for (let n = 0; n < shape[k]; n++) {
+        for (let n = 0; n < sh[k]; n++) {
           const r = [rank, 3, 2, 1].find(x => x <= rank && pools[x].length);       // short of this rank: next one down
           if (r) deck.push(pools[r].shift());
         }
       });
-    }
+    });
     if (deck.length !== 40 || deckCost(deck) > cap) continue;
     const p = deck.reduce((t, id) => t + power(id), 0);
     if (!best || p > best.p) best = { deck, p };

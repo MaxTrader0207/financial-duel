@@ -233,7 +233,7 @@ export function init() {
 downloadsP = (window.claude && typeof window.claude.use === 'function') ? window.claude.use('downloads').catch(() => null) : Promise.resolve(null);
 RC = { ink: '#0d1230', ink2: '#161d48', ink3: '#222b64', line: '#3a4384', wave: '#19214f', washi: '#f1e8d3', gold: '#d8b25a', goldHi: '#f3dc95',
   shu: '#e14b32', text: '#eceaf6', muted: '#9ea4cc', good: '#4cc28e', bad: '#e8574a',
-  cat: { tech: '#3f7fe0', fund: '#2f9e74', deriv: '#8d5ee0', risk: '#d8553a', chips: '#c3902e', fx: '#1f9fb3', crypto: '#d9467f', etf: '#6e9a2a' } };
+  cat: { tech: '#3f7fe0', fund: '#2f9e74', deriv: '#8d5ee0', risk: '#d8553a', chips: '#c3902e', fx: '#1f9fb3', crypto: '#d9467f', etf: '#6e9a2a', money: '#c24fc8' } };
 RF = { mincho: '"FD Serif","Noto Serif TC",serif', jp: '"FD Sans","Noto Sans TC","PingFang TC",sans-serif', name: '"FD Serif","Noto Serif TC","Songti TC",serif', body: '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif' };
 fnt = (w, s, fam = RF.body) => `${w} ${s}px ${fam}`;
 RW = 1080;

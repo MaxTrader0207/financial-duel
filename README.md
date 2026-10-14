@@ -1,6 +1,6 @@
 # 金融決鬥
 
-日式卡牌對決風格的金融知識遊戲：召喚交易怪獸，答對題目才能攻擊或防禦。8 個屬性、160 張卡、400 題。
+日式卡牌對決風格的金融知識遊戲：召喚交易怪獸，答對題目才能攻擊或防禦。9 個屬性、180 張卡、900 題。
 
 **▶ 線上遊玩：https://maxtrader0207.github.io/financial-duel/**
 
@@ -21,7 +21,7 @@ Vite 建置的 ES 模組專案。卡牌與題庫是 `public/data/` 裡的 JSON�
 ```bash
 npm install
 npm run dev               # 開發伺服器，改檔即時更新
-npm test                  # 單元測試（Vitest）：傷害計算、160 張卡、狀態機、存檔轉換、資料完整性
+npm test                  # 單元測試（Vitest）：傷害計算、180 張卡、狀態機、存檔轉換、資料完整性
 npm run build             # dist/：GitHub Pages 版，data/*.json 執行時載入；可安裝成 App、離線可玩（sw.js 建置時產生）
 npm run build:artifact    # artifact/index.html：claude.ai Artifact 單檔版（資料內嵌，jsPDF 走 cdnjs）
 npm run build:standalone  # standalone/：雙擊即可開的單檔版，jsPDF 放在旁邊的 vendor/，可離線
@@ -51,8 +51,8 @@ cd worker && npm ci && npm test   # 線上排行榜 API 的整合測試（本機
 
 | 檔案 | 內容 |
 |---|---|
-| `public/data/cards.json` | 160 張卡：`id`、`name`、`cat`（tech fund deriv risk chips fx crypto etf）、`rank` 1–4、`atk`、`def`、`race`、`sigil`、`text` |
-| `public/data/questions.json` | 400 題，格式與遊戲內「題庫管理」的匯入格式相同 |
+| `public/data/cards.json` | 180 張卡：`id`、`name`、`cat`（tech fund deriv risk chips fx crypto etf money）、`rank` 1–4、`atk`、`def`、`race`、`sigil`、`text` |
+| `public/data/questions.json` | 900 題（9 個屬性各 100 題，初階 34／中階 36／進階 30），格式與遊戲內「題庫管理」的匯入格式相同 |
 | `public/data/knowledge.json` | 100 張金融知識卡（四種各 25 張）：`type`（stock 股票卡、defense 防禦卡、event 事件卡、trap 陷阱卡）、`name`、`sigil`、`summary`、`levels`（Lv1–Lv3 的說明：是什麼、實際例子、常見誤區）、`quiz`（升 Lv2、Lv3 的檢定題）；`starter` 是新玩家一開始擁有的卡 |
 | `public/data/daily.json` | 每日挑戰的生活金融情境（目前 98 個 × 3 題，100 張知識卡中有 85 張連到情境）：`id`、`theme`、`title`、`scene`、`questions`（`q`、4 個 `options`、`answer`、`explain`）、`takeaway`、`card`（完成這天會解鎖的知識卡），有時效的數字可加 `asOf`／`reviewBy`。依日期輪替，98 天一輪；直接加情境就會排進輪替（已經開始的那一天不會被換掉） |
 
@@ -69,7 +69,7 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
    │           │ 對戰回合順序、各畫面、事件綁定
 桌面與動畫   board（手牌、資金條、階段）  fx（召喚、傷害動畫）  view（切換畫面、過場、提示）  foequiz  report
    │
-規則         calc（傷害計算）  skills（160 個技能）  ai（對手出牌）  deck（抽牌、洗牌）  state（開新局）
+規則         calc（傷害計算）  skills（180 個技能）  ai（對手出牌）  deck（抽牌、洗牌）  state（開新局）
              quiz  bank  notebook  records  collection  save  rules  fsm
    │
 資料與基礎   carddata（卡牌資料）  cards（卡面繪製）  scenes  ur-art  core  data  sound  perf  backgrounds
@@ -83,8 +83,8 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
 | `game.js` | 目前這場對戰的狀態 `G`（欄位說明寫在檔案開頭的 JSDoc）；只有 `flow.js` 會用 `setGame()` 換掉它 |
 | `actions.js` | 跨畫面動作（開始對戰、續戰、回標題、打開牌組）：擁有者在 `init()` 註冊，呼叫方用 `Actions.x()`，不必互相引用 |
 | `ui.js` | 技能需要的畫面更新（重畫手牌、資金條、飄字、記錄）；由 `board.js`、`fx.js` 提供 |
-| `carddata.js`、`cards.js` | 卡牌資料（屬性、160 張卡、稀有度）／卡面繪製（依稀有度的插圖、延遲繪製） |
-| `skills.js`、`calc.js`、`rules.js` | 160 個技能、傷害計算純函式、屬性相剋 |
+| `carddata.js`、`cards.js` | 卡牌資料（屬性、180 張卡、稀有度）／卡面繪製（依稀有度的插圖、延遲繪製） |
+| `skills.js`、`calc.js`、`rules.js` | 180 個技能、傷害計算純函式、屬性相剋 |
 | `deck.js`、`state.js`、`fsm.js` | 抽牌與洗牌、開新局、對戰狀態機 |
 | `flow.js`、`ask.js`、`quiz.js` | 回合流程（含續戰）、答題畫面、出題 |
 | `board.js`、`fx.js`、`view.js`、`foequiz.js` | 對戰桌面、動畫、切換畫面與過場、對手作答畫面 |
@@ -182,7 +182,7 @@ Playwright（JavaScript），和單元測試放在同一套流程。`npm run e2e
 
 - 驗證基本規則，例如速攻、連鎖、弱項、重答、相剋、貫通與反彈。
 - 驗證條件型技能。
-- 把 160 張卡 × 5 種情況存成快照。之後任何卡的數字變動，都會在測試失敗訊息中列出。
+- 把 180 張卡 × 5 種情況存成快照。之後任何卡的數字變動，都會在測試失敗訊息中列出。
 
 ## 平衡模擬（`sim/`）
 

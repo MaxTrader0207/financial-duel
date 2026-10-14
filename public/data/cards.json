@@ -1,6 +1,6 @@
 {
  "version": 3,
- "note": "卡牌資料。技能程式在 src/js/skills.js，以 id 對應；沒有對應技能的卡會顯示「無技能」。cat 可用 tech fund deriv risk chips fx crypto etf；rank 1–4。",
+ "note": "卡牌資料。技能程式在 src/js/skills.js，以 id 對應；沒有對應技能的卡會顯示「無技能」。cat 可用 tech fund deriv risk chips fx crypto etf money；rank 1–4。",
  "cards": [
   {
    "id": "ma_samurai",
@@ -1761,6 +1761,226 @@
    "race": "機關",
    "sigil": "機",
    "text": "折價時買進贖回，溢價時申購賣出，價格總被拉回淨值。"
+  },
+  {
+   "id": "ledger_doji",
+   "name": "記帳童子",
+   "cat": "money",
+   "rank": 1,
+   "atk": 800,
+   "def": 1200,
+   "race": "童子",
+   "sigil": "記",
+   "text": "每一筆花費都寫進帳本，錢從哪裡漏掉一目了然。"
+  },
+  {
+   "id": "budget_abacus",
+   "name": "預算算盤師",
+   "cat": "money",
+   "rank": 1,
+   "atk": 900,
+   "def": 1100,
+   "race": "算師",
+   "sigil": "預",
+   "text": "薪水一進門就先分好用途，剩下的才是能花的。"
+  },
+  {
+   "id": "reserve_keeper",
+   "name": "預備金倉守",
+   "cat": "money",
+   "rank": 1,
+   "atk": 700,
+   "def": 1500,
+   "race": "倉守",
+   "sigil": "備",
+   "text": "倉裡鎖著六個月生活費，風雨來時不必賤賣家當。"
+  },
+  {
+   "id": "snowball_doji",
+   "name": "雪球童子",
+   "cat": "money",
+   "rank": 1,
+   "atk": 1000,
+   "def": 900,
+   "race": "童子",
+   "sigil": "雪",
+   "text": "小雪球推得夠久，終會滾成擋不住的大雪球。"
+  },
+  {
+   "id": "dca_pilgrim",
+   "name": "定額行腳僧",
+   "cat": "money",
+   "rank": 1,
+   "atk": 900,
+   "def": 1200,
+   "race": "行腳僧",
+   "sigil": "額",
+   "text": "不論晴雨，每月固定走同一段路，從不看天色。"
+  },
+  {
+   "id": "scale_ashigaru",
+   "name": "分批足輕",
+   "cat": "money",
+   "rank": 1,
+   "atk": 1000,
+   "def": 1000,
+   "race": "足輕",
+   "sigil": "批",
+   "text": "不一次押上全部兵力，分三段進場攤平成本。"
+  },
+  {
+   "id": "allocation_bugyo",
+   "name": "資產配置奉行",
+   "cat": "money",
+   "rank": 2,
+   "atk": 1100,
+   "def": 1400,
+   "race": "奉行",
+   "sigil": "配",
+   "text": "股、債、現金各守其位，比例決定了大半的報酬。"
+  },
+  {
+   "id": "cashflow_clerk",
+   "name": "現金流掌櫃",
+   "cat": "money",
+   "rank": 2,
+   "atk": 1200,
+   "def": 1200,
+   "race": "掌櫃",
+   "sigil": "櫃",
+   "text": "進帳與出帳是兩條水道，管好了水位就不會乾涸。"
+  },
+  {
+   "id": "delever_monk",
+   "name": "去槓桿僧",
+   "cat": "money",
+   "rank": 2,
+   "atk": 1000,
+   "def": 1500,
+   "race": "僧",
+   "sigil": "節",
+   "text": "能借多少不等於該借多少，槓桿上限自己訂。"
+  },
+  {
+   "id": "addon_ronin",
+   "name": "順勢加碼浪人",
+   "cat": "money",
+   "rank": 2,
+   "atk": 1500,
+   "def": 600,
+   "race": "浪人",
+   "sigil": "碼",
+   "text": "贏的部位才加碼，輸的部位絕不攤平。"
+  },
+  {
+   "id": "fraction_bettor",
+   "name": "固定比例賭士",
+   "cat": "money",
+   "rank": 2,
+   "atk": 1200,
+   "def": 1300,
+   "race": "賭士",
+   "sigil": "比",
+   "text": "每回只押當下資金的一小部分，所以永遠不會歸零。"
+  },
+  {
+   "id": "insurance_miko",
+   "name": "保險巫女",
+   "cat": "money",
+   "rank": 2,
+   "atk": 1100,
+   "def": 1400,
+   "race": "巫女",
+   "sigil": "保",
+   "text": "平時付一點保費，換來風暴來襲時的安心。"
+  },
+  {
+   "id": "jars_planner",
+   "name": "六罐子理財師",
+   "cat": "money",
+   "rank": 3,
+   "atk": 1500,
+   "def": 1600,
+   "race": "理財師",
+   "sigil": "罐",
+   "text": "收入分進六個罐子：生活、儲蓄、學習、玩樂、投資、分享。"
+  },
+  {
+   "id": "rule72_sage",
+   "name": "七十二法賢者",
+   "cat": "money",
+   "rank": 3,
+   "atk": 1700,
+   "def": 1300,
+   "race": "賢者",
+   "sigil": "七",
+   "text": "七十二除以報酬率，便知資產幾年翻倍。"
+  },
+  {
+   "id": "equity_curve_seer",
+   "name": "資金曲線觀星師",
+   "cat": "money",
+   "rank": 3,
+   "atk": 1400,
+   "def": 1800,
+   "race": "觀星師",
+   "sigil": "曲",
+   "text": "資金曲線跌破均線就減碼，重新站上再加回來。"
+  },
+  {
+   "id": "pyramid_general",
+   "name": "金字塔加碼將",
+   "cat": "money",
+   "rank": 3,
+   "atk": 1800,
+   "def": 1200,
+   "race": "武將",
+   "sigil": "塔",
+   "text": "底部最重、越往上越輕，獲利的金字塔才站得穩。"
+  },
+  {
+   "id": "passive_lord",
+   "name": "被動收入城主",
+   "cat": "money",
+   "rank": 4,
+   "atk": 2000,
+   "def": 1800,
+   "race": "城主",
+   "sigil": "收",
+   "text": "城裡的租金與股息日夜流入，城主不必親自出征。"
+  },
+  {
+   "id": "freedom_tennyo",
+   "name": "財務自由天女",
+   "cat": "money",
+   "rank": 4,
+   "atk": 1800,
+   "def": 2200,
+   "race": "天女",
+   "sigil": "由",
+   "text": "被動收入超過生活支出的那天，天女便降臨人間。"
+  },
+  {
+   "id": "budget_shogun",
+   "name": "風險預算大將軍",
+   "cat": "money",
+   "rank": 4,
+   "atk": 2100,
+   "def": 1900,
+   "race": "將軍",
+   "sigil": "將",
+   "text": "每一兵一卒都算進風險預算，從不孤注一擲。"
+  },
+  {
+   "id": "pension_guardian",
+   "name": "退休金守護神",
+   "cat": "money",
+   "rank": 4,
+   "atk": 1700,
+   "def": 2300,
+   "race": "守護神",
+   "sigil": "壽",
+   "text": "四十年的積累化為城牆，守住人生最後一段路。"
   }
  ]
 }

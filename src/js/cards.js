@@ -108,6 +108,17 @@ SCENE = (() => {
       <g stroke="#3b260c" stroke-width=".6" fill="none"><path d="M26 46 H70 M27.5 50 H68.5 M29 54 H67"/><path d="M34 42 L36 59 M42 42 L43 59 M50 42 V59 M58 42 L57 59 M66 42 L64 59"/></g>
       <path d="M24 42 H72" stroke="#f3dc95" stroke-width="1"/>
       <path d="M4 40 L16 36 L24 38 L40 26 L52 28 L70 14 L96 8" fill="none" stroke="#fff2b0" stroke-width="1.3" filter="url(#glow)"/>`),
+    /* the storehouse (kura) and chests of coins */
+    money: wrap(`<rect width="100" height="60" fill="url(#sky-money)"/><circle cx="80" cy="15" r="9" fill="url(#sun-gold)"/>${clouds(6, 12)}
+      <path d="M0 54 Q30 48 60 52 T100 50 V60 H0Z" fill="#1a0622"/>
+      <g stroke="#2a0a30" stroke-width=".5" stroke-linejoin="round"><path d="M16 31 L35 22 L54 31Z" fill="#2a0a30" stroke="#f3dc95"/><rect x="20" y="31" width="30" height="24" fill="#f4ead2"/>
+        <rect x="20" y="45" width="30" height="10" fill="#3a1440"/><rect x="30" y="35" width="10" height="9" fill="#2a0a30" stroke="#f3dc95"/></g>
+      <g stroke="#f4ead2" stroke-width=".35" opacity=".6"><path d="M20 48 L50 48 M20 51.5 H50 M25 45 L22 55 M31 45 L28 55 M37 45 L34 55 M43 45 L40 55 M49 45 L46 55"/></g>
+      <circle cx="35" cy="39.5" r="2" fill="none" stroke="#f3dc95" stroke-width=".6"/><path d="M35 37.5 V41.5 M33 39.5 H37" stroke="#f3dc95" stroke-width=".5"/>
+      <g fill="#7a4a1a" stroke="#2a1405" stroke-width=".5"><rect x="60" y="47" width="15" height="8"/><rect x="77" y="47" width="15" height="8"/><rect x="68.5" y="39" width="15" height="8"/></g>
+      <g stroke="#f3dc95" stroke-width=".8"><path d="M60 51 H75 M77 51 H92 M68.5 43 H83.5"/></g>
+      ${[[71, 38], [76, 37.4], [81, 38]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="2.6" ry=".9" fill="url(#gold-v)" stroke="#6b470f" stroke-width=".25"/>`).join('')}
+      <path d="M4 44 C24 41 44 33 62 27 S90 13 98 9" fill="none" stroke="#fff2b0" stroke-width="1.3" filter="url(#glow)"/>`),
   };
 })();
 VAR_HUE = [0, 14, -14, 24, -22, 8, -8, 18, -18, 30, -28, 4, -4, 34, -34, 12, -12, 22, -26, 28];

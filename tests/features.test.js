@@ -13,10 +13,10 @@ afterEach(() => vi.restoreAllMocks());
 
 describe('opponent block', () => {
   it('picks the hand card with the best DEF × advantage and only lets damage − DEF through', () => {
-    const G = fresh({ diff: DIFFS.hard }); G.hand.c = hand('ma_samurai', 'index_scroll', 'sortino_keep');
+    const G = fresh({ diff: DIFFS.hard }); G.hand.c = hand('ma_samurai', 'insurance_miko', 'sortino_keep');
     vi.spyOn(Math, 'random').mockReturnValue(0);                       // smart pick, block succeeds
-    const b = calc.foeBlock(MON.boll_dragon, 2700);                     // tech attack: ETF beats tech → index_scroll DEF 1400 × 1.5
-    expect(b.card.id).toBe('index_scroll'); expect(b.def).toBe(2100); expect(b.ok).toBe(true); expect(b.dmg).toBe(600);
+    const b = calc.foeBlock(MON.boll_dragon, 2700);                     // tech attack: 資金管理 beats tech → insurance_miko DEF 1400 × 1.5
+    expect(b.card.id).toBe('insurance_miko'); expect(b.def).toBe(2100); expect(b.ok).toBe(true); expect(b.dmg).toBe(600);
     expect(G.hand.c.map(i => i.id)).toEqual(['ma_samurai', 'sortino_keep']);
   });
   it('stops at zero (never reflects), does nothing when it answers wrong, and needs a card', () => {

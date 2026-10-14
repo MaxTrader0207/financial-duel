@@ -357,6 +357,73 @@ export const TEMPLATES = [
     return { q: `兩檔 ETF 的年報酬（未扣費用）都是 ${g}%，總費用率分別是 ${f1}% 與 ${f2}%，${n} 年後前者的期末資產約比後者少多少？`,
       a: pct(less, 1), w: [pct((f1 - f2) / 100, 1), pct((f1 - f2) * n / 100 * 0.5, 1), pct(less * 2, 1)],
       ex: `期末資產比 =（${fix(1 + (g - f1) / 100, 3)} ÷ ${fix(1 + (g - f2) / 100, 3)}）^${n} ≈ ${pct(ratio, 1)}，約少 ${pct(less, 1)}。費用每年複利累積，時間越長差距越大。` }; } },
+
+  /* ============ 資金管理 ============ */
+  { id: 'money-72', cat: 'money', diff: 1, title: '72 法則', make(r) {
+    const k = pick(r, [3, 4, 6, 8, 9, 12]);
+    return { q: `年報酬率 ${k}%，依 72 法則估算，資產大約幾年會翻倍？`,
+      a: fix(72 / k, 0) + ' 年', w: [fix(100 / k, 1) + ' 年', fix(72 / k / 2, 0) + ' 年', fix(k * 72 / 100, 1) + ' 年'],
+      ex: `72 法則：72 ÷ 年報酬率 = 72 ÷ ${k} ≈ ${fix(72 / k, 0)} 年。` }; } },
+  { id: 'money-reserve', cat: 'money', diff: 1, title: '緊急預備金', make(r) {
+    const e = int(r, 20, 80) * 1000, m = pick(r, [3, 4, 6, 9, 12]);
+    return { q: `每月必要支出 ${fix(e)} 元，想準備 ${m} 個月的緊急預備金，需要多少錢？`,
+      a: money(e * m), w: [money(e * 12), money(e * m / 2), money(e * (m + 3))],
+      ex: `緊急預備金 = 每月必要支出 × 月數 = ${fix(e)} × ${m} = ${fix(e * m)} 元。` }; } },
+  { id: 'money-goal', cat: 'money', diff: 1, title: '儲蓄目標', make(r) {
+    const n = pick(r, [12, 18, 24, 30, 36, 48]), per = int(r, 3, 30) * 1000, g = per * n;
+    return { q: `${n} 個月後需要 ${fix(g)} 元，不計利息，每月至少要存多少？`,
+      a: money(per), w: [money(g / (n / 12)), money(per * 2), money(g / 100)],
+      ex: `${fix(g)} ÷ ${n} 個月 = 每月 ${fix(per)} 元。把大目標拆成每月金額，比較容易執行。` }; } },
+  { id: 'money-compound', cat: 'money', diff: 2, title: '複利本利和', make(r) {
+    const p = int(r, 5, 50) * 10000, k = pick(r, [2, 3, 4, 5, 6]), n = pick(r, [2, 3, 5]);
+    return { q: `${fix(p)} 元以年利率 ${k}% 複利存 ${n} 年，到期本利和約是多少？`,
+      a: money(p * (1 + k / 100) ** n), w: [money(p * (1 + k / 100 * n)), money(p * (1 + k / 100) ** (n - 1)), money(p * k / 100 * n)],
+      ex: `複利本利和 = 本金 ×（1 + 利率）^年數 = ${fix(p)} × ${fix(1 + k / 100, 2)}^${n} ≈ ${fix(p * (1 + k / 100) ** n)} 元；單利只有 ${fix(p * (1 + k / 100 * n))} 元。` }; } },
+  { id: 'money-real', cat: 'money', diff: 2, title: '實質報酬', make(r) {
+    const i = int(r, 0, 8), pi = int(r, 1, 5); if (i === pi) return null;
+    return { q: `存款或投資的名目報酬率 ${i}%，通膨率 ${pi}%，實質報酬率大約是多少？`,
+      a: spct((i - pi) / 100, 0), w: [spct((i + pi) / 100, 0), spct((pi - i) / 100, 0), spct(i / 100, 0)],
+      ex: `實質報酬 ≈ 名目報酬 − 通膨率 = ${i}% − ${pi}% = ${spct((i - pi) / 100, 0)}；為負代表購買力在下降。` }; } },
+  { id: 'money-4pct', cat: 'money', diff: 2, title: '4% 法則', make(r) {
+    const e = int(r, 30, 150) * 10000;
+    return { q: `退休後每年預計支出 ${fix(e)} 元，依 4% 法則，大約需要準備多少退休資產？`,
+      a: money(e * 25), w: [money(e * 4), money(e * 10), money(e / 0.4)],
+      ex: `所需資產 ≈ 年支出 ÷ 4% = ${fix(e)} × 25 = ${fix(e * 25)} 元。` }; } },
+  { id: 'money-shares', cat: 'money', diff: 2, title: '可以買多少股', make(r) {
+    const c = int(r, 20, 200) * 10000, k = pick(r, [1, 2]), d = pick(r, [2, 4, 5, 8, 10, 20]);
+    const sh = c * k / 100 / d; if (!Number.isInteger(sh)) return null;
+    return { q: `總資金 ${fix(c)} 元，每筆最多承擔 ${k}% 的風險，停損距離每股 ${d} 元，最多可以買多少股？`,
+      a: fix(sh) + ' 股', w: [fix(sh * 10) + ' 股', fix(c / d) + ' 股', fix(sh / 2) + ' 股'],
+      ex: `可承擔風險 = ${fix(c)} × ${k}% = ${fix(c * k / 100)} 元；${fix(c * k / 100)} ÷ 每股 ${d} 元 = ${fix(sh)} 股。` }; } },
+  { id: 'money-leverage', cat: 'money', diff: 2, title: '實際槓桿', make(r) {
+    const eq = int(r, 20, 200) * 10000, lev = pick(r, [1.5, 2, 2.5, 3, 4, 5, 8]);
+    return { q: `帳戶權益 ${fix(eq)} 元，持有名目價值 ${fix(eq * lev)} 元的期貨部位，實際槓桿約是幾倍？`,
+      a: fix(lev, 1) + ' 倍', w: [fix(lev * 10, 1) + ' 倍', fix(1 / lev, 2) + ' 倍', fix(lev + 1, 1) + ' 倍'],
+      ex: `實際槓桿 = 名目價值 ÷ 帳戶權益 = ${fix(eq * lev)} ÷ ${fix(eq)} = ${fix(lev, 1)} 倍；標的變動 1%，帳戶約變動 ${fix(lev, 1)}%。` }; } },
+  { id: 'money-mortgage', cat: 'money', diff: 3, title: '房貸月付金', make(r) {
+    const L = int(r, 3, 15) * 1000000, y = pick(r, [20, 30]), k = pick(r, [1.8, 2, 2.2, 2.5, 3]);
+    const i = k / 1200, n = y * 12, pay = L * i / (1 - (1 + i) ** -n);
+    return { q: `房貸 ${fix(L / 10000)} 萬元、${y} 年、年利率 ${k}%，本息平均攤還，每月還款約是多少？`,
+      a: money(pay), w: [money(L / n), money(L * (1 + k / 100 * y) / n), money(L * k / 1200)],
+      ex: `本息平均攤還每月 = 貸款 × 月利率 ÷（1 −（1 + 月利率）^−期數）≈ ${fix(pay)} 元；只看本金 ÷ 期數的 ${fix(L / n)} 元忽略了利息。` }; } },
+  { id: 'money-fv', cat: 'money', diff: 3, title: '定期定額終值', make(r) {
+    const s = int(r, 3, 20) * 1000, y = pick(r, [10, 15, 20, 25, 30]), k = pick(r, [3, 4, 5, 6, 7]);
+    const i = k / 1200, n = y * 12, fv = s * ((1 + i) ** n - 1) / i;
+    return { q: `每月定期定額投入 ${fix(s)} 元，年報酬率 ${k}%（按月複利），${y} 年後大約累積多少？`,
+      a: money(fv), w: [money(s * n), money(s * 12 * (1 + k / 100) ** y), money(fv * 1.5)],
+      ex: `終值 = 每月金額 ×（（1 + 月利率）^月數 − 1）÷ 月利率 ≈ ${fix(fv)} 元；投入本金只有 ${fix(s * n)} 元，其餘是複利。` }; } },
+  { id: 'money-kelly', cat: 'money', diff: 3, title: '連續型凱利', make(r) {
+    const m = pick(r, [3, 4, 5, 6, 8]), sd = pick(r, [10, 15, 20, 25]);
+    const f = (m / 100) / (sd / 100) ** 2;
+    return { q: `依連續型凱利公式 f* ≈ 超額報酬 ÷ 變異數，年超額報酬 ${m}%、年波動率 ${sd}%，最適槓桿約是幾倍？`,
+      a: fix(f, 2) + ' 倍', w: [fix(m / sd, 2) + ' 倍', fix(sd / m, 2) + ' 倍', fix(f / 2, 2) + ' 倍'],
+      ex: `f* = ${m}% ÷（${sd}%）² = ${fix(m / 100, 2)} ÷ ${fix((sd / 100) ** 2, 4)} ≈ ${fix(f, 2)} 倍；實務上常只用一半（半凱利）。` }; } },
+  { id: 'money-atr', cat: 'money', diff: 3, title: 'ATR 部位大小', make(r) {
+    const R = int(r, 5, 30) * 1000, a = pick(r, [2, 2.5, 4, 5, 8, 10]), k = pick(r, [1, 2, 3]);
+    const sh = R / (k * a); if (!Number.isInteger(sh)) return null;
+    return { q: `每筆願意虧損 ${fix(R)} 元，停損設在 ${k} 倍 ATR，ATR 為 ${fix(a, 1)} 元，最多可以買多少股？`,
+      a: fix(sh) + ' 股', w: [fix(R / a) + ' 股', fix(R * k / a) + ' 股', fix(sh * 10) + ' 股'],
+      ex: `停損距離 = ${k} × ${fix(a, 1)} = ${fix(k * a, 1)} 元；部位 = ${fix(R)} ÷ ${fix(k * a, 1)} = ${fix(sh)} 股。` }; } },
 ];
 
 /* draw one question from a template: → { q, options (right one first), answer: 0, explain } or null */

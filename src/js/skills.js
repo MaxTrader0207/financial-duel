@@ -1,4 +1,4 @@
-// skills.js — the 160 card skills, keyed by card id: what each does on hit, miss, block or failed block, and its quiz effects.
+// skills.js — the 180 card skills, keyed by card id: what each does on hit, miss, block or failed block, and its quiz effects.
 import { MON, MONSTERS } from './carddata.js';
 import { $, AD, LP_MAX, RM, esc, sleep } from './core.js';
 import { Sound } from './sound.js';
@@ -373,6 +373,47 @@ SKILLS = {
                      defFail: c => { const k = kinds('p'); if (k) { c.dmg = Math.max(0, c.dmg - k * 250); return true; } } },
   nav_engine:      { name: '回歸淨值', text: '攻擊命中時，若雙方資金相差 3,000 以上傷害 ×2；否則追加 400 傷害。',
                      hit: c => { if (Math.abs(G.lp.p - G.lp.c) >= 3000) c.mult *= 2; else c.dmg += 400; return true; } },
+  /* ---------- 資金管理 ---------- */
+  ledger_doji:     { name: '記帳', text: '防禦成功時回復 300 資金。',
+                     defOk: c => { c.heal += 300; return true; } },
+  budget_abacus:   { name: '先存後花', text: '攻擊命中時，若我方資金高於對方，追加 300 傷害。',
+                     hit: c => { if (G.lp[c.side] > G.lp[foeOf(c.side)]) { c.dmg += 300; return true; } } },
+  reserve_keeper:  { name: '緊急預備金', text: '防禦失敗時，承受的傷害減少 400。',
+                     defFail: c => { c.dmg = Math.max(0, c.dmg - 400); return true; } },
+  snowball_doji:   { name: '滾雪球', text: '攻擊命中時，本場每經過 1 回合追加 40 傷害（最多 600）。',
+                     hit: c => { const add = Math.min(600, (G.turn || 0) * 40); if (add > 0) { c.dmg += add; return true; } } },
+  dca_pilgrim:     { name: '定期定額', text: '答題時間 +3 秒；攻擊失敗時回復 200 資金。', quiz: { extraTime: 3 },
+                     miss: c => { c.heal += 200; return true; } },
+  scale_ashigaru:  { name: '分批進場', text: '攻擊失敗時回復 400 資金。',
+                     miss: c => { c.heal += 400; return true; } },
+  allocation_bugyo:{ name: '資產配置', text: '防禦時，手牌每有 1 種不同屬性，守備力 +120；防禦成功時回復 200 資金。',
+                     defBonus: () => new Set(G.hand.p.map(i => MON[i.id].cat)).size * 120, defOk: c => { c.heal += 200; return true; } },
+  cashflow_clerk:  { name: '現金流', text: '攻擊命中時回復 300 資金。',
+                     hit: c => { c.heal += 300; return true; } },
+  delever_monk:    { name: '去槓桿', text: '防禦失敗時，最多承受 1,100 傷害。',
+                     defFail: c => { if (c.dmg > 1100) { c.dmg = 1100; return true; } } },
+  addon_ronin:     { name: '順勢加碼', text: '攻擊命中時，若已連續答對 2 題以上，傷害 ×1.5。',
+                     hit: c => { if (c.side === 'p' && G.streak >= 2) { c.mult *= 1.5; return true; } } },
+  fraction_bettor: { name: '固定比例', text: '防禦失敗時，承受的傷害減少 30%。',
+                     defFail: c => { c.dmg = Math.round(c.dmg * 0.7); return true; } },
+  insurance_miko:  { name: '保險', text: '防禦失敗時，若承受的傷害達 1,500 以上，減少 800。',
+                     defFail: c => { if (c.dmg >= 1500) { c.dmg -= 800; return true; } } },
+  jars_planner:    { name: '六罐子', text: '答題時刪去 1 個錯誤選項；防禦成功時回復 300 資金。', quiz: { remove: 1 },
+                     defOk: c => { c.heal += 300; return true; } },
+  rule72_sage:     { name: '72 法則', text: '攻擊命中時，若本場正確率達 70% 以上，追加 500 傷害。',
+                     hit: c => { if (c.side === 'p' && G.stats.total && G.stats.correct / G.stats.total >= 0.7) { c.dmg += 500; return true; } } },
+  equity_curve_seer:{ name: '資金曲線', text: '防禦成功時守備力再 +300；若我方資金低於 5,000，另回復 700 資金。',
+                     defOk: c => { addDef(c, 300); if (G.lp.p < 5000) c.heal += 700; return true; } },
+  pyramid_general: { name: '金字塔加碼', text: '攻擊命中時追加 300 傷害；若已連續答對 3 題以上，改為追加 800。',
+                     hit: c => { c.dmg += c.side === 'p' && G.streak >= 3 ? 800 : 300; return true; } },
+  passive_lord:    { name: '被動收入', text: '攻擊命中時回復 300 資金；防禦成功時回復 500 資金。',
+                     hit: c => { c.heal += 300; return true; }, defOk: c => { c.heal += 500; return true; } },
+  freedom_tennyo:  { name: '財務自由', text: '防禦成功時回復 800 資金；防禦失敗時，承受的傷害減少 500。',
+                     defOk: c => { c.heal += 800; return true; }, defFail: c => { c.dmg = Math.max(0, c.dmg - 500); return true; } },
+  budget_shogun:   { name: '風險預算', text: '攻擊命中時追加 300 傷害；防禦失敗時，最多承受 900 傷害。',
+                     hit: c => { c.dmg += 300; return true; }, defFail: c => { if (c.dmg > 900) { c.dmg = 900; return true; } } },
+  pension_guardian:{ name: '4% 法則', text: '防禦時守備力 +400；防禦成功時，我方下一次攻擊 +400。',
+                     defBonus: 400, defOk: c => { G.mods.myAtk += 400; return true; } }
 };
 foeOf = side => side === 'p' ? 'c' : 'p';
 countCat = (side, cat) => G.hand[side].filter(i => MON[i.id].cat === cat).length;

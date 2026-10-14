@@ -90,7 +90,7 @@ export function foePickBlocker(m) {
    in (−FOE_FORTE). The block question is in the attacker's attribute, so attacking with its weak ones pays.
    The swings cancel out, so the average block rate (and the simulated balance) stays at FOE_BLOCK. */
 export const FOE_FORTE = 0.15;
-const FOE_CATS = ['tech', 'fund', 'deriv', 'risk', 'chips', 'fx', 'crypto', 'etf'];
+const FOE_CATS = ['tech', 'fund', 'deriv', 'risk', 'chips', 'fx', 'crypto', 'etf', 'money'];
 export function foeProfile(rnd = Math.random) {
   const c = FOE_CATS.slice();
   for (let i = c.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [c[i], c[j]] = [c[j], c[i]]; }

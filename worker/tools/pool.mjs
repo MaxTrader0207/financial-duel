@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const at = p => fileURLToPath(new URL('../' + p, import.meta.url));
 const PLAIN = at('pool/pool.json'), ENC = at('pool/pool.enc.json'), OUT = at('src/pool.gen.json'), FIXTURE = at('test/pool.fixture.json');
-const CATS = ['tech', 'fund', 'deriv', 'risk', 'chips', 'fx', 'crypto', 'etf'];
+const CATS = ['tech', 'fund', 'deriv', 'risk', 'chips', 'fx', 'crypto', 'etf', 'money'];
 
 function key() {
   const k = process.env.RANKED_POOL_KEY ? Buffer.from(process.env.RANKED_POOL_KEY.trim(), 'base64') : null;

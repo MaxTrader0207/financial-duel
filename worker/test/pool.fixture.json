@@ -336,6 +336,48 @@
    ],
    "answer": 0,
    "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-money1",
+   "category": "money",
+   "difficulty": 1,
+   "q": "測試用題目（money 第 1 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-money2",
+   "category": "money",
+   "difficulty": 2,
+   "q": "測試用題目（money 第 2 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
+  },
+  {
+   "id": "p-test-money3",
+   "category": "money",
+   "difficulty": 3,
+   "q": "測試用題目（money 第 3 階）",
+   "options": [
+    "正解選項",
+    "錯誤選項一",
+    "錯誤選項二",
+    "錯誤選項三"
+   ],
+   "answer": 0,
+   "explain": "這是整合測試用的假題目，不會部署。"
   }
  ]
 }

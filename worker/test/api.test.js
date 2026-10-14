@@ -359,7 +359,7 @@ test('server questions: no answer before picking, skills (remove, retry), late a
   for (let i = 0; i < 8; i++) { const x = await call('POST', '/v1/match/q', { auth: p, body: { ticket: t2, cat: 'etf', rank: 2, limit: 20 } }); seen.push(x.body.q); }
   assert.ok(seen.some(x => x.startsWith('測試用題目')), 'a private question was asked');
   assert.equal(new Set(seen.filter(x => x.startsWith('測試用題目'))).size, seen.filter(x => x.startsWith('測試用題目')).length);
-  const h = await call('GET', '/v1/health'); assert.equal(h.body.rankedPool, 24);
+  const h = await call('GET', '/v1/health'); assert.equal(h.body.rankedPool, 27);
 });
 
 test('題目品質: answer counts per built-in question, and the disputed / hardest / easiest lists', async () => {

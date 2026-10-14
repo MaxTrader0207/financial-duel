@@ -5,9 +5,11 @@ import { BUILTIN, normalizeQ } from '../src/js/bank.js';
 import { DATA } from '../src/js/data.js';
 
 describe('cards.json', () => {
-  it('has 160 unique cards, 20 per category with the rarity split 6/6/4/4', () => {
-    expect(MONSTERS).toHaveLength(160);
-    expect(new Set(MONSTERS.map(m => m.id)).size).toBe(160);
+  it('has 180 unique cards, 20 per category (9 categories) with the rarity split 6/6/4/4', () => {
+    expect(Object.keys(CATS)).toHaveLength(9);
+    expect(MONSTERS).toHaveLength(180);
+    expect(new Set(MONSTERS.map(m => m.id)).size).toBe(180);
+    expect(new Set(MONSTERS.map(m => m.sigil)).size).toBe(180);
     for (const k of Object.keys(CATS)) {
       const list = MONSTERS.filter(m => m.cat === k);
       expect(list, k).toHaveLength(20);
@@ -25,13 +27,14 @@ describe('cards.json', () => {
 
 describe('questions.json', () => {
   const raw = DATA.questions.questions;
-  it('has 400 questions, 50 per category, difficulty 17/18/15', () => {
-    expect(raw).toHaveLength(400);
-    expect(new Set(raw.map(q => q.id)).size).toBe(400);
+  it('has 900 questions, 100 per category, difficulty 34/36/30', () => {
+    expect(raw).toHaveLength(900);
+    expect(new Set(raw.map(q => q.id)).size).toBe(900);
+    expect(new Set(raw.map(q => q.q)).size).toBe(900);
     for (const k of Object.keys(CATS)) {
       const list = raw.filter(q => q.category === k);
-      expect(list, k).toHaveLength(50);
-      expect([1, 2, 3].map(d => list.filter(q => q.difficulty === d).length), k).toEqual([17, 18, 15]);
+      expect(list, k).toHaveLength(100);
+      expect([1, 2, 3].map(d => list.filter(q => q.difficulty === d).length), k).toEqual([34, 36, 30]);
     }
   });
   it('passes the importer validation and has distinct options', () => {
@@ -41,6 +44,6 @@ describe('questions.json', () => {
       expect(new Set(q.options).size, q.id).toBe(q.options.length);
       expect(q.explain, q.id).toBeTruthy();
     });
-    expect(BUILTIN).toHaveLength(400);
+    expect(BUILTIN).toHaveLength(900);
   });
 });

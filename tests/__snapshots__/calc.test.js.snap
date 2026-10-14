@@ -1,9 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`all 160 cards > matches the recorded outcomes 1`] = `
+exports[`all cards > matches the recorded outcomes 1`] = `
 {
   "active_ronin": {
-    "def": 1950,
+    "def": 1300,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -35,8 +35,8 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 0,
-      "reflect": 150,
+      "pierce": 500,
+      "reflect": 0,
     },
     "okMods": {
       "foeAtk": 0,
@@ -79,6 +79,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "fired": false,
       "heal": 0,
       "pierce": 300,
+      "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "addon_ronin": {
+    "def": 900,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1800,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1500,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 900,
       "reflect": 0,
     },
     "okMods": {
@@ -166,6 +209,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "heal": 150,
       "pierce": 600,
       "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "allocation_bugyo": {
+    "def": 2100,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1400,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1100,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": true,
+      "heal": 200,
+      "pierce": 0,
+      "reflect": 300,
     },
     "okMods": {
       "foeAtk": 0,
@@ -476,7 +562,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "bond_etf_monk": {
-    "def": 2250,
+    "def": 1500,
     "fail": {
       "dmg": 1100,
       "fired": true,
@@ -508,8 +594,8 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 0,
-      "reflect": 450,
+      "pierce": 300,
+      "reflect": 0,
     },
     "okMods": {
       "foeAtk": 0,
@@ -639,6 +725,92 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "heal": 0,
       "pierce": 700,
       "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "budget_abacus": {
+    "def": 1650,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1200,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 900,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 150,
+      "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "budget_shogun": {
+    "def": 2850,
+    "fail": {
+      "dmg": 900,
+      "fired": true,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 2700,
+      "extra": false,
+      "fired": true,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 2400,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 0,
+      "reflect": 1050,
     },
     "okMods": {
       "foeAtk": 0,
@@ -815,6 +987,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "okMods": {
       "foeAtk": 0,
       "myAtk": 400,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "cashflow_clerk": {
+    "def": 1800,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1500,
+      "extra": false,
+      "fired": true,
+      "heal": 300,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1200,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 0,
+      "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
       "skipFoe": false,
       "skipMe": false,
     },
@@ -1122,7 +1337,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "creation_envoy": {
-    "def": 1650,
+    "def": 1100,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -1154,7 +1369,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": true,
       "heal": 0,
-      "pierce": 150,
+      "pierce": 700,
       "reflect": 0,
     },
     "okMods": {
@@ -1208,7 +1423,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "dca_ant": {
-    "def": 1650,
+    "def": 1100,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -1240,7 +1455,50 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 150,
+      "pierce": 700,
+      "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "dca_pilgrim": {
+    "def": 1800,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1200,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 900,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": true,
+      "heal": 200,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 0,
       "reflect": 0,
     },
     "okMods": {
@@ -1371,6 +1629,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "heal": 0,
       "pierce": 900,
       "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "delever_monk": {
+    "def": 2250,
+    "fail": {
+      "dmg": 1100,
+      "fired": true,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1300,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1000,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 0,
+      "reflect": 450,
     },
     "okMods": {
       "foeAtk": 0,
@@ -1552,7 +1853,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "dividend_lantern": {
-    "def": 2250,
+    "def": 1500,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -1584,8 +1885,8 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": true,
       "heal": 300,
-      "pierce": 0,
-      "reflect": 450,
+      "pierce": 300,
+      "reflect": 0,
     },
     "okMods": {
       "foeAtk": 0,
@@ -1896,6 +2197,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "skipMe": false,
     },
   },
+  "equity_curve_seer": {
+    "def": 2700,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1700,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1400,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": true,
+      "heal": 0,
+      "pierce": 0,
+      "reflect": 1200,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
   "eurusd_knights": {
     "def": 800,
     "fail": {
@@ -1940,7 +2284,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "factor_strategist": {
-    "def": 2250,
+    "def": 1500,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -1973,8 +2317,8 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 0,
-      "reflect": 450,
+      "pierce": 300,
+      "reflect": 0,
     },
     "okMods": {
       "foeAtk": 0,
@@ -2027,7 +2371,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "fee_mouse": {
-    "def": 900,
+    "def": 600,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -2059,7 +2403,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 900,
+      "pierce": 1200,
       "reflect": 0,
     },
     "okMods": {
@@ -2190,6 +2534,92 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "heal": 0,
       "pierce": 500,
       "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "fraction_bettor": {
+    "def": 1950,
+    "fail": {
+      "dmg": 1260,
+      "fired": true,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1500,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1200,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 0,
+      "reflect": 150,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "freedom_tennyo": {
+    "def": 3300,
+    "fail": {
+      "dmg": 1300,
+      "fired": true,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 2100,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1800,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": true,
+      "heal": 800,
+      "pierce": 0,
+      "reflect": 1500,
     },
     "okMods": {
       "foeAtk": 0,
@@ -2460,7 +2890,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "global_fleet": {
-    "def": 2100,
+    "def": 1400,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -2492,8 +2922,8 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 0,
-      "reflect": 300,
+      "pierce": 400,
+      "reflect": 0,
     },
     "okMods": {
       "foeAtk": 0,
@@ -2848,7 +3278,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "index_scroll": {
-    "def": 2100,
+    "def": 1400,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -2871,6 +3301,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "skipMe": false,
     },
     "hitSlow": 700,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 400,
+      "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "insurance_miko": {
+    "def": 2100,
+    "fail": {
+      "dmg": 1000,
+      "fired": true,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1400,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1100,
     "miss": {
       "backlash": 0,
       "dmg": 0,
@@ -2934,7 +3407,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "inverse_shade": {
-    "def": 1500,
+    "def": 1000,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -2966,7 +3439,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 300,
+      "pierce": 800,
       "reflect": 0,
     },
     "okMods": {
@@ -3105,6 +3578,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "skipMe": false,
     },
   },
+  "jars_planner": {
+    "def": 2400,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1800,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1500,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": true,
+      "heal": 300,
+      "pierce": 0,
+      "reflect": 600,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
   "journal_scribe": {
     "def": 550,
     "fail": {
@@ -3234,6 +3750,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "skipMe": false,
     },
   },
+  "ledger_doji": {
+    "def": 1800,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1100,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 800,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": true,
+      "heal": 300,
+      "pierce": 0,
+      "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
   "lending_envoy": {
     "def": 1100,
     "fail": {
@@ -3322,7 +3881,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "leveraged_oni": {
-    "def": 900,
+    "def": 600,
     "fail": {
       "dmg": 2340,
       "fired": true,
@@ -3355,7 +3914,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 900,
+      "pierce": 1200,
       "reflect": 0,
     },
     "okMods": {
@@ -3452,7 +4011,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "lp_merchant": {
-    "def": 1650,
+    "def": 1100,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -3484,7 +4043,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": true,
       "heal": 0,
-      "pierce": 150,
+      "pierce": 700,
       "reflect": 0,
     },
     "okMods": {
@@ -3839,7 +4398,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "mcap_giant": {
-    "def": 1800,
+    "def": 1200,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -3872,7 +4431,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 0,
+      "pierce": 600,
       "reflect": 0,
     },
     "okMods": {
@@ -4055,7 +4614,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "nav_engine": {
-    "def": 1500,
+    "def": 1000,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -4087,7 +4646,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 300,
+      "pierce": 800,
       "reflect": 0,
     },
     "okMods": {
@@ -4269,8 +4828,51 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "skipMe": false,
     },
   },
+  "passive_lord": {
+    "def": 2700,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 2300,
+      "extra": false,
+      "fired": true,
+      "heal": 300,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 2000,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": true,
+      "heal": 500,
+      "pierce": 0,
+      "reflect": 900,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
   "passive_titan": {
-    "def": 3300,
+    "def": 2200,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -4303,7 +4905,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "fired": true,
       "heal": 400,
       "pierce": 0,
-      "reflect": 1500,
+      "reflect": 400,
     },
     "okMods": {
       "foeAtk": 0,
@@ -4484,6 +5086,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "skipMe": false,
     },
   },
+  "pension_guardian": {
+    "def": 4050,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 2000,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1700,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": true,
+      "heal": 0,
+      "pierce": 0,
+      "reflect": 2250,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 400,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
   "pip_sprite": {
     "def": 800,
     "fail": {
@@ -4571,7 +5216,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "premium_imp": {
-    "def": 1200,
+    "def": 800,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -4603,7 +5248,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 600,
+      "pierce": 1000,
       "reflect": 0,
     },
     "okMods": {
@@ -4742,6 +5387,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "skipMe": false,
     },
   },
+  "pyramid_general": {
+    "def": 1800,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 2400,
+      "extra": false,
+      "fired": true,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 2100,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 0,
+      "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
   "rate_titan": {
     "def": 1500,
     "fail": {
@@ -4787,7 +5475,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "rebalance_clock": {
-    "def": 2700,
+    "def": 1800,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -4820,7 +5508,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "fired": true,
       "heal": 0,
       "pierce": 0,
-      "reflect": 900,
+      "reflect": 0,
     },
     "okMods": {
       "foeAtk": 0,
@@ -4907,6 +5595,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "heal": 0,
       "pierce": 0,
       "reflect": 500,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "reserve_keeper": {
+    "def": 2250,
+    "fail": {
+      "dmg": 1400,
+      "fired": true,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1000,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 700,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 0,
+      "reflect": 450,
     },
     "okMods": {
       "foeAtk": 0,
@@ -5173,6 +5904,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "skipMe": false,
     },
   },
+  "rule72_sage": {
+    "def": 1950,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 2000,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1700,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 0,
+      "reflect": 150,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
   "sat_sprite": {
     "def": 1000,
     "fail": {
@@ -5207,6 +5981,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "fired": false,
       "heal": 0,
       "pierce": 800,
+      "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "scale_ashigaru": {
+    "def": 1500,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1300,
+      "extra": false,
+      "fired": false,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1000,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": true,
+      "heal": 400,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 300,
       "reflect": 0,
     },
     "okMods": {
@@ -5422,6 +6239,49 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "fired": false,
       "heal": 0,
       "pierce": 1150,
+      "reflect": 0,
+    },
+    "okMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+  },
+  "snowball_doji": {
+    "def": 1350,
+    "fail": {
+      "dmg": 1800,
+      "fired": false,
+      "foeFired": false,
+      "foeHeal": 0,
+    },
+    "hitFast": {
+      "dmg": 1340,
+      "extra": false,
+      "fired": true,
+      "heal": 0,
+      "tags": [
+        "速攻 +300",
+      ],
+    },
+    "hitFastMods": {
+      "foeAtk": 0,
+      "myAtk": 0,
+      "skipFoe": false,
+      "skipMe": false,
+    },
+    "hitSlow": 1040,
+    "miss": {
+      "backlash": 0,
+      "dmg": 0,
+      "fired": false,
+      "heal": 0,
+    },
+    "ok": {
+      "fired": false,
+      "heal": 0,
+      "pierce": 450,
       "reflect": 0,
     },
     "okMods": {
@@ -5948,7 +6808,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "theme_comet": {
-    "def": 1350,
+    "def": 900,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -5981,7 +6841,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 450,
+      "pierce": 900,
       "reflect": 0,
     },
     "okMods": {
@@ -6121,7 +6981,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "tracking_hound": {
-    "def": 1350,
+    "def": 900,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -6153,7 +7013,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     "ok": {
       "fired": false,
       "heal": 0,
-      "pierce": 450,
+      "pierce": 900,
       "reflect": 0,
     },
     "okMods": {
@@ -6336,7 +7196,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
     },
   },
   "tw50_shogun": {
-    "def": 3300,
+    "def": 2200,
     "fail": {
       "dmg": 1800,
       "fired": false,
@@ -6369,7 +7229,7 @@ exports[`all 160 cards > matches the recorded outcomes 1`] = `
       "fired": false,
       "heal": 0,
       "pierce": 0,
-      "reflect": 1500,
+      "reflect": 400,
     },
     "okMods": {
       "foeAtk": 0,

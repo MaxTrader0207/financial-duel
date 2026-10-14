@@ -39,7 +39,7 @@ describe('defence rules', () => {
     expect(calc.defendFail(m, foe, s).dmg).toBe(900);          // 停損: damage halved
   });
   it('raises DEF ×1.5 when the defender beats the attacker and reflects the surplus', () => {
-    fresh(); const m = MON.index_scroll, foe = MON.boll_dragon;  // ETF 1400 vs tech 1800: ETF beats tech
+    fresh(); const m = MON.insurance_miko, foe = MON.boll_dragon;  // 資金管理 1400 vs tech 1800: 資金管理 beats tech
     const s = calc.defendSetup(m, foe); expect(s.def).toBe(2100);
     expect(calc.defendOk(m, s, SLOW)).toMatchObject({ pierce: 0, reflect: 300 });
   });
@@ -96,7 +96,7 @@ describe('conditional skills', () => {
 });
 
 /* every card × five situations, frozen as a snapshot: any change to a card's numbers shows up in review */
-describe('all 160 cards', () => {
+describe('all cards', () => {
   it('matches the recorded outcomes', () => {
     const rows = {};
     for (const m of MONSTERS) {

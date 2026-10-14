@@ -11,7 +11,7 @@ test('installs as an app and starts and plays offline', async ({ page, context, 
   expect(await page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
   await context.setOffline(true);
   await page.reload(); await page.waitForFunction(() => document.documentElement.dataset.ready === '1');
-  expect(await page.evaluate(() => window.__T.MONSTERS.length)).toBe(160);
+  expect(await page.evaluate(() => window.__T.MONSTERS.length)).toBe(180);
   await startDuel(page);
   await context.setOffline(false);
 });

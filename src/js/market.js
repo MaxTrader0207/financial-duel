@@ -7,22 +7,22 @@ import { G } from './game.js';
 export const EVENT_UP = 1.2, EVENT_DOWN = 0.8;
 export const FIRST_TURN = 2, EVERY = 3;
 export const EVENTS = [
-  { id: 'hike', card: 'evt_rate_hike', name: '升息', up: ['fx', 'risk'], down: 'crypto',
-    why: '資金成本上升：重視現金流與匯差的外匯、風險管理受惠，高槓桿的虛擬貨幣承壓。' },
+  { id: 'hike', card: 'evt_rate_hike', name: '升息', up: ['fx', 'money'], down: 'crypto',
+    why: '資金成本上升：現金與存款變得有吸引力，懂資金管理與匯差的人受惠，高槓桿的虛擬貨幣承壓。' },
   { id: 'cut', card: 'evt_rate_cut', name: '降息', up: ['etf', 'chips'], down: 'fx',
     why: '資金變便宜，股市資金行情與 ETF 受惠；利差縮小，外匯吸引力下降。' },
   { id: 'inflation', card: 'evt_inflation', name: '通膨升溫', up: ['fund', 'deriv'], down: 'etf',
     why: '有定價能力的公司與避險工具較吃香；全市場資產的實質報酬被侵蝕。' },
-  { id: 'jobless', card: 'evt_unemployment', name: '失業率攀升', up: ['risk', 'fund'], down: 'chips',
-    why: '消費轉弱，防守與基本面分析更重要；市場追價氣氛降溫。' },
+  { id: 'jobless', card: 'evt_unemployment', name: '失業率攀升', up: ['risk', 'money'], down: 'chips',
+    why: '收入不穩，緊急預備金與資金控管最重要；市場追價氣氛降溫。' },
   { id: 'crash', card: 'evt_crash', name: '股市暴跌', up: ['risk', 'deriv'], down: 'tech',
     why: '風險控管與避險部位發揮作用；技術線型在恐慌中頻頻失靈。' },
   { id: 'twd', card: 'evt_twd', name: '匯率劇烈波動', up: ['fx', 'deriv'], down: 'etf',
     why: '懂匯率與避險的人掌握主動；海外 ETF 的報酬受匯損影響。' },
   { id: 'recession', card: 'evt_recession', name: '經濟衰退', up: ['risk', 'fund'], down: 'crypto',
     why: '資金回到穩健資產與財務體質好的公司，投機性資產首當其衝。' },
-  { id: 'bubble', card: 'evt_bubble', name: '資產泡沫', up: ['crypto', 'tech'], down: 'fund',
-    why: '動能與投機當道，追價的技術面與虛擬貨幣暫時領風騷，基本面評價被忽視。' },
+  { id: 'bubble', card: 'evt_bubble', name: '資產泡沫', up: ['crypto', 'tech'], down: 'money',
+    why: '動能與投機當道，追價的技術面與虛擬貨幣暫時領風騷，按部就班的資金配置看起來落後。' },
 ];
 export const byId = id => EVENTS.find(e => e.id === id) || null;
 

@@ -5,7 +5,7 @@ test('the 圖鑑 draws cards as they scroll into view, with the right art per ra
   await open(page); await page.click('#btn-dex');
   const count = () => page.evaluate(() => [document.querySelectorAll('#dex .card.lazy').length, document.querySelectorAll('#dex .card:not(.lazy)').length]);
   const [lazy0, drawn0] = await count();
-  expect(lazy0 + drawn0).toBe(160); expect(drawn0).toBeGreaterThan(0); expect(drawn0).toBeLessThan(60);
+  expect(lazy0 + drawn0).toBe(180); expect(drawn0).toBeGreaterThan(0); expect(drawn0).toBeLessThan(60);
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.waitForTimeout(500);
   const [, drawn1] = await count(); expect(drawn1).toBeGreaterThan(drawn0);
   await page.click('#dex-filter button[data-k="deriv"]');

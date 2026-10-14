@@ -62,6 +62,14 @@ export const SCENE_B = {
     <g stroke="#0b1603" stroke-width=".4">${[[6, 30, '#3f7fe0'], [14, 22, '#2f9e74'], [22, 34, '#f3dc95'], [30, 16, '#d8553a'], [38, 26, '#8d5ee0'], [46, 12, '#c3902e'], [54, 20, '#1f9fb3'], [62, 28, '#d9467f'], [70, 18, '#6e9a2a'], [78, 32, '#3f7fe0'], [86, 24, '#2f9e74']].map(([x, y, c]) => `<rect x="${x}" y="${y + 6}" width="7" height="${54 - y}" fill="${c}"/>`).join('')}</g>
     <path d="M0 60 V58 H100 V60Z" fill="#0b1603"/>
     <path d="M4 38 L18 30 L28 34 L44 20 L58 24 L72 14 L96 8" fill="none" stroke="#fff2b0" stroke-width="1.3" filter="url(#glow)"/>`),
+  /* six money jars on a shelf, filled to different levels, under a rising moon */
+  money: wrap(`<rect width="100" height="60" fill="url(#sky-money)"/>${stars([[8, 8], [26, 12, .4], [44, 6], [90, 10]])}
+    <circle cx="76" cy="16" r="9" fill="#f6e2a0" filter="url(#glow)"/><circle cx="80" cy="13.5" r="7.6" fill="url(#sky-money)"/>
+    <path d="M0 56 H100 V60 H0Z" fill="#2a0c30"/><path d="M4 50 H96" stroke="#c89a5a" stroke-width="1.4"/><path d="M6 50 V56 M94 50 V56" stroke="#c89a5a" stroke-width="1.2"/>
+    ${[[11, .35], [26, .8], [41, .55], [56, .95], [71, .45], [86, .7]].map(([x, f], i) => { const top = 34, h = 15, lv = top + h * (1 - f);
+      return `<path d="M${x - 5} ${top} Q${x - 6} ${top + h} ${x - 4} ${top + h} H${x + 4} Q${x + 6} ${top + h} ${x + 5} ${top}Z" fill="#f4ead2" opacity=".18" stroke="#f4ead2" stroke-width=".5"/>
+        <path d="M${x - 5.3} ${lv} H${x + 5.3} L${x + 4.2} ${top + h} H${x - 4.2}Z" fill="${['#e14b32', '#f3dc95', '#3f7fe0', '#2f9e74', '#d9467f', '#8d5ee0'][i]}" opacity=".85"/>
+        <rect x="${x - 5.6}" y="${top - 2}" width="11.2" height="2.2" fill="#c89a5a"/>`; }).join('')}`),
 };
 
 export const SCENE_C = {
@@ -115,4 +123,13 @@ export const SCENE_C = {
   etf: wrap(`<rect width="100" height="60" fill="url(#sky-etf)"/>${clouds(6, 40)}
     <g transform="translate(50 26)">${(() => { const parts = [[0.28, '#3f7fe0'], [0.18, '#2f9e74'], [0.16, '#f3dc95'], [0.14, '#d8553a'], [0.12, '#8d5ee0'], [0.12, '#1f9fb3']]; let a = -Math.PI / 2; return parts.map(([f, c]) => { const a2 = a + f * Math.PI * 2, r = 16; const d = `M0 0 L${(r * Math.cos(a)).toFixed(2)} ${(r * Math.sin(a)).toFixed(2)} A${r} ${r} 0 ${f > 0.5 ? 1 : 0} 1 ${(r * Math.cos(a2)).toFixed(2)} ${(r * Math.sin(a2)).toFixed(2)}Z`; a = a2; return `<path d="${d}" fill="${c}" stroke="#0d1a05" stroke-width=".5"/>`; }).join(''); })()}<circle r="16" fill="none" stroke="#fff2b0" stroke-width=".8" filter="url(#glow)"/></g>
     <path d="M0 50 Q25 40 50 48 T100 44 V60 H0Z" fill="#2f4d10"/><path d="M0 56 Q30 50 60 55 T100 52 V60 H0Z" fill="#1d3308"/>`),
+  /* a reservoir with a level gauge and a water wheel: cash flow in and out */
+  money: wrap(`<rect width="100" height="60" fill="url(#sky-money)"/><circle cx="20" cy="16" r="8" fill="url(#sun-gold)"/>${clouds(56, 12)}
+    <path d="M0 40 L20 30 L36 38 L52 28 L70 36 L100 26 V60 H0Z" fill="#3a1440" opacity=".7"/>
+    <path d="M14 44 H70 V60 H14Z" fill="#2e6fa8" opacity=".85"/><path d="M14 44 Q42 42 70 44" fill="none" stroke="#bfe6ff" stroke-width=".7"/>
+    <path d="M10 36 H14 V60 H10Z M70 36 H74 V60 H70Z" fill="#5a3a2a" stroke="#f3dc95" stroke-width=".4"/>
+    <g stroke="#f3dc95" stroke-width=".5"><path d="M20 36 V58"/>${[38, 42, 46, 50, 54].map(y => `<path d="M20 ${y} h2.4"/>`).join('')}</g><path d="M18.6 44 h4" stroke="#ff9cc0" stroke-width="1"/>
+    <g transform="translate(84 46)"><circle r="9" fill="none" stroke="#c89a5a" stroke-width="1"/>${[0, 45, 90, 135].map(a => `<path d="M-9 0 H9" stroke="#c89a5a" stroke-width=".7" transform="rotate(${a})"/>`).join('')}<circle r="1.6" fill="#f3dc95"/></g>
+    <path d="M74 40 Q78 38 80 37" fill="none" stroke="#9fd8ff" stroke-width="1.6"/>
+    ${[[36, 52], [46, 54], [56, 51]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="2.2" ry=".8" fill="url(#gold-v)" opacity=".8"/>`).join('')}`),
 };

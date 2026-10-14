@@ -12,10 +12,21 @@ function deckValid(list) {
   const n = {}; for (const id of list) { if (!MON[id] || !owns(id)) return false; n[id] = (n[id] || 0) + 1; if (n[id] > DECK_COPY) return false; }
   return true;
 }
+/* how many cards of each attribute an automatic deck takes: DECK_SIZE spread over the attributes (with 9 attributes:
+   4 each, plus 1 more for the four strongest owned), or DECK_FOCUS for a focus attribute and the rest spread out */
+function deckQuota(focus) {
+  const cats = Object.keys(CATS), power = k => MONSTERS.filter(m => m.cat === k && owns(m.id)).reduce((s, m) => s + m.rank * 10 + (m.atk + m.def) / 1000, 0);
+  const rest = focus ? cats.filter(k => k !== focus) : cats, total = focus ? DECK_SIZE - DECK_FOCUS : DECK_SIZE;
+  const base = Math.floor(total / rest.length), extra = total - base * rest.length;
+  const order = rest.slice().sort((a, b) => power(b) - power(a) || cats.indexOf(a) - cats.indexOf(b));
+  const q = Object.fromEntries(rest.map(k => [k, base + (order.indexOf(k) < extra ? 1 : 0)]));
+  if (focus) q[focus] = DECK_FOCUS;
+  return q;
+}
 function autoDeck(focus) {
-  const out = [];
+  const out = [], quota = deckQuota(focus);
   Object.keys(CATS).forEach(k => {
-    const want = focus ? (k === focus ? DECK_FOCUS : DECK_OTHER) : DECK_EACH;
+    const want = quota[k] || 0;
     const kinds = MONSTERS.filter(m => m.cat === k && owns(m.id)).sort((a, b) => b.rank - a.rank || (b.atk + b.def) - (a.atk + a.def));
     const picked = [];
     for (let copy = 0; copy < DECK_COPY && picked.length < want; copy++) for (const m of kinds) { if (picked.length >= want) break; picked.push(m.id); }
@@ -101,7 +112,7 @@ COL = (() => {
   return o;
 })();
 owns = id => COL.owned.includes(id);
-/* balanced deck from what you own: 5 per category (or 12 for a focus category, 4 for the rest), strongest first, then second copies */
+/* balanced deck from what you own: 40 cards spread over the attributes (or 12 for a focus attribute), strongest first, then second copies */
 DECK_EACH = 5;
 DECK_FOCUS = 12;
 DECK_OTHER = 4;
@@ -113,4 +124,4 @@ DECK = Store.load(DECK_KEY, { version: DECK_V, fallback: () => autoDeck(), valid
 CPU_MIX = { easy: [32, 6, 2], normal: [30, 7, 3], hard: [24, 10, 6] };
 }
 
-export { CPU_GROW_PER, CPU_GROW_MAX, cpuGrowth, COL, COL_KEY, COL_V, CPU_MIX, DECK, DECKS_FIXED, DECK_COPY, DECK_EACH, DECK_FOCUS, DECK_KEY, DECK_OTHER, DECK_SIZE, DECK_V, STARTER, setDeck, autoDeck, claimReward, colSave, cpuDeckList, deckSave, deckValid, fitDeck, owns, rewardHTML, rewardOffer, wireReward };
+export { deckQuota, CPU_GROW_PER, CPU_GROW_MAX, cpuGrowth, COL, COL_KEY, COL_V, CPU_MIX, DECK, DECKS_FIXED, DECK_COPY, DECK_EACH, DECK_FOCUS, DECK_KEY, DECK_OTHER, DECK_SIZE, DECK_V, STARTER, setDeck, autoDeck, claimReward, colSave, cpuDeckList, deckSave, deckValid, fitDeck, owns, rewardHTML, rewardOffer, wireReward };

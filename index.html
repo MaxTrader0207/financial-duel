@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>金融決鬥</title>
-<meta name="description" content="日式卡牌對決風格的金融知識遊戲：召喚交易怪獸，答對技術分析、基本面、衍生性商品、風險管理、籌碼、外匯、虛擬貨幣、ETF 題目才能攻擊或防禦。">
+<meta name="description" content="日式卡牌對決風格的金融知識遊戲：召喚交易怪獸，答對技術分析、基本面、衍生性商品、風險管理、籌碼、外匯、虛擬貨幣、ETF、資金管理題目才能攻擊或防禦。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="金融決鬥">
-<meta property="og:description" content="召喚交易怪獸，答對金融題目才能攻擊或防禦。160 張卡、400 題，免安裝，打開網址即可對戰，也能安裝成 App 離線玩。">
+<meta property="og:description" content="召喚交易怪獸，答對金融題目才能攻擊或防禦。180 張卡、900 題，免安裝，打開網址即可對戰，也能安裝成 App 離線玩。">
 <meta property="og:url" content="https://maxtrader0207.github.io/financial-duel/">
 <meta property="og:site_name" content="金融決鬥">
 <meta property="og:locale" content="zh_TW">
@@ -36,6 +36,7 @@
     <linearGradient id="sky-chips" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="60"><stop offset="0" stop-color="#241604"/><stop offset=".6" stop-color="#8a5a12"/><stop offset="1" stop-color="#f2c75e"/></linearGradient>
     <linearGradient id="sky-fx" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="60"><stop offset="0" stop-color="#03202a"/><stop offset=".6" stop-color="#11707e"/><stop offset="1" stop-color="#9fe0dc"/></linearGradient>
     <linearGradient id="sky-crypto" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="60"><stop offset="0" stop-color="#16041a"/><stop offset=".6" stop-color="#6a1650"/><stop offset="1" stop-color="#ee7fae"/></linearGradient>
+    <linearGradient id="sky-money" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="60"><stop offset="0" stop-color="#1a0622"/><stop offset=".6" stop-color="#6e2478"/><stop offset="1" stop-color="#eeb0e4"/></linearGradient>
     <linearGradient id="sky-etf" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="60"><stop offset="0" stop-color="#0d1a05"/><stop offset=".6" stop-color="#4a6b17"/><stop offset="1" stop-color="#d8e59a"/></linearGradient>
     <radialGradient id="sun-gold"><stop offset="0" stop-color="#fff8dc"/><stop offset=".6" stop-color="#f3d27a"/><stop offset="1" stop-color="#d49a32"/></radialGradient>
     <radialGradient id="sun-shu"><stop offset="0" stop-color="#ffd8c4"/><stop offset=".55" stop-color="#ff6a3d"/><stop offset="1" stop-color="#c8321f"/></radialGradient>
@@ -68,7 +69,7 @@
         <li><span class="k">攻</span><span><b>我方回合：</b>從手牌選一張卡召喚。答對該卡屬性的題目，就能以攻擊力直擊對手資金。在難易度的速攻秒數內答對另加 300，連續答對 3 題起再加 500。</span></li>
         <li><span class="k">擋</span><span><b>對手防禦：</b>你答對後，對手會派一張手牌抵擋，並當場回答一題你攻擊卡屬性的題目。它答對時你只造成「傷害 − 守備力」（不會反彈）。對手的答對率依難易度為 45%／50%／55%，每場另有 2 個擅長屬性（+15%）與 2 個不擅長屬性（−15%），寫在對手資金下方。對手防禦時不發動技能。</span></li>
         <li><span class="k">守</span><span><b>對手回合：</b>對手召喚怪獸攻擊，選一張手牌防禦，題目出<b>攻擊方的屬性</b>。答對時只承受「攻擊力 − 守備力」，守備力較高還會反彈；答錯則全額承受。</span></li>
-        <li><span class="k">剋</span><span><b>屬性相剋：</b>風險管理 → 衍生性商品 → 虛擬貨幣 → 外匯 → 籌碼與市場 → 基本面 → ETF → 技術分析 → 風險管理（箭頭前者剋制後者）。防禦卡剋制攻擊方時守備力 ×1.5，被剋制時 ×0.5。</span></li>
+        <li><span class="k">剋</span><span><b>屬性相剋：</b>風險管理 → 衍生性商品 → 虛擬貨幣 → 外匯 → 籌碼與市場 → 基本面 → ETF → 資金管理 → 技術分析 → 風險管理（箭頭前者剋制後者）。防禦卡剋制攻擊方時守備力 ×1.5，被剋制時 ×0.5。</span></li>
         <li><span class="k">市</span><span><b>市場事件：</b>休閒場與排位場從第 2 回合起每 3 回合翻出一個金融事件（升息、股市暴跌、通膨…），兩個屬性攻擊力 ×1.2、一個 ×0.8，雙方都適用，手牌上會標出「事件 ×1.2」。</span></li>
         <li><span class="k">排</span><span><b>排位賽：</b>依段位配對手強度（見習交易員 → 傳奇投資人）。勝 +4～+28、敗 −30～−4，依段位與知識、策略、風險管理的表現計分；加入排行榜後，題目由伺服器出題（含每次換數字的計算題）；排位牌組點數上限 80（普通 1、稀有 2、超稀有 3、極稀有 5）。每月一個賽季，依最高段位發放限定稱號與卡背。</span></li>
         <li><span class="k">弱</span><span><b>弱項加成：</b>學習紀錄中正確率最低的屬性是你的弱項，用弱項屬性的卡攻擊，答對時傷害 ×1.2。</span></li>
@@ -149,7 +150,7 @@
   <div class="page" style="max-width:1100px">
     <div class="eyebrow">一百六十種卡牌一覽</div>
     <h3 class="sec">卡牌圖鑑</h3>
-    <p class="lead">共 160 張卡，8 個屬性各 20 張（普通 6、稀有 6、超稀有 4、極稀有 4）。稀有度依星數分為普通、稀有、超稀有、極稀有。攻擊類技能在對手使用時，於攻擊命中你的時候同樣發動。</p>
+    <p class="lead">共 180 張卡，9 個屬性各 20 張（普通 6、稀有 6、超稀有 4、極稀有 4）。稀有度依星數分為普通、稀有、超稀有、極稀有。攻擊類技能在對手使用時，於攻擊命中你的時候同樣發動。</p>
     <div class="dex-filter" id="dex-filter"></div>
     <div class="dex" id="dex"></div>
     <div><button class="btn" id="btn-dex-back" type="button">回標題</button></div>

@@ -1,7 +1,7 @@
 // ur-art.js — one exclusive illustration per ★4 (極稀有) card, keyed by card id.
 // Same 100 × 70 box as the scenes; drawn over the attribute's sky with a gold sunburst behind the subject.
 // Unlike the shared scenes these are never hue-shifted or mirrored (see .c-art svg.scene.ur in styles.css).
-const INK = { tech: '#04102e', fund: '#021a14', deriv: '#08021a', risk: '#1e0604', chips: '#1a0f02', fx: '#021419', crypto: '#10020f', etf: '#0a1403' };
+const INK = { tech: '#04102e', fund: '#021a14', deriv: '#08021a', risk: '#1e0604', chips: '#1a0f02', fx: '#021419', crypto: '#10020f', etf: '#0a1403', money: '#14031a' };
 const G = '#f3dc95', GH = '#fff2b0', W = '#f4ead2', R = '#e14b32';
 const f1 = n => Math.round(n * 10) / 10;
 const rays = (cx, cy, n = 18, r = 90) => `<g fill="#fff4c8" opacity=".16">${Array.from({ length: n }, (_, i) => {
@@ -226,6 +226,36 @@ const ART = {
       <path d="M14 24 l4 -3 v6Z M88 52 l-4 3 v-6Z" fill="${GH}"/>
       ${[[6, 30], [12, 30]].map(([x, y]) => coin(x, y, 1.8)).join('')}<g transform="translate(90 42)"><path d="M-4 0 H4 L3 4 H-3Z" fill="#7a5222" stroke="#2a1a05" stroke-width=".4"/></g>
       <g fill="${GH}" font-size="3.4" font-family="serif" text-anchor="middle"><text x="12" y="22">申購</text><text x="88" y="38">贖回</text><text x="40" y="54">NAV</text></g>${ground(k, 'M0 62 H100 V70 H0Z')}`); },
+  /* money */
+  passive_lord: k => frame('money', 50, 20, `<circle cx="50" cy="20" r="11" fill="url(#sun-gold)"/>
+    <path d="M0 62 Q24 40 50 44 Q76 40 100 62 V70 H0Z" fill="#2a0c30"/>
+    <g fill="${k}" stroke="${G}" stroke-width=".5" stroke-linejoin="round"><path d="M34 46 H66 L62 40 H38Z"/><rect x="40" y="31" width="20" height="9"/><path d="M36 32 L50 24 L64 32Z"/>
+      <rect x="45" y="20" width="10" height="5"/><path d="M42 21 L50 15 L58 21Z"/></g>
+    <g fill="${GH}" opacity=".85"><rect x="43" y="34" width="2" height="2"/><rect x="49" y="34" width="2" height="2"/><rect x="55" y="34" width="2" height="2"/></g>
+    <path d="M6 50 Q20 44 34 46" fill="none" stroke="#9fd8ff" stroke-width="2.2" opacity=".75"/><path d="M94 50 Q80 44 66 46" fill="none" stroke="#9fd8ff" stroke-width="2.2" opacity=".75"/>
+    ${[[10, 47.5], [18, 45.8], [26, 45.2], [90, 47.5], [82, 45.8], [74, 45.2]].map(([x, y]) => coin(x, y, 1.6)).join('')}
+    <g fill="${GH}" font-size="3.6" font-family="serif" text-anchor="middle"><text x="16" y="40">租金</text><text x="84" y="40">股息</text></g>${ground(k, 'M0 64 Q50 60 100 64 V70 H0Z')}`),
+  freedom_tennyo: k => frame('money', 50, 20, `<circle cx="50" cy="20" r="13" fill="#f6e2a0" opacity=".9" filter="url(#glow)"/>
+    <path d="M6 52 L94 40" stroke="#ff9cc0" stroke-width="1.2" opacity=".9"/><path d="M6 62 C34 60 60 48 94 24" fill="none" stroke="${GH}" stroke-width="1.6" filter="url(#glow)"/>
+    <circle cx="68" cy="44.3" r="2" fill="none" stroke="${W}" stroke-width=".7"/>
+    <path d="M14 30 Q30 18 42 26 Q54 34 70 22 Q82 14 92 20" fill="none" stroke="#ffd2f0" stroke-width="2.4" stroke-linecap="round" opacity=".85"/>
+    <g fill="${k}" stroke="${G}" stroke-width=".5"><circle cx="50" cy="20" r="3.4"/><path d="M46 24 Q50 22 54 24 L57 40 Q50 43 43 40Z"/><path d="M46.5 18.5 Q50 14 53.5 18.5" fill="none"/></g>
+    <path d="M47 27 L38 33 M53 27 L62 31" stroke="${k}" stroke-width="1.6" stroke-linecap="round"/>
+    <g fill="#fff" opacity=".55"><ellipse cx="22" cy="54" rx="12" ry="3"/><ellipse cx="76" cy="58" rx="14" ry="3.4"/></g>
+    <g fill="${GH}" font-size="3.4" font-family="serif"><text x="8" y="49">支出</text><text x="70" y="32">被動收入</text></g>${ground(k, 'M0 66 H100 V70 H0Z')}`),
+  budget_shogun: k => frame('money', 50, 26, `<circle cx="50" cy="26" r="12" fill="url(#sun-shu)" opacity=".9"/>
+    ${[[12, R, '1%'], [24, '#3f7fe0', '1%'], [76, '#2f9e74', '1%'], [88, G, '1%']].map(([x, c, t]) => `<path d="M${x} 16 V60" stroke="#5a3a1a" stroke-width=".8"/><rect x="${x}" y="17" width="6" height="22" fill="${c}" stroke="${k}" stroke-width=".4"/><text x="${x + 3}" y="30" font-size="3.4" font-family="serif" fill="${k}" text-anchor="middle">${t}</text>`).join('')}
+    <g fill="${k}" stroke="${G}" stroke-width=".5" stroke-linejoin="round"><path d="M36 60 Q36 46 44 42 L56 42 Q64 46 64 60Z"/><path d="M42 42 L50 36 L58 42Z"/>
+      <circle cx="50" cy="32" r="4.6"/><path d="M42 30 Q50 20 58 30 L55 29 Q50 25 45 29Z"/><path d="M50 22 L46 15 M50 22 L54 15" stroke="${G}" stroke-width="1"/></g>
+    <path d="M62 44 L74 36 L72 46Z" fill="${G}" stroke="${k}" stroke-width=".4"/><path d="M62 44 L74 36 M62 44 L74 40 M62 44 L73 43" stroke="${k}" stroke-width=".3"/>
+    ${ground(k, 'M0 60 H100 V70 H0Z')}`),
+  pension_guardian: k => frame('money', 50, 22, `<circle cx="50" cy="22" r="11" fill="url(#sun-gold)"/>
+    <path d="M50 64 L44 40 L56 40Z" fill="#f4ead2" opacity=".25"/><path d="M42 64 L49 40 M58 64 L51 40" stroke="#f4ead2" stroke-width=".5" opacity=".6"/>
+    ${Array.from({ length: 9 }, (_, i) => Array.from({ length: 3 + (i % 3) }, (_, j) => coin(8 + i * 3.6 + (i > 4 ? 45 : 0), 60 - j * 1.6, 1.7)).join('')).join('')}
+    <g fill="${k}" stroke="${G}" stroke-width=".5" stroke-linejoin="round"><path d="M38 60 Q38 44 44 40 L56 40 Q62 44 62 60Z"/><circle cx="50" cy="34" r="5"/>
+      <path d="M44 40 L32 32 L30 36 L42 44Z"/><path d="M56 40 L68 32 L70 36 L58 44Z"/></g>
+    <circle cx="50" cy="34" r="8.5" fill="none" stroke="${GH}" stroke-width=".8" opacity=".8"/>
+    <text x="50" y="52" font-size="6" font-family="serif" fill="${GH}" text-anchor="middle">4%</text>${ground(k, 'M0 62 H100 V70 H0Z')}`),
 };
 const CACHE = {};
 export function urArt(m) {

@@ -26,7 +26,7 @@ function renderDeck(msg) {
     <div class="stat"><div class="n" style="font-size:clamp(18px,5vw,28px);white-space:nowrap">${avg('atk')} / ${avg('def')}</div><div class="l">平均 攻 / 守</div></div>
     <div class="stat"><div class="l" style="display:flex;flex-wrap:wrap;gap:4px 8px;font-size:13px;letter-spacing:0">${Object.keys(CATS).map(k => `<span><span class="chip" style="background:${CATS[k].color}">${CATS[k].name}</span>${by[k]}</span>`).join('')}</div><div class="l" style="margin-top:6px">屬性分布${weak ? ` · 弱項 ${CATS[weak].name}` : ''}</div></div>`;
   $('#deck-weak').disabled = !weak;
-  $('#deck-weak').title = weak ? `${CATS[weak].name} ${DECK_FOCUS} 張、其他屬性各 ${DECK_OTHER} 張` : `需要學習紀錄判斷弱項（單一屬性累計至少答 ${WEAK_MIN} 題）`;
+  $('#deck-weak').title = weak ? `${CATS[weak].name} ${DECK_FOCUS} 張、其他屬性各 3～4 張` : `需要學習紀錄判斷弱項（單一屬性累計至少答 ${WEAK_MIN} 題）`;
   $('#deck-filter').innerHTML = [['all', '全部'], ...Object.keys(CATS).map(k => [k, CATS[k].name]), ['in', '牌組中']]
     .map(([k, n]) => `<button class="btn ghost small" type="button" data-k="${k}" aria-pressed="${deckCat === k}">${n}</button>`).join('');
   const pend = rewardHTML();
@@ -61,8 +61,8 @@ $('#deck-grid').addEventListener('click', e => {
   Sound.select(); renderDeck();
 });
 $('#deck-filter').addEventListener('click', e => { const b = e.target.closest('button[data-k]'); if (b) { deckCat = b.dataset.k; renderDeck(); } });
-$('#deck-auto').onclick = () => { deckDraft = autoDeck(); renderDeck(`已自動組成平衡牌組（每屬性 ${DECK_EACH} 張），記得儲存。`); };
-$('#deck-weak').onclick = () => { const w = weakCat(); if (!w) return; deckDraft = autoDeck(w); renderDeck(`已組成弱項練習牌組：${CATS[w].name} ${DECK_FOCUS} 張，其他各 ${DECK_OTHER} 張。記得儲存。`); };
+$('#deck-auto').onclick = () => { deckDraft = autoDeck(); renderDeck(`已自動組成平衡牌組（每屬性 4～5 張），記得儲存。`); };
+$('#deck-weak').onclick = () => { const w = weakCat(); if (!w) return; deckDraft = autoDeck(w); renderDeck(`已組成弱項練習牌組：${CATS[w].name} ${DECK_FOCUS} 張，其他各 3～4 張。記得儲存。`); };
 $('#deck-clear').onclick = () => { deckDraft = []; renderDeck(); };
 $('#deck-save').onclick = () => {
   if (!deckValid(deckDraft)) { renderDeck(`牌組需要剛好 ${DECK_SIZE} 張已收集的卡，每種最多 ${DECK_COPY} 張。`); return; }
