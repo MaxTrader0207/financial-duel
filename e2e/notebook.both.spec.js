@@ -8,7 +8,7 @@ test('due questions: reminder on the title, one-tap review, results list', async
   await page.evaluate(() => { const T = window.__T; T.BANK.slice(0, 3).forEach(q => T.notebook.nbRecord(q, false, q.options[(q.answer + 1) % q.options.length])); });
   await page.reload(); await page.waitForFunction(() => document.documentElement.dataset.ready === '1');
   await expect(page.locator('#nb-due')).toBeVisible();
-  await expect(page.locator('#nb-due-n')).toHaveText('3 題該複習了');
+  await expect(page.locator('#nb-due-n')).toHaveText('3 題正在等你復仇');
   await page.click('#nb-due');
   await expect(page.locator('#rv-q')).toBeVisible();
   for (let i = 0; i < 3; i++) {
