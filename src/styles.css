@@ -1065,3 +1065,42 @@ html:is(.rs-l,.rs-xl) .rv-log li{font-size:calc(14px*var(--rs))}
 .rk-back-face[data-back="hall"]{--fb:#14090a;--fl:#4a2a12;--fi:#ffe08a}
 html[data-back="hall"] .card.back{--w-bg:#14090a;--w-ln:#4a2a12}
 html[data-back="hall"] .card.back .mark{color:#ffe08a;border-color:#ffe08a;box-shadow:0 0 12px #ffd25a55}
+/* 卡牌技能族譜 */
+#scr-tree .page{display:grid;gap:14px}
+#tree-sum .stat .n small{font-size:15px;color:var(--muted);font-weight:500}
+.tr-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.tr-box{padding:12px 16px;background:var(--ink2);border:1px solid var(--line);border-left:4px solid var(--gold)}
+.tr-box.good{border-left-color:#5fc28f}.tr-box.bad{border-left-color:var(--shu)}
+.tr-box h4{margin:0 0 6px;font-weight:600;font-size:16px}
+.tr-box ul{margin:0;padding-left:1.2em;display:grid;gap:4px;font-size:14px;line-height:1.55}
+.tr-h{margin:8px 0 0;font-weight:500;font-size:17px;color:var(--gold-hi)}
+.tr-note{margin:0;font-size:13px;line-height:1.6}
+.tr-scroll{overflow-x:auto}
+.tr-table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+.tr-table th,.tr-table td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;font-weight:400}
+.tr-table th{color:var(--muted);font-size:12px;letter-spacing:.08em}
+.tr-table td.bad{color:#ff9c86}.tr-table td.good{color:#7fdcae}.tr-table td.muted{color:var(--muted)}
+.tr-dot{display:inline-block;width:10px;height:10px;margin-right:8px;vertical-align:middle}
+.tr-wishes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+.tr-wish{padding:8px;background:var(--ink2);border:1px solid var(--line)}
+.tr-wish ul{margin:6px 0 0;padding-left:1.2em;font-size:13px;color:var(--muted);line-height:1.5}
+.tr-clan{border:1px solid var(--line);border-left:5px solid var(--cc);background:var(--ink2);margin-bottom:8px}
+.tr-clan summary{cursor:pointer;padding:10px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.tr-clan summary b{font-weight:600;font-size:16px}
+.tr-clan summary small{color:var(--muted);font-size:12px}
+.tr-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:var(--cc);color:#fff;font-size:14px}
+.tr-fams{padding:4px 14px 12px;display:grid;gap:10px}
+.tr-fam{border-left:2px solid var(--line);padding-left:12px}
+.tr-famh{font-size:14px;color:var(--gold-hi);margin-bottom:6px}
+.tr-famh small{margin-left:8px;color:var(--muted)}
+.tr-leaves{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.tr-leaf{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;text-align:left;background:var(--ink3);border:1px solid var(--cc);color:inherit;font:inherit;cursor:pointer}
+.tr-leaf.missing{background:transparent;border-style:dashed;border-color:var(--line);opacity:.7}
+.tr-leaf.indeck{box-shadow:inset 0 0 0 2px var(--gold)}
+.tr-sig{flex:none;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:var(--cc);color:#fff;font-family:"FD Serif","Noto Serif TC",serif;font-size:16px}
+.tr-leaf.missing .tr-sig{background:var(--line)}
+.tr-nm{flex:1;min-width:0;display:grid}
+.tr-nm b{font-weight:500;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-nm small{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-leaf em{flex:none;font-style:normal;font-size:11px;color:var(--muted)}
+.tr-leaf.indeck em{color:var(--gold-hi)}

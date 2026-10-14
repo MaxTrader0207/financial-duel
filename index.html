@@ -95,6 +95,7 @@
         <button class="btn ghost" id="btn-rec" type="button">學習紀錄</button>
         <button class="btn ghost" id="btn-know" type="button">知識圖鑑<span class="badge" id="kn-badge" hidden></span></button>
         <button class="btn ghost" id="btn-dex" type="button">卡牌圖鑑</button>
+        <button class="btn ghost" id="btn-tree" type="button">卡牌族譜</button>
         <button class="btn ghost" id="btn-bank" type="button">題庫管理</button>
         <button class="btn ghost" id="btn-install" type="button" hidden>安裝到主畫面</button>
       </div>
@@ -148,12 +149,12 @@
 <!-- DEX -->
 <section class="screen" id="scr-dex" hidden>
   <div class="page" style="max-width:1100px">
-    <div class="eyebrow">一百六十種卡牌一覽</div>
+    <div class="eyebrow">一百八十種卡牌一覽</div>
     <h3 class="sec">卡牌圖鑑</h3>
     <p class="lead">共 180 張卡，9 個屬性各 20 張（普通 6、稀有 6、超稀有 4、極稀有 4）。稀有度依星數分為普通、稀有、超稀有、極稀有。攻擊類技能在對手使用時，於攻擊命中你的時候同樣發動。</p>
     <div class="dex-filter" id="dex-filter"></div>
     <div class="dex" id="dex"></div>
-    <div><button class="btn" id="btn-dex-back" type="button">回標題</button></div>
+    <div class="btn-row"><button class="btn" id="btn-dex-back" type="button">回標題</button><button class="btn ghost" id="dex-tree" type="button">看我的卡牌族譜</button></div>
   </div>
 </section>
 
@@ -240,6 +241,32 @@
   </div>
 </section>
 
+<!-- SKILL TREE -->
+<section class="screen" id="scr-tree" hidden>
+  <div class="page" style="max-width:1100px">
+    <div class="eyebrow">收藏、牌組與技能的全貌</div>
+    <h3 class="sec">卡牌技能族譜</h3>
+    <p class="lead">把 180 張卡依「屬性 → 技能系統 → 卡牌」排成族譜，標出你已收集、放進牌組、還沒收集的卡，並分析目前儲存的牌組有哪些強項和弱點。可以輸出成圖片分享給朋友朝聖，或輸出規劃表離線規劃怎麼湊齊。</p>
+    <div class="stat-row" id="tree-sum"></div>
+    <div class="btn-row"><button class="btn small" id="tree-png" type="button">輸出族譜圖（PNG）</button><button class="btn ghost small" id="tree-share" type="button">分享給朋友</button><button class="btn ghost small" id="tree-pdf" type="button">輸出規劃表（PDF）</button><span class="status" id="tree-status" role="status"></span></div>
+    <div class="tr-two">
+      <div class="tr-box good"><h4>強項</h4><ul id="tree-good"></ul></div>
+      <div class="tr-box bad"><h4>需要補強</h4><ul id="tree-bad"></ul></div>
+    </div>
+    <h4 class="tr-h">屬性與相剋</h4>
+    <p class="muted tr-note">防禦時，卡牌屬性剋制對手的攻擊屬性，守備力 ×1.5。正確率是你這個屬性題目的累積答對率（答滿 10 題才顯示）。</p>
+    <div class="tr-scroll" id="tree-cats"></div>
+    <h4 class="tr-h">技能系統（牌組）</h4>
+    <div id="tree-fams"></div>
+    <h4 class="tr-h">收集建議</h4>
+    <div class="tr-wishes" id="tree-wish"></div>
+    <h4 class="tr-h">族譜</h4>
+    <p class="muted tr-note">點卡牌可以看詳細資料。實線：已收集；虛線：未收集；金框：在牌組中。</p>
+    <div id="tree-body"></div>
+    <div class="btn-row"><button class="btn" id="tree-back" type="button">回標題</button><button class="btn ghost" id="tree-deck" type="button">去編輯牌組</button></div>
+  </div>
+</section>
+
 <!-- DECK BUILDER -->
 <section class="screen" id="scr-deck" hidden>
   <div class="page" style="max-width:1100px">
@@ -247,7 +274,7 @@
     <h3 class="sec">牌組編輯</h3>
     <p class="lead">從已收集的卡中選 40 張組成牌組，每種卡最多 2 張。對戰時牌組用完會重新洗牌。每贏一場可以從 3 張未收集的卡中選 1 張，困難模式勝利的選項必定包含極稀有卡。</p>
     <div class="deck-sum" id="deck-sum"></div>
-    <div class="btn-row"><button class="btn small" id="deck-save" type="button">儲存牌組</button><button class="btn ghost small" id="deck-auto" type="button">自動組牌</button><button class="btn ghost small" id="deck-weak" type="button">弱項練習牌組</button><button class="btn ghost small" id="deck-clear" type="button">清空</button><span class="status" id="deck-status" role="status"></span></div>
+    <div class="btn-row"><button class="btn small" id="deck-save" type="button">儲存牌組</button><button class="btn ghost small" id="deck-auto" type="button">自動組牌</button><button class="btn ghost small" id="deck-weak" type="button">弱項練習牌組</button><button class="btn ghost small" id="deck-clear" type="button">清空</button><button class="btn ghost small" id="deck-tree" type="button">牌組分析與族譜</button><span class="status" id="deck-status" role="status"></span></div>
     <p class="deck-cost" id="deck-cost"></p>
     <div class="dex-filter" id="deck-filter"></div>
     <div class="deck-grid" id="deck-grid"></div>
