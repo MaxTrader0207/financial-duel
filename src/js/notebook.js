@@ -8,15 +8,22 @@ import { Sound } from './sound.js';
 
 let NB_KEY, DAY, NB_WAIT, NB_V, NB, nbSave, fmtDue, fmtDay, nbCat, nbShowMastered, RV;
 
-function nbRecord(q, correct) {
+/* record an answer. pick: the option text chosen when wrong ('' when time ran out), kept to show "你上次選了…".
+   Returns what happened: 'new' | 'down' | 'again' (wrong) · 'up' | 'mastered' · 'early' (right before it was due: the
+   count goes up but the box stays, so a question is only mastered after right answers on different days). */
+function nbRecord(q, correct, pick) {
   const now = Date.now(), e = NB[q.id];
   if (!correct) {
-    NB[q.id] = { box: 1, wrong: (e ? e.wrong : 0) + 1, right: e ? e.right : 0, due: now, last: now, added: e ? e.added : now, mastered: false };
-  } else if (e && !e.mastered) {
-    e.right++; e.last = now;
-    if (e.box >= 3) e.mastered = true; else { e.box++; e.due = now + NB_WAIT[e.box] * DAY; }
-  } else return;
-  nbSave();
+    NB[q.id] = { box: 1, wrong: (e ? e.wrong : 0) + 1, right: e ? e.right : 0, due: now, last: now, added: e ? e.added : now, mastered: false,
+      ...(typeof pick === 'string' ? { pick } : e && e.pick !== undefined ? { pick: e.pick } : {}) };
+    nbSave(); return !e ? 'new' : e.box > 1 || e.mastered ? 'down' : 'again';
+  }
+  if (!e || e.mastered) return null;
+  e.right++; e.last = now;
+  let res;
+  if (e.due > now) res = 'early';
+  else if (e.box >= 3) { e.mastered = true; res = 'mastered'; } else { e.box++; e.due = now + NB_WAIT[e.box] * DAY; res = 'up'; }
+  nbSave(); return res;
 }
 function nbEntries() {
   const byId = new Map(allQuestions().map(q => [q.id, q]));
@@ -44,6 +51,7 @@ function renderNotebook() {
     <div class="miss nb-item">
       <div class="q"><span class="chip" style="background:${CATS[q.category].color}">${CATS[q.category].name}</span>${esc(q.q)}</div>
       <div class="a">正解：${esc(q.options[q.answer])}</div>
+      ${!e.mastered && e.pick !== undefined ? `<div class="nb-pick">${e.pick ? `你上次選：${esc(e.pick)}` : '上次時間到，沒有作答'}</div>` : ''}
       ${q.explain ? `<div class="e">${esc(q.explain)}</div>` : ''}
       <div class="nb-meta"><span class="boxes" title="第 ${e.box} 階">${[1, 2, 3].map(i => `<i class="${e.mastered || i <= e.box ? 'on' : ''}"></i>`).join('')}</span>
         <span>答錯 ${e.wrong} 次 · 答對 ${e.right} 次</span><span>${e.mastered ? `${fmtDay(e.last)} 掌握` : fmtDue(e.due)}</span>
@@ -51,11 +59,11 @@ function renderNotebook() {
         <button class="linkbtn" type="button" data-act="remove" data-id="${esc(q.id)}">移除</button></div>
     </div>`).join('') : `<p class="lead">${nbShowMastered ? '還沒有已掌握的題目。' : '這裡會收集對戰中答錯的題目。答錯的題目會在之後的對戰和複習中再次出現，連續在不同天答對 3 次就算掌握。'}</p>`;
 }
-function startReview(all) {
+function startReview(all, cat = nbCat) {
   const now = Date.now();
-  let list = nbEntries().filter(x => !x.e.mastered && (all || x.e.due <= now) && (nbCat === 'all' || x.q.category === nbCat)).map(x => x.q);
+  let list = nbEntries().filter(x => !x.e.mastered && (all || x.e.due <= now) && (cat === 'all' || x.q.category === cat)).map(x => x.q);
   if (!list.length) return;
-  RV = { list: shuffle(list).slice(0, 10), i: 0, right: 0 };
+  RV = { list: shuffle(list).slice(0, 10), i: 0, right: 0, all: !!all, log: [] };
   $('#nb-main').hidden = true; $('#nb-review').hidden = false;
   showReviewQ();
 }
@@ -72,12 +80,13 @@ function answerReview(pos) {
   if (!RV || RV.done) return;
   const q = RV.list[RV.i], cp = RV.order.indexOf(q.answer), ok = pos === cp;
   RV.done = true; if (ok) RV.right++;
-  nbRecord(q, ok);
+  const res = nbRecord(q, ok, ok ? undefined : q.options[RV.order[pos]]);
   [...$('#rv-opts').children].forEach((b, i) => { b.disabled = true; if (i === cp) b.classList.add('right'); else if (i === pos) b.classList.add('wrong'); });
   ok ? Sound.correct() : Sound.wrong();
   const e = NB[q.id];
+  RV.log.push({ q, res, box: e.box, due: e.due });
   const fb = $('#rv-fb'); fb.hidden = false; fb.classList.toggle('no', !ok);
-  $('#rv-verdict').innerHTML = ok ? `正解！<small>${e.mastered ? '已掌握' : `升到第 ${e.box} 階 · ${fmtDue(e.due)}`}</small>` : '不正解<small>退回第 1 階</small>';
+  $('#rv-verdict').innerHTML = (ok ? '正解！' : '不正解') + `<small>${RESULT[res](e)}</small>`;
   $('#rv-explain').textContent = q.explain || `正確答案：${q.options[q.answer]}`;
   $('#rv-next').textContent = RV.i + 1 < RV.list.length ? '下一題 ▶' : '查看結果 ▶';
   $('#rv-next').focus({ preventScroll: true });
@@ -89,10 +98,22 @@ function nextReview() {
   $('#rv-bar').style.transform = 'scaleX(1)';
   $('#rv-progress').textContent = '複習完成';
   $('#rv-q').textContent = `這輪答對 ${RV.right} / ${RV.list.length} 題。`;
-  $('#rv-opts').innerHTML = '';
+  const up = RV.log.filter(x => x.res === 'up' || x.res === 'mastered').length, down = RV.log.filter(x => x.res === 'down' || x.res === 'again').length;
+  const later = nbEntries().filter(x => !x.e.mastered && x.e.due > Date.now()).map(x => x.e.due).sort((a, b) => a - b);
+  $('#rv-opts').innerHTML = `<div class="rv-sum"><span>升階 <b>${up}</b></span><span>已掌握 <b>${RV.log.filter(x => x.res === 'mastered').length}</b></span><span>答錯 <b>${down}</b></span>${
+    RV.log.some(x => x.res === 'early') ? `<span>提前練習 <b>${RV.log.filter(x => x.res === 'early').length}</b></span>` : ''}</div>
+    <ol class="rv-log">${RV.log.map(x => `<li class="${x.res === 'again' ? 'down' : x.res}"><span class="t">${esc(x.q.q)}</span><span class="r">${RESULT[x.res]({ box: x.box, due: x.due, mastered: x.res === 'mastered' })}</span></li>`).join('')}</ol>
+    <p class="rv-next">${nbDueList().length ? `還有 ${nbDueList().length} 題現在就可以複習（答錯的題目會留在第 1 階）。` : later.length ? `下一次到期：${fmtDue(later[0]).replace('後複習', '後')}，到時候標題畫面會提醒你。` : '目前沒有要複習的題目了。'}</p>`;
   $('#rv-fb').hidden = true;
   $('#rv-done').hidden = false;
 }
+/* what an answer did, in words (nbRecord's result) */
+const RESULT = {
+  new: () => '收進錯題本 · 第 1 階', down: () => '退回第 1 階', again: () => '留在第 1 階，下次再練',
+  up: e => `升到第 ${e.box} 階 · ${fmtDue(e.due)}`, mastered: () => '已掌握',
+  early: e => `還沒到複習日，階段不變（第 ${e.box} 階 · ${fmtDue(e.due)}）`,
+  null: () => '',
+};
 function endReview() { RV = null; $('#nb-review').hidden = true; $('#rv-done').hidden = true; $('#nb-main').hidden = false; renderNotebook(); }
 
 export function init() {

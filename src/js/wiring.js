@@ -8,7 +8,7 @@ import { owns } from './collection.js';
 import { $, DIFF_KEY, RM, setDiffKey, diffKey, esc, foeAtkOf } from './core.js';
 import { renderReports } from './feedback.js';
 import { onPlay, startDuel } from './flow.js';
-import { endReview, renderNotebook } from './notebook.js';
+import { endReview, renderNotebook, startReview } from './notebook.js';
 import { setQuizState, quizState } from './quiz.js';
 import { recordGame } from './records.js';
 import { ADV_WHY, BEATS, WEAK_MULT, advOf } from './rules.js';
@@ -66,6 +66,7 @@ $('#btn-start').onclick = () => startDuel();
 $('#btn-bank').onclick = () => { renderBank(); renderReports(); show('bank'); };
 $('#btn-dex').onclick = () => { renderDex(); show('dex'); };
 $('#btn-nb').onclick = () => { renderNotebook(); show('notebook'); };
+$('#nb-due').onclick = () => { renderNotebook(); show('notebook'); startReview(false, 'all'); };   // 標題的到期提醒：直接開始複習
 $('#btn-nb-back').onclick = () => { endReview(); renderTitle(); show('title'); };
 $('#btn-save').onclick = () => {
   if (!G || G.busy || (G.phase !== 'attack' && G.phase !== 'defend')) return;

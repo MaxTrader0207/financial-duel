@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 async function seed(page) {
   await page.evaluate(() => { const T = window.__T, qs = T.BANK.filter(q => q.category === 'tech').slice(0, 6).concat(T.BANK.filter(q => q.category === 'fx').slice(0, 3));
     qs.forEach(q => T.notebook.nbRecord(q, false));
-    T.notebook.nbRecord(qs[0], true); T.notebook.nbRecord(qs[0], true); T.notebook.nbRecord(qs[0], true);   // the first one ends up mastered
+    Object.assign(T.notebook.NB[qs[0].id], { mastered: true, box: 3, right: 3 }); T.notebook.nbSave();   // the first one is mastered
   });
   await page.click('#btn-nb');
   await expect(page.locator('#nb-export-pdf')).toBeVisible();

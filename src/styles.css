@@ -1013,3 +1013,28 @@ html.cvd .dl-fb.no .dl-verdict{color:#ffc27a}
 html.cvd .rr-delta.down{color:#ffb35c}
 html.cvd .rk-deck.ok{border-color:#4ea1ff66}
 html.cvd .tut-list li::before{color:#2a64b8}
+
+/* ---------- 錯題本: title reminder, last wrong pick, review results ---------- */
+.nb-due{display:flex;align-items:center;gap:12px;width:100%;margin:-4px 0 14px;padding:10px 14px;box-sizing:border-box;text-align:left;cursor:pointer;
+  background:color-mix(in oklab,var(--shu) 12%,var(--ink2));border:1px solid color-mix(in oklab,var(--shu) 60%,transparent);color:var(--text);font:inherit}
+.nb-due:hover{border-color:var(--shu)}
+.nb-due .seal-s{flex:none;display:grid;place-items:center;width:34px;height:34px;background:var(--shu);color:#fff;font-family:var(--f-name);font-weight:700;font-size:18px}
+.nb-due .t{display:grid;gap:2px;min-width:0}
+.nb-due .t b{font-weight:600;font-size:15px;color:var(--gold-hi)}
+.nb-due .t small{font-size:12.5px;color:var(--muted)}
+.nb-due .go{margin-left:auto;flex:none;font-size:13px;color:var(--gold)}
+.nb-pick{font-size:13.5px;color:#ffb19c}
+html.cvd .nb-pick{color:#ffc27a}
+html:is(.rs-l,.rs-xl) .nb-pick{font-size:calc(13.5px*var(--rs))}
+.rv-sum{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted)}
+.rv-sum b{color:var(--text);font-size:18px;font-weight:600;margin-left:4px;font-variant-numeric:tabular-nums}
+.rv-log{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:6px}
+.rv-log li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:8px 12px;background:var(--ink2);border-left:3px solid var(--line);font-size:14px}
+.rv-log li .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-log li .r{font-size:12.5px;color:var(--muted);text-align:right}
+.rv-log li.up,.rv-log li.mastered{border-left-color:var(--good)}.rv-log li.up .r,.rv-log li.mastered .r{color:var(--good)}
+.rv-log li.down,.rv-log li.new{border-left-color:var(--bad)}.rv-log li.down .r{color:var(--bad)}
+.rv-log li.early{border-left-color:var(--gold)}
+.rv-next{margin:6px 0 0;font-size:14px;color:var(--muted)}
+html:is(.rs-l,.rs-xl) .rv-log li{font-size:calc(14px*var(--rs))}
+@media (max-width:480px){ .rv-log li{grid-template-columns:1fr} .rv-log li .t{white-space:normal} .rv-log li .r{text-align:left} }

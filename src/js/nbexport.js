@@ -28,14 +28,15 @@ export function arranged(q) {
   return { options: order.map(i => q.options[i]), answer: order.indexOf(q.answer) };
 }
 const status = e => (e.mastered ? `已掌握（${fmtDay(e.last)}）` : `第 ${e.box} 階 · ${e.due <= Date.now() ? '現在可複習' : `${Math.ceil((e.due - Date.now()) / 864e5)} 天後複習`}`);
+const lastPick = e => (e.pick === undefined ? '' : e.pick || '（時間到）');
 const stamp = (d = new Date()) => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}`;
 
 /* ---------- CSV (UTF-8 with BOM so Excel shows Chinese correctly) ---------- */
 export function toCSV(list) {
   const cell = v => `"${String(v ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
-  const head = ['屬性', '難度', '題目', '選項A', '選項B', '選項C', '選項D', '正確答案', '解說', '答錯次數', '答對次數', '狀態', '加入日期'];
+  const head = ['屬性', '難度', '題目', '選項A', '選項B', '選項C', '選項D', '正確答案', '上次選的答案', '解說', '答錯次數', '答對次數', '狀態', '加入日期'];
   const rows = list.map(({ q, e }) => { const a = arranged(q); return [CATS[q.category] ? CATS[q.category].name : q.category, DIFF_LABEL[q.difficulty] || '', q.q,
-    ...[0, 1, 2, 3].map(i => a.options[i] || ''), `${KEYS[a.answer]}. ${a.options[a.answer]}`, q.explain || '', e.wrong, e.right, status(e),
+    ...[0, 1, 2, 3].map(i => a.options[i] || ''), `${KEYS[a.answer]}. ${a.options[a.answer]}`, lastPick(e), q.explain || '', e.wrong, e.right, status(e),
     e.added ? new Date(e.added).toLocaleDateString('zh-TW') : '']; });
   return '﻿' + [head, ...rows].map(r => r.map(cell).join(',')).join('\r\n');
 }
@@ -86,6 +87,7 @@ function questionBlocks({ q, e }, i, withAnswers) {
   ];
   if (withAnswers) {
     parts.push(textBlock(`正解：${KEYS[a.answer]}. ${a.options[a.answer]}`, f(700, 24), GOLD, 6, 0));
+    if (e.pick !== undefined && !e.mastered) parts.push(textBlock(`你上次選：${lastPick(e)}`, f(400, 22), '#b0472f', 6, 0));
     if (q.explain) parts.push(textBlock(`解說：${q.explain}`, f(400, 22), MUTED, 6, 0));
   } else parts.push(textBlock('作答：＿＿＿＿', f(400, 22), MUTED, 6, 24));
   parts.push({ measure: () => 34, draw(x, y) { x.strokeStyle = LINE; x.lineWidth = 1.5; x.beginPath(); x.moveTo(MX, y + 14); x.lineTo(PW - MX, y + 14); x.stroke(); } });

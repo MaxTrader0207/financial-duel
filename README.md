@@ -90,7 +90,7 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
 | `board.js`、`fx.js`、`view.js`、`foequiz.js` | 對戰桌面、動畫、切換畫面與過場、對手作答畫面 |
 | `save.js`、`progress.js` | 對戰存檔與版本轉換、匯出／匯入進度、轉移碼（經伺服器把進度搬到另一台裝置） |
 | `ai.js`、`collection.js`、`records.js` | 對手策略、收藏與牌組、學習紀錄 |
-| `notebook.js`、`feedback.js`、`bank.js`、`bankui.js` | 錯題本、題目回報、題庫 |
+| `notebook.js`、`feedback.js`、`bank.js`、`bankui.js` | 錯題本（間隔複習：第 1 階立即、第 2 階隔 1 天、第 3 階隔 3 天；沒到期先答對不升階；記下上次選錯的答案；標題到期提醒與複習結果）、題目回報、題庫 |
 | `report.js`、`result.js` | PDF／PNG 對戰報告、結算畫面 |
 | `scenes.js`、`ur-art.js` | 每屬性第 2、3 種卡面場景、32 張極稀有卡的專屬插圖 |
 | `perf.js`、`pwa.js` | 簡化特效、可安裝 App |

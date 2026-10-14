@@ -55,6 +55,7 @@
       <div class="eyebrow">金融知識卡牌對決</div>
       <h2>召喚交易怪獸，答對題目才能發動攻擊。</h2>
       <button class="daily-card" id="daily-card" type="button" hidden></button>
+      <button class="nb-due" id="nb-due" type="button" hidden><span class="seal-s">複</span><span class="t"><b id="nb-due-n"></b><small>錯題本到期了，花一兩分鐘複習，記得更牢</small></span><span class="go">開始 ▶</span></button>
       <div class="fan" id="fan"></div>
       <ol class="steps3" aria-label="三步驟玩法">
         <li><span class="n">壹</span><b>出牌</b><span>從手牌選一張卡召喚</span></li>
@@ -161,9 +162,9 @@
     <div class="eyebrow">間隔複習</div>
     <h3 class="sec">錯題本</h3>
     <div id="nb-main" class="nb-main">
-      <p class="lead">對戰中答錯的題目會自動收進來。之後的對戰會優先穿插到期的錯題，也可以在這裡直接複習。答對一次升一階，第 1 階立即複習、第 2 階隔 1 天、第 3 階隔 3 天，第 3 階再答對就算掌握；答錯會退回第 1 階。</p>
+      <p class="lead">對戰中答錯的題目會自動收進來。之後的對戰會優先穿插到期的錯題，也可以在這裡直接複習。答對一次升一階，第 1 階立即複習、第 2 階隔 1 天、第 3 階隔 3 天，第 3 階再答對就算掌握；答錯會退回第 1 階。還沒到複習日就先練習的題目，答對不會升階，要隔天再答對才算數。</p>
       <div class="stat-row" id="nb-stats"></div>
-      <div class="btn-row"><button class="btn" id="nb-review-due" type="button">複習到期題目</button><button class="btn ghost" id="nb-review-all" type="button">複習全部未掌握</button></div>
+      <div class="btn-row"><button class="btn" id="nb-review-due" type="button">複習到期題目</button><button class="btn ghost" id="nb-review-all" type="button">提前練習全部未掌握</button></div>
       <div class="dex-filter" id="nb-filter"></div>
       <div class="missed" id="nb-list"></div>
       <div class="btn-row"><button class="btn ghost small" id="nb-toggle" type="button">顯示已掌握的題目</button></div>

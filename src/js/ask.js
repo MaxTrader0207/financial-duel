@@ -47,7 +47,7 @@ function ask(m, mode, foe) {
     const panel = $('#quiz .q-panel');
     if (!RM) panel.animate([{ opacity: 0, transform: 'translateY(24px) scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'ease-out' });
     if (qz.remove || qz.extraTime) setTimeout(() => { Sound.skill(); floatText($('#q-skill'), `【${sk.name}】${[qz.remove && `刪去 ${qz.remove} 個錯誤選項`, qz.extraTime && `答題時間 +${qz.extraTime} 秒`].filter(Boolean).join('、')}`, 'skill'); }, 300);
-    let t0 = performance.now(), raf = 0, done = false, retried = false;
+    let t0 = performance.now(), raf = 0, done = false, retried = false, firstPick = null;
     let lastSec = Math.ceil(limit);
     const tick = now => {
       if (done) return;
@@ -64,7 +64,7 @@ function ask(m, mode, foe) {
     const finish = pos => {
       if (done) return;
       if (qz.retry && !retried && pos !== -1 && pos !== correctPos) {
-        retried = true;
+        retried = true; firstPick = q.options[order[pos]];
         const b = $('#q-opts').children[pos]; b.disabled = true; b.classList.add('wrong');
         Sound.wrong(); setTimeout(() => Sound.skill(), 250);
         floatText(b, `【${sk.name}】再答一次`, 'skill');
@@ -78,7 +78,7 @@ function ask(m, mode, foe) {
       if (correct) { G.stats.correct++; bc.c++; G.streak++; } else { G.streak = 0; G.missed.push({ q: q.q, a: q.options[q.answer], e: q.explain, cat: q.category }); }
       G.maxStreak = Math.max(G.maxStreak, G.streak);
       const nbBefore = !!(NB[q.id] && !NB[q.id].mastered);
-      nbRecord(q, correct && !retried); qsRecord(q, correct && !retried);
+      nbRecord(q, correct && !retried, correct ? firstPick : pos === -1 ? (firstPick ?? '') : q.options[order[pos]]); qsRecord(q, correct && !retried);
       if (!(correct && !retried) && !nbBefore) G.nbAdded = (G.nbAdded || 0) + 1;
       if ((builtinSet || (builtinSet = new Set(BUILTIN))).has(q)) Usage.question(q.id, pos === -1 ? -1 : order[pos], q.answer);
       if (G.mode === 'ranked') (G.answerLog || (G.answerLog = [])).push({ qid: q.id, pick: pos === -1 ? -1 : order[pos], ms: Math.round(time * 1000), mode });   // judged again by the server
