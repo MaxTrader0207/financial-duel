@@ -24,6 +24,8 @@ export const BACKS = [
   { id: 'gold', name: '金紋', tier: 3 }, { id: 'shu', name: '朱印', tier: 4 }, { id: 'phoenix', name: '鳳凰', tier: 5 }, { id: 'legend', name: '黑金傳奇', tier: 6 },
 ];
 export const SEASON_BACK_TIER = 2;
+/* 名人堂 card back: finishing a season in the online top 10 (see RANK_AWARDS) */
+export const HALL_BACK = { id: 'hall', name: '名人堂', mark: '冠' };
 const MONTH_KANJI = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'];
 export const seasonBack = season => { const m = Number(season.split('-')[1]); return { id: `s-${season}`, name: `${m} 月賽季限定`, mark: MONTH_KANJI[m - 1], month: m, season }; };
 
@@ -32,7 +34,7 @@ export const setClock = f => { clock = f || (() => new Date()); };
 export const seasonKey = (d = clock()) => seasonOf(d.getTime());           // calendar month in Taiwan time, like the server
 export function seasonDaysLeft(d = clock()) { const [y, m] = seasonKey(d).split('-').map(Number); const end = Date.UTC(y, m, 1) - 8 * 3600e3; return Math.max(1, Math.ceil((end - d.getTime()) / 864e5)); }
 
-const fresh = () => ({ season: seasonKey(), rp: 0, peak: 0, w: 0, l: 0, played: 0, backs: ['default'], back: 'default', seasons: [], pending: null, active: false });
+const fresh = () => ({ season: seasonKey(), rp: 0, peak: 0, w: 0, l: 0, played: 0, backs: ['default'], back: 'default', seasons: [], pending: null, active: false, onlineChecked: null });
 let R = fresh();
 export function load() { R = { ...fresh(), ...Store.load(RANK_KEY, { version: RANK_V, fallback: fresh, validate: isObj }) }; return checkSeason(); }
 const save = () => Store.trySave(RANK_KEY, RANK_V, R);
@@ -136,11 +138,66 @@ export function checkSeason(now = seasonKey()) {
   save();
   return reward;
 }
+/* ---------- online final ranks ----------
+   A season's final place on the online board earns an extra title (the best one that applies). The bars keep a
+   handful of players from making it meaningless, and a player must have played enough duels that season. */
+export const RANK_MIN_DUELS = 10;
+export const RANK_AWARDS = [
+  { id: 'champion', name: '冠軍', ok: (rank, total) => rank === 1 && total >= 5, hall: true },
+  { id: 'top3', name: '前三名', ok: (rank, total) => rank <= 3 && total >= 10, hall: true },
+  { id: 'top10', name: '前十名', ok: (rank, total) => rank <= 10 && total >= 30, hall: true },
+  { id: 'top10pct', name: '前 10%', ok: (rank, total) => total >= 20 && rank <= Math.ceil(total * 0.1), hall: false },
+];
+export function rankAward(s) {
+  if (!s || !s.rank || !s.total || (s.w || 0) + (s.l || 0) < RANK_MIN_DUELS) return null;
+  const a = RANK_AWARDS.find(x => x.ok(s.rank, s.total)); if (!a) return null;
+  const [y, m] = s.season.split('-').map(Number);
+  return { season: s.season, rank: s.rank, total: s.total, award: a.id, hall: a.hall,
+    title: { id: `season-${s.season}-${a.id}`, name: `${y} 年 ${m} 月賽季・${a.name}`, desc: `${y} 年 ${m} 月賽季線上排行榜第 ${s.rank} 名（共 ${s.total} 人）` } };
+}
+/* the server's season history (online players): fill in seasons played on another device, add final ranks, and
+   grant what was earned. → [{ kind: 'season' | 'rank', … }] newly granted, for the reward dialog */
+export function mergeOnlineSeasons(list, now = seasonKey()) {
+  const granted = [];
+  if (!Array.isArray(list)) return granted;
+  for (const x of list) {
+    if (!x || !x.ended || typeof x.season !== 'string' || x.season >= now) continue;
+    let e = R.seasons.find(s => s.season === x.season);
+    if (!e) {                                                       // played elsewhere: that season's reward too
+      e = { season: x.season, peak: Math.max(0, Math.min(TIERS.length - 1, x.peak | 0)), rp: x.rp | 0, w: x.w | 0, l: x.l | 0 };
+      R.seasons.push(e); R.seasons.sort((a, b) => (a.season < b.season ? -1 : 1));
+      const rw = rewardFor(e.season, e.peak);
+      for (const b of rw.backs) if (!R.backs.includes(b)) R.backs.push(b);
+      Daily.addCustomTitle(rw.title.id, rw.title.name, rw.title.desc);
+      granted.push({ kind: 'season', ...rw });
+    }
+    if ((x.peak | 0) > e.peak && x.peak < TIERS.length) {             // reached higher on another device: the better reward
+      e.peak = x.peak | 0; const rw = rewardFor(e.season, e.peak);
+      for (const b of rw.backs) if (!R.backs.includes(b)) R.backs.push(b);
+      Daily.addCustomTitle(rw.title.id, rw.title.name, rw.title.desc);
+      granted.push({ kind: 'season', ...rw });
+    }
+    Object.assign(e, { rank: x.rank, total: x.total, w: Math.max(e.w, x.w | 0), l: Math.max(e.l, x.l | 0), online: true });
+    const a = rankAward(e);
+    if (a && !e.award) {
+      e.award = a.award;
+      Daily.addCustomTitle(a.title.id, a.title.name, a.title.desc);
+      if (a.hall && !R.backs.includes(HALL_BACK.id)) R.backs.push(HALL_BACK.id);
+      granted.push({ kind: 'rank', ...a });
+    }
+  }
+  R.onlineChecked = now; save();
+  return granted;
+}
+/* what this season would give if it ended now (the screen's preview) */
+export function seasonPreview() { return rewardFor(R.season, R.peak); }
+
 export function takePending() { const p = R.pending; if (p) { R.pending = null; save(); } return p; }
 
 /* ---------- card backs ---------- */
 export function backInfo(id) {
   if (id && id.startsWith('s-')) return { ...seasonBack(id.slice(2)), season: id.slice(2) };
+  if (id === HALL_BACK.id) return HALL_BACK;
   return BACKS.find(b => b.id === id) || BACKS[0];
 }
 export function setBack(id) { if (!R.backs.includes(id)) return false; R.back = id; save(); return true; }

@@ -25,7 +25,7 @@ export function applyBack(id = Ranked.state().back) {
 }
 const backTile = (id, owned, need) => { const b = Ranked.backInfo(id);
   return `<button class="rk-back${owned ? '' : ' locked'}${Ranked.state().back === id ? ' on' : ''}" type="button" data-id="${id}" ${owned ? '' : 'disabled'}>
-    <span class="rk-back-face" data-back="${b.season ? 'season' : b.id}" style="${b.season ? seasonVars(b) : ''}"><i>${b.season ? b.mark : '金'}</i></span><b>${esc(b.name)}</b><small>${owned ? (Ranked.state().back === id ? '使用中' : '點一下使用') : esc(need)}</small></button>`; };
+    <span class="rk-back-face" data-back="${b.season ? 'season' : b.id}" style="${b.season ? seasonVars(b) : ''}"><i>${b.mark || '金'}</i></span><b>${esc(b.name)}</b><small>${owned ? (Ranked.state().back === id ? '使用中' : '點一下使用') : esc(need)}</small></button>`; };
 const seasonVars = b => { const [bg, ln, ink] = SEASON_PALETTE[(b.month - 1) % 12]; return `--cb-bg:${bg};--cb-ln:${ln};--cb-ink:${ink}`; };
 
 /* ---------- title button ---------- */
@@ -49,6 +49,7 @@ export function openRanked({ sync = true } = {}) {
         <div class="rk-meta">本季 ${R.w} 勝 ${R.l} 敗 · 本季最高 ${esc(Ranked.TIERS[R.peak].name)} · 對手「${esc(Ranked.LEVEL_NAME[T.level])}」 · 勝 +${T.win}／敗 ${T.loss}（表現 ±${Ranked.PERF_SWING}）</div></div>
     </div>
     <div class="rk-online" id="rk-online">${onlineHTML()}</div>
+    ${previewHTML()}
     <div class="rk-tiers">${Ranked.TIERS.map((x, i) => `<span class="${i === t ? 'on' : i < t ? 'past' : ''}"><i class="rk-seal mini t${i}">${x.seal}</i>${esc(x.name)}<small>${x.at}</small></span>`).join('')}</div>
     ${gate ? `<div class="rk-deck gate"><b>先完成新手場，就能開始排位賽</b><span>新手場是一場約 3 分鐘的教學對戰，會帶你走過出牌、答題、防禦與相剋。完成後回到這裡，就能直接開始排位賽。</span></div>
     <div class="btn-row"><button class="btn" id="rk-tut" type="button">開始新手場</button><button class="btn ghost" id="rk-home" type="button">回標題</button></div>` : `<div class="rk-deck ${ok ? 'ok' : 'auto'}">${ok ? `<b>排位牌組點數 ${cost} / ${Ranked.DECK_CAP}</b><span>你的牌組符合排位規則，直接開始就好。</span>`
@@ -68,9 +69,10 @@ export function openRanked({ sync = true } = {}) {
     <h4 class="rk-h">外觀 · 卡背</h4>
     <div class="rk-backs">${Ranked.BACKS.map(b => backTile(b.id, R.backs.includes(b.id), `賽季達到「${Ranked.TIERS[b.tier].name}」解鎖`)).join('')}
       ${R.backs.filter(id => id.startsWith('s-')).map(id => backTile(id, true, '')).join('')}
-      ${R.backs.some(id => id === `s-${R.season}`) ? '' : backTile(`s-${R.season}`, false, `本季達到「${Ranked.TIERS[Ranked.SEASON_BACK_TIER].name}」，下個月領取`)}</div>
-    ${R.seasons.length ? `<h4 class="rk-h">過去賽季</h4><div class="rk-hist">${R.seasons.slice().reverse().map(s => { const [sy, sm] = s.season.split('-').map(Number);
-      return `<span>${sy} 年 ${sm} 月 · 最高 ${esc(Ranked.TIERS[s.peak].name)} · ${s.w} 勝 ${s.l} 敗</span>`; }).join('')}</div>` : ''}`;
+      ${R.backs.some(id => id === `s-${R.season}`) ? '' : backTile(`s-${R.season}`, false, `本季達到「${Ranked.TIERS[Ranked.SEASON_BACK_TIER].name}」，下個月領取`)}
+      ${backTile(Ranked.HALL_BACK.id, R.backs.includes(Ranked.HALL_BACK.id), '任一賽季線上排名前十名解鎖')}</div>
+    <h4 class="rk-h">歷屆賽季</h4><div class="rk-hist" id="rk-hist">${historyHTML()}</div>
+    <h4 class="rk-h">名人堂 · 歷屆前三名</h4><div class="rk-hall" id="rk-hall"><p class="muted">載入中…</p></div>`;
   const go = $('#rk-go'); if (go) go.onclick = () => Actions.startDuel({ mode: 'ranked' });
   const tut = $('#rk-tut'); if (tut) tut.onclick = () => Actions.startDuel({ tutorial: true });
   $('#rk-board').onclick = () => Actions.openBoard();
@@ -80,11 +82,68 @@ export function openRanked({ sync = true } = {}) {
   document.querySelectorAll('#rk-body .rk-back:not(.locked)').forEach(b => { b.onclick = () => { Ranked.setBack(b.dataset.id); applyBack(); openRanked(); }; });
   show('ranked');
   const p = Ranked.takePending(); if (p) showSeasonReward(p);
+  loadHall();
   if (sync && Online.joined()) Online.sync().then(me => {     // take the server's points, then redraw what changed
     if (!me || $('#scr-ranked').hidden) return;
     if (R.rp !== cached.rp || R.w !== cached.w || R.l !== cached.l) openRanked({ sync: false });
     else { $('#rk-online').innerHTML = onlineHTML(); $('#rk-board').onclick = () => Actions.openBoard(); }
-  });
+  }).then(() => checkOnlineSeasons(true));
+}
+
+/* ---------- season rewards: preview, history, hall of fame ---------- */
+function previewHTML() {
+  const R = Ranked.state(), p = Ranked.seasonPreview(), played = R.w + R.l, A = Ranked.RANK_AWARDS;
+  const backs = p.backs.map(id => Ranked.backInfo(id).name);
+  const O = Online.state(), rank = Online.joined() && O.me && O.me.season === R.season && O.me.w + O.me.l > 0 ? O.me.rank : null;
+  return `<div class="rk-preview"><h4>本季結算預覽</h4>
+    <p>${played ? `以本季最高段位「${esc(Ranked.TIERS[R.peak].name)}」結算，下個月第一次開啟時發放：` : '打完第一場排位賽後，月底依本季最高段位發放：'}</p>
+    <ul><li>稱號「${esc(p.title.name)}」</li><li>卡背：${esc(backs.join('、'))}${R.peak < Ranked.SEASON_BACK_TIER ? `（達到「${esc(Ranked.TIERS[Ranked.SEASON_BACK_TIER].name)}」再加本月限定卡背）` : ''}</li>
+      <li>線上排名獎勵：本季至少 ${Ranked.RANK_MIN_DUELS} 場${played < Ranked.RANK_MIN_DUELS ? `（目前 ${played} 場）` : ''}，月底名列${A.map(a => a.name).join('、')}，另得排名稱號；前十名以上解鎖「名人堂」卡背${rank ? ` · 你目前第 ${rank} 名` : Online.joined() ? '' : ' · 需要先加入線上排行榜'}</li></ul></div>`;
+}
+const awardName = id => (Ranked.RANK_AWARDS.find(a => a.id === id) || {}).name || '';
+function historyHTML() {
+  const S = Ranked.state().seasons;
+  if (!S.length) return '<p class="muted">第一個賽季結束後，每一季的段位、戰績與線上排名會留在這裡。</p>';
+  return S.slice().reverse().map(s => { const [y, m] = s.season.split('-').map(Number);
+    return `<div class="rk-hrow"><span class="rk-seal mini t${s.peak}">${Ranked.TIERS[s.peak].seal}</span>
+      <div><b>${y} 年 ${m} 月賽季</b><small>最高 ${esc(Ranked.TIERS[s.peak].name)} · ${s.w} 勝 ${s.l} 敗${s.rank ? ` · 線上第 ${s.rank} 名／${s.total} 人` : ''}</small></div>
+      ${s.award ? `<em>${esc(awardName(s.award))}</em>` : ''}</div>`; }).join('');
+}
+let hallCache = null;
+async function loadHall() {
+  const box = $('#rk-hall'); if (!box) return;
+  const list = hallCache || (hallCache = await Online.hall());
+  if (!$('#rk-hall')) return;
+  if (!list) { $('#rk-hall').innerHTML = '<p class="muted">連不上排行榜伺服器，名人堂暫時無法顯示。</p>'; hallCache = null; return; }
+  const me = Online.state().name;
+  $('#rk-hall').innerHTML = list.length ? list.map(x => { const [y, m] = x.season.split('-').map(Number);
+    return `<div class="rk-hseason"><b>${y} 年 ${m} 月賽季<small>${x.total} 人參賽</small></b><ol>${x.top.map((t, i) => `<li class="${me && t.name === me ? 'you' : ''}"><span class="medal m${i + 1}">${['冠', '亞', '季'][i]}</span>${esc(t.name)}<small>${esc(Ranked.TIERS[t.tier].name)} · ${t.rp} 分</small></li>`).join('')}</ol></div>`; }).join('')
+    : '<p class="muted">第一個賽季結束後，每一季的前三名會留在這裡。</p>';
+}
+/* the server's season history: final ranks, seasons played on another device, and their rewards.
+   Once per season on start; every time the 排位賽 screen opens (force). */
+let checking = false;
+export async function checkOnlineSeasons(force = false) {
+  if (checking || !Online.joined() || (!force && Ranked.state().onlineChecked === Ranked.seasonKey())) return;
+  checking = true;
+  try {
+    const list = await Online.seasons(); if (!list) return;
+    const granted = Ranked.mergeOnlineSeasons(list);
+    if (!$('#scr-ranked').hidden && $('#rk-hist')) $('#rk-hist').innerHTML = historyHTML();
+    if (granted.length) { showGranted(granted); if (!$('#scr-ranked').hidden) openRanked({ sync: false }); }
+  } finally { checking = false; }
+}
+function showGranted(list) {
+  const open = !$('#season-dlg').hidden, before = open ? $('#season-body').innerHTML + '<hr class="rk-sep">' : '';
+  $('#season-body').innerHTML = before + list.map(g => { const [y, m] = g.season.split('-').map(Number);
+    if (g.kind === 'rank') return `<div class="eyebrow">${y} 年 ${m} 月賽季 · 線上排名結算</div><h3 class="rk-name">第 ${g.rank} 名（共 ${g.total} 人）</h3>
+      <div class="dl-title-new"><span>排名稱號</span><b>${esc(g.title.name)}</b></div>${g.hall ? '<p class="lead">解鎖卡背：名人堂。</p>' : ''}`;
+    return `<div class="eyebrow">${y} 年 ${m} 月賽季結算</div><h3 class="rk-name">最高段位：${esc(Ranked.TIERS[g.peak].name)}</h3>
+      <div class="dl-title-new"><span>限定稱號</span><b>${esc(g.title.name)}</b></div><p class="lead">解鎖卡背：${g.backs.map(id => esc(Ranked.backInfo(id).name)).join('、')}。</p>`; }).join('<hr class="rk-sep">')
+    + '<p class="lead">卡背在「排位賽」的外觀裡更換，稱號在每日挑戰的成果頁選擇。</p>';
+  $('#season-dlg').hidden = false;
+  const best = list.find(g => g.kind === 'rank') || list[0];
+  if (!Daily.profile().title) Daily.setTitle(best.title.id);
 }
 function onlineHTML() {
   const O = Online.state();
@@ -133,4 +192,5 @@ export function init() {
   $('#season-ok').onclick = () => { $('#season-dlg').hidden = true; };
   applyBack();
   renderRankedButton();
+  setTimeout(() => checkOnlineSeasons(), 1500);                      // a new month: last season's final rank
 }

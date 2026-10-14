@@ -143,6 +143,19 @@ export async function sendAnswer(n, pick) {
   return null;
 }
 
+/* ---------- season history ---------- */
+/* my past seasons from the server: [{ season, rp, peak, w, l, rank, total, ended }] or null */
+export async function seasons() {
+  if (!joined()) return null;
+  const r = await request('GET', '/v1/me/seasons');
+  return r.ok && r.data && Array.isArray(r.data.seasons) ? r.data.seasons : null;
+}
+/* the hall of fame: top 3 of each ended season, or null */
+export async function hall() {
+  const r = await request('GET', '/v1/hall');
+  return r.ok && r.data && Array.isArray(r.data.seasons) ? r.data.seasons : null;
+}
+
 export async function board(season) {
   const r = await request('GET', `/v1/board${season ? `?season=${encodeURIComponent(season)}` : ''}`);
   return r.ok ? { ok: true, ...r.data } : { ok: false, error: errorText(r) };

@@ -1038,3 +1038,30 @@ html:is(.rs-l,.rs-xl) .nb-pick{font-size:calc(13.5px*var(--rs))}
 .rv-next{margin:6px 0 0;font-size:14px;color:var(--muted)}
 html:is(.rs-l,.rs-xl) .rv-log li{font-size:calc(14px*var(--rs))}
 @media (max-width:480px){ .rv-log li{grid-template-columns:1fr} .rv-log li .t{white-space:normal} .rv-log li .r{text-align:left} }
+
+/* ---------- 賽季獎勵: preview, history, hall of fame, 名人堂 card back ---------- */
+.rk-preview{margin:14px 0;padding:12px 16px;background:var(--ink2);border:1px solid var(--line);border-left:3px solid var(--gold)}
+.rk-preview h4{margin:0 0 6px;font-family:var(--f-name);font-weight:600;font-size:16px;color:var(--gold-hi)}
+.rk-preview p{margin:0 0 4px;font-size:14px}
+.rk-preview ul{margin:0;padding-left:1.2em;display:grid;gap:3px;font-size:13.5px;color:var(--muted)}
+.rk-preview li::marker{color:var(--gold)}
+.rk-hist{gap:6px}
+.rk-hrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 12px;background:var(--ink2);border:1px solid var(--line)}
+.rk-hrow b{display:block;font-weight:600;color:var(--text);font-size:14.5px}
+.rk-hrow small{font-size:12.5px;color:var(--muted)}
+.rk-hrow em{font-style:normal;font-size:12.5px;padding:2px 8px;border:1px solid var(--gold);color:var(--gold-hi);white-space:nowrap}
+.rk-hall{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.rk-hall .muted{grid-column:1/-1;margin:0}
+.rk-hseason{padding:10px 12px;background:var(--ink2);border:1px solid var(--line)}
+.rk-hseason>b{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:600;color:var(--gold-hi);font-size:14.5px}
+.rk-hseason>b small{font-weight:400;font-size:12px;color:var(--muted)}
+.rk-hseason ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:5px}
+.rk-hseason li{display:flex;align-items:center;gap:8px;font-size:14px;min-width:0}
+.rk-hseason li small{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.rk-hseason li.you{color:var(--gold-hi)}
+.medal{flex:none;display:grid;place-items:center;width:22px;height:22px;font-family:var(--f-name);font-weight:600;font-size:12.5px;color:#1d1405;background:#c9a24a}
+.medal.m1{background:linear-gradient(180deg,#fff0b8,#d8a93a)}.medal.m2{background:linear-gradient(180deg,#f2f2f6,#a9adbd)}.medal.m3{background:linear-gradient(180deg,#ffd2a8,#b8763a)}
+.rk-sep{border:0;border-top:1px solid var(--line);margin:14px 0}
+.rk-back-face[data-back="hall"]{--fb:#14090a;--fl:#4a2a12;--fi:#ffe08a}
+html[data-back="hall"] .card.back{--w-bg:#14090a;--w-ln:#4a2a12}
+html[data-back="hall"] .card.back .mark{color:#ffe08a;border-color:#ffe08a;box-shadow:0 0 12px #ffd25a55}

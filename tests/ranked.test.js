@@ -110,3 +110,34 @@ describe('ranked deck at the door', () => {
     expect(Ranked.deckForRanked([]).auto).toBe(true);
   });
 });
+
+describe('online season history and final-rank rewards', () => {
+  it('a final rank earns the best award that applies, only with enough players and duels', () => {
+    const s = (rank, total, w = 8, l = 4) => Ranked.rankAward({ season: '2026-09', rank, total, w, l });
+    expect(s(1, 5)).toMatchObject({ award: 'champion', hall: true, title: { name: '2026 年 9 月賽季・冠軍' } });
+    expect(s(1, 4)).toBeNull();                                         // too few players
+    expect(s(3, 12).award).toBe('top3'); expect(s(3, 9)).toBeNull();
+    expect(s(9, 40).award).toBe('top10');
+    expect(s(12, 150)).toMatchObject({ award: 'top10pct', hall: false });
+    expect(s(1, 50, 5, 4)).toBeNull();                                  // fewer than 10 duels
+  });
+  it('merges the server history: adds ranks, fills in seasons played elsewhere, grants rewards once', () => {
+    at('2026-11'); Ranked.load();
+    Ranked.state().seasons.push({ season: '2026-10', peak: 1, rp: 120, w: 6, l: 5 });
+    const list = [
+      { season: '2026-11', rp: 50, peak: 0, w: 1, l: 0, rank: 4, total: 9, ended: false },          // running: ignored
+      { season: '2026-10', rp: 300, peak: 3, w: 9, l: 5, rank: 2, total: 12, ended: true },         // higher on another device
+      { season: '2026-09', rp: 90, peak: 1, w: 3, l: 2, rank: 7, total: 8, ended: true },           // only played elsewhere
+    ];
+    const g = Ranked.mergeOnlineSeasons(list);
+    expect(g.map(x => `${x.kind}:${x.season}`).sort()).toEqual(['rank:2026-10', 'season:2026-09', 'season:2026-10']);
+    const R = Ranked.state();
+    expect(R.seasons.map(x => x.season)).toEqual(['2026-09', '2026-10']);
+    expect(R.seasons[1]).toMatchObject({ peak: 3, rank: 2, total: 12, w: 9, award: 'top3', online: true });
+    expect(R.backs).toEqual(expect.arrayContaining(['hall', 'gold', 's-2026-10']));
+    expect(Daily.titleName('season-2026-10-top3')).toBe('2026 年 10 月賽季・前三名');
+    expect(Daily.titleName('season-2026-10')).toBe(`2026 年 10 月賽季・${Ranked.TIERS[3].name}`);
+    expect(Ranked.mergeOnlineSeasons(list)).toEqual([]);               // nothing twice
+    expect(Ranked.backInfo('hall').name).toBe('名人堂');
+  });
+});

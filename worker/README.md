@@ -42,6 +42,8 @@
 | `POST /v1/me` `{name}` | 改暱稱，一天最多 3 次 |
 | `DELETE /v1/me` | 退出排行榜，刪除暱稱與所有成績 |
 | `POST /v1/match/start` | 開始一場排位賽，取得對戰憑證。若有沒結束的上一場，先以敗場結算 |
+| `GET /v1/me/seasons` | 自己每一季的積分、最高段位、戰績、最終名次與參賽人數（遊戲用來發放排名獎勵） |
+| `GET /v1/hall` | 名人堂：每個已結束賽季的前三名與參賽人數 |
 | `POST /v1/match/q` `{ticket, cat, rank, limit, remove, retry}` | 排位賽出一題：回傳題目與選項，不含答案。上一題沒作答就以時間到計 |
 | `POST /v1/match/a` `{ticket, n, pick}` | 送出作答（顯示順序，−1 = 時間到），回傳對錯、正解與解說；重送同一題會得到同樣的結果 |
 | `POST /v1/match/end` `{ticket, win, perf, answers}` 或 `{ticket, surrender: true}` | 結算這場。`answers` 只放斷線時改用本機題庫的題目（最多 3 題） |

@@ -169,6 +169,26 @@ test('a new season starts two tiers lower; the old board stays', async () => {
   assert.equal(cur.body.season, '2026-11'); assert.equal(cur.body.previous, '2026-10');
 });
 
+test('season history: my past seasons with final rank, and the hall of fame (top 3 of each ended season)', async () => {
+  clock = Date.UTC(2027, 5, 10, 4);                                  // 2027-06
+  const ps = [];
+  for (const n of ['名人甲', '名人乙', '名人丙', '名人丁']) ps.push(await join(n));
+  for (let i = 0; i < ps.length; i++) for (let k = 0; k < 4 - i; k++) await duel(ps[i], true, perf(40, 35, 25));   // 甲 4 wins … 丁 1 win
+  clock = Date.UTC(2027, 6, 3, 4);                                   // 2027-07: June has ended
+  await duel(ps[3], true, perf(40, 35, 25));
+  const mine = await call('GET', '/v1/me/seasons', { auth: ps[1] });
+  assert.equal(mine.status, 200);
+  assert.deepEqual(mine.body.seasons.map(x => [x.season, x.rank, x.total, x.ended]), [['2027-06', 2, 4, true]]);
+  assert.equal(mine.body.seasons[0].w, 3);
+  const d = await call('GET', '/v1/me/seasons', { auth: ps[3] });
+  assert.deepEqual(d.body.seasons.map(x => [x.season, x.ended]), [['2027-07', false], ['2027-06', true]]);
+  const h = await call('GET', '/v1/hall');
+  const june = h.body.seasons.find(x => x.season === '2027-06');
+  assert.equal(june.total, 4); assert.deepEqual(june.top.map(x => x.name), ['名人甲', '名人乙', '名人丙']);
+  assert.ok(!h.body.seasons.some(x => x.season === '2027-07'));     // the running season is not in the hall yet
+  assert.equal((await call('GET', '/v1/me/seasons')).status, 401);
+});
+
 test('rename and leave', async () => {
   const p = await join('改名前');
   const r = await call('POST', '/v1/me', { auth: p, body: { name: '改名後' } });
@@ -350,10 +370,13 @@ test('題目品質: answer counts per built-in question, and the disputed / hard
   for (let i = 0; i < 3; i++) await call('POST', '/v1/ping', { body: { pid: (5000 + i).toString(16).padStart(32, '0'), days: { '2027-04-01': { open: 1 } },
     q: { [a.id]: counts(a, 3, 7), [b.id]: counts(b, 10, 0), [c.id]: counts(c, 1, 0), nope: [1, 1, 1, 0, 0, 0, 0] } } });
   const r = await call('GET', '/v1/stats?key=test-stats-key&format=json');
+  /* only these three questions (other tests also answer ranked questions, which are counted too) */
+  const ours = list => list.filter(x => [a.id, b.id, c.id].includes(x.qid));
   const Q = r.body.quality;
-  assert.equal(Q.enough, 2);                                             // c has only 3 answers
-  assert.equal(Q.disputed[0].qid, a.id); assert.equal(Q.disputed[0].rate, 0.3); assert.equal(Q.disputed[0].topWrong.n, 21);
-  assert.equal(Q.hardest[0].qid, a.id); assert.equal(Q.easiest[0].qid, b.id);
+  assert.ok(Q.enough >= 2);
+  assert.ok(![...Q.hardest, ...Q.easiest, ...Q.disputed].some(x => x.qid === c.id));   // c has only 3 answers
+  assert.equal(ours(Q.disputed)[0].qid, a.id); assert.equal(ours(Q.disputed)[0].rate, 0.3); assert.equal(ours(Q.disputed)[0].topWrong.n, 21);
+  assert.equal(ours(Q.hardest)[0].qid, a.id); assert.equal(ours(Q.easiest)[0].qid, b.id);
   const html = await (await fetch(`${BASE}/v1/stats?key=test-stats-key`, { headers: { 'X-Test-Now': String(clock) } })).text();
   assert.match(html, /題目品質/); assert.match(html, /可能有爭議/);
 });

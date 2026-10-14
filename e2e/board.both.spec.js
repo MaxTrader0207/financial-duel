@@ -36,7 +36,9 @@ function mockApi() {
         .map((x, i) => ({ rank: i + 1, name: x.name, rp: x.rp, tier: tierOf(x.rp), peak: x.peak, w: x.w, l: x.l, you: !!p && x.id === p.id })) : [];
       return reply(200, { season, current: S, previous: prevSeason(S), total: rows.length, rows, me: p && p.w + p.l > 0 ? { ...me(p), name: p.name } : null });
     }
+    if (path === '/v1/hall') return reply(200, { current: S, seasons: api.hall });
     if (!p) return reply(401, { error: '找不到這個排行榜身分，請重新加入', code: 'auth' });
+    if (path === '/v1/me/seasons') return reply(200, { current: S, seasons: api.mySeasons });
     if (path === '/v1/me' && method === 'GET') return reply(200, { id: p.id, name: p.name, me: me(p) });
     if (path === '/v1/me' && method === 'POST') { p.name = body.name; return reply(200, { name: p.name }); }
     if (path === '/v1/me' && method === 'DELETE') { players.delete(p.id); return reply(200, { ok: true }); }
@@ -65,7 +67,7 @@ function mockApi() {
     }
     return reply(404, { error: '找不到這個網址', code: 'not_found' });
   }
-  const api = { handle, calls, players, state, lastEnd: null, asked: 0 };
+  const api = { handle, calls, players, state, lastEnd: null, asked: 0, hall: [], mySeasons: [] };
   return api;
 }
 
@@ -170,4 +172,28 @@ test('leaving the board deletes the nickname', async ({ page, errors }) => {
   await expect(page.locator('.bd-join')).toBeVisible();
   expect(api.calls).toContain('DELETE /v1/me');
   expect(await page.evaluate(() => window.__T.online.joined())).toBe(false);
+});
+
+test('season history: the final online rank earns a title and the 名人堂 back; the hall shows each season\'s top 3', async ({ page, errors }) => {
+  const api = await withApi(page);
+  const prev = prevSeason(seasonOf());
+  api.hall = [{ season: prev, total: 42, top: [{ name: '股海老手', rp: 900, tier: 5, peak: 5, w: 30, l: 8 }, { name: '名人測試', rp: 610, tier: 4, peak: 4, w: 20, l: 9 }, { name: '存股族', rp: 500, tier: 3, peak: 3, w: 18, l: 12 }] }];
+  await open(page);
+  await joinAs(page, '名人測試');
+  api.mySeasons = [{ season: prev, rp: 610, peak: 4, w: 20, l: 9, rank: 2, total: 42, ended: true }];
+  await page.click('#bd-ranked');
+  await expect(page.locator('#season-dlg')).toBeVisible();
+  await expect(page.locator('#season-body')).toContainText('第 2 名（共 42 人）');
+  await expect(page.locator('#season-body')).toContainText('前三名');
+  await page.click('#season-ok');
+  await expect(page.locator('#rk-hist .rk-hrow').first()).toContainText('線上第 2 名／42 人');
+  await expect(page.locator('#rk-hist em').first()).toHaveText('前三名');
+  await expect(page.locator('#rk-hall .rk-hseason li')).toHaveCount(3);
+  await expect(page.locator('#rk-hall li.you')).toContainText('名人測試');
+  await expect(page.locator('.rk-preview')).toContainText('本季結算預覽');
+  const hallBack = page.locator('.rk-back[data-id="hall"]');
+  await expect(hallBack).not.toHaveClass(/locked/);
+  await hallBack.click();
+  expect(await page.evaluate(() => document.documentElement.dataset.back)).toBe('hall');
+  expect(await page.evaluate(() => window.__T.ranked.state().seasons.find(x => x.award))).toMatchObject({ award: 'top3', rank: 2 });
 });

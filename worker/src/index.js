@@ -250,6 +250,31 @@ async function serverAnswers(env, ticket, now) {
   const r = await env.DB.prepare('SELECT COUNT(*) AS total, COALESCE(SUM(correct), 0) AS correct, COALESCE(MAX(fast), 0) AS fast FROM match_questions WHERE ticket = ?').bind(ticket).first();
   return { total: r ? r.total : 0, correct: r ? r.correct : 0, fast: !!(r && r.fast) };
 }
+/* ---------- season history ---------- */
+/* GET /v1/me/seasons → { current, seasons: [{ season, rp, peak, w, l, rank, total, ended }] } (newest first, played seasons only) */
+async function mySeasons(req, env, now) {
+  const p = await mustAuth(req, env), current = seasonOf(now);
+  const { results } = await env.DB.prepare(`SELECT m.season, m.rp, m.peak, m.w, m.l,
+      (SELECT COUNT(*) FROM standings s WHERE s.season = m.season AND (s.w + s.l) > 0 AND s.rp > m.rp) + 1 AS rank,
+      (SELECT COUNT(*) FROM standings s WHERE s.season = m.season AND (s.w + s.l) > 0) AS total
+    FROM standings m WHERE m.player = ? AND (m.w + m.l) > 0 ORDER BY m.season DESC LIMIT 36`).bind(p.id).all();
+  return json({ current, seasons: (results || []).map(r => ({ ...r, ended: r.season < current })) }, 200, { 'Cache-Control': 'no-store' });
+}
+/* GET /v1/hall → { seasons: [{ season, total, top: [{ name, rp, peak, w, l }] }] }: the top 3 of each ended season */
+async function hall(req, env, now) {
+  const current = seasonOf(now);
+  const { results: counts } = await env.DB.prepare('SELECT season, COUNT(*) AS total FROM standings WHERE (w + l) > 0 AND season < ? GROUP BY season ORDER BY season DESC LIMIT 24').bind(current).all();
+  const seasons = (counts || []).map(c => ({ season: c.season, total: c.total, top: [] }));
+  if (seasons.length) {
+    const { results } = await env.DB.prepare(`SELECT season, name, rp, peak, w, l FROM (
+        SELECT s.season, p.name, s.rp, s.peak, s.w, s.l, ROW_NUMBER() OVER (PARTITION BY s.season ORDER BY s.rp DESC, s.updated ASC) AS rn
+        FROM standings s JOIN players p ON p.id = s.player WHERE (s.w + s.l) > 0 AND s.season < ? AND s.season >= ?)
+      WHERE rn <= 3 ORDER BY season DESC, rn`).bind(current, seasons[seasons.length - 1].season).all();
+    const by = new Map(seasons.map(x => [x.season, x]));
+    for (const r of results || []) { const x = by.get(r.season); if (x) x.top.push({ name: r.name, rp: r.rp, tier: tierOf(r.rp), peak: r.peak, w: r.w, l: r.l }); }
+  }
+  return json({ current, seasons }, 200, { 'Cache-Control': 'public, max-age=300' });
+}
 const result = (r, rank, expired, perf) => ({ perf: perf || null, delta: r.delta, before: r.before, after: r.after, tierBefore: r.tierBefore, tierAfter: r.tierAfter, shielded: r.shielded, promoted: r.promoted, demoted: r.demoted, expired, me: view(r.standing, rank) });
 
 async function board(req, env, now, url) {
@@ -366,6 +391,8 @@ async function route(req, env, now) {
   if (m === 'GET' && path === '/v1/me') return me(req, env, now);
   if (m === 'POST' && path === '/v1/me') return rename(req, env, now);
   if (m === 'DELETE' && path === '/v1/me') return leave(req, env);
+  if (m === 'GET' && path === '/v1/me/seasons') return mySeasons(req, env, now);
+  if (m === 'GET' && path === '/v1/hall') return hall(req, env, now);
   if (m === 'POST' && path === '/v1/match/start') return matchStart(req, env, now);
   if (m === 'POST' && path === '/v1/match/end') return matchEnd(req, env, now);
   if (m === 'POST' && path === '/v1/match/q') return matchQuestion(req, env, now);
