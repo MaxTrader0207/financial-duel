@@ -18,6 +18,7 @@ function sparkSVG(vals, color, h = 30) {
 }
 function renderRecord() {
   const body = $('#rec-body');
+  $('#rec-export').hidden = !RECS.length;
   if (!RECS.length) { body.innerHTML = '<p class="lead">還沒有紀錄。打完一場對戰（或中途投降）後，這裡會出現勝率、各屬性正確率與最常答錯的題目。</p>'; return; }
   const n = RECS.length, wins = RECS.filter(r => r.win).length;
   const tot = RECS.reduce((a, r) => a + r.total, 0), cor = RECS.reduce((a, r) => a + r.correct, 0);

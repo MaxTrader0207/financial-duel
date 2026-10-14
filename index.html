@@ -246,6 +246,11 @@
     <h3 class="sec">學習紀錄</h3>
     <p class="lead">每場對戰結束（包含投降）都會記在這台裝置。弱項會用在「弱項加成」與牌組建議，對手在困難模式下也會針對你的弱項出牌。</p>
     <div id="rec-body"></div>
+    <div class="rec-box rec-export" id="rec-export">
+      <div class="export-head"><h3 class="sec">輸出學習紀錄</h3><p class="lead">學習報告（PDF）含各屬性正確率與趨勢、學習建議、最常答錯的題目和全部對戰紀錄，可以印出來檢討；成績單是一張可以分享的圖片；CSV 可以用 Excel 或 Google 試算表自己分析。</p></div>
+      <div class="btn-row"><button class="btn small" type="button" id="rec-export-pdf">PDF 學習報告</button><button class="btn ghost small" type="button" id="rec-export-card">分享成績單（圖片）</button><button class="btn ghost small" type="button" id="rec-export-games">對戰紀錄（CSV）</button><button class="btn ghost small" type="button" id="rec-export-q">題目統計（CSV）</button></div>
+      <p class="status" id="rec-export-status" role="status"></p>
+    </div>
     <div class="btn-row"><button class="btn" id="btn-rec-back" type="button">回標題</button><button class="btn ghost small danger" id="rec-clear" type="button">清除學習紀錄</button></div>
   </div>
 </section>

@@ -1195,3 +1195,5 @@ html[data-back="hall"] .card.back .mark{color:#ffe08a;border-color:#ffe08a;box-s
 .title-hook{margin:-10px 0 0;font-size:16px;line-height:1.6;color:color-mix(in oklab,var(--gold-hi) 55%,var(--text));text-wrap:balance}
 .title-hook[data-kind=weak],.title-hook[data-kind=rank]{color:var(--gold-hi)}
 @media (max-width:640px){ .title-hook{font-size:15px;margin-top:-8px} }
+.rec-export{margin-top:6px}
+.rec-export[hidden]{display:none}

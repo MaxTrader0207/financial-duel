@@ -38,7 +38,7 @@ test('tips appear once, and progress exports and imports (bad files are refused)
   await page.evaluate(() => { localStorage.clear(); localStorage.setItem('soba-ketto.tutorial.v1', 'done'); }); await page.reload();
   await page.click('#btn-set'); await page.setInputFiles('#prog-file', path);
   await expect(page.locator('#prog-apply')).toBeVisible();
-  await page.click('#prog-apply'); await page.click('#prog-apply');
+  await page.click('#prog-apply'); await Promise.all([page.waitForEvent('load'), page.click('#prog-apply')]);
   await page.waitForFunction(() => document.documentElement.dataset.ready === '1' && localStorage.getItem('soba-ketto.tips.v1'));
   expect(await page.evaluate(() => localStorage.getItem('soba-ketto.tips.v1'))).toContain('foeBlock');
   await page.click('#btn-set');
