@@ -61,7 +61,7 @@
       <div class="quest-card" id="quest-card" hidden>
         <div class="qc-head"><span class="seal-s">任</span><b>新手任務</b><span class="qc-dots" id="qc-dots" aria-hidden="true"></span><small id="qc-prog"></small></div>
         <div class="qc-now"><div class="qc-t"><b id="qc-title"></b><small id="qc-desc"></small></div><button class="btn small" id="qc-go" type="button">前往</button></div>
-        <small class="qc-reward">每完成一項得 30 碎片，全部完成獲得稱號「新手畢業生」</small>
+        <div class="qc-foot"><small class="qc-reward">每完成一項得 30 碎片，全部完成獲得稱號「新手畢業生」</small><button class="linkbtn" id="qc-skip" type="button">略過新手任務</button></div>
       </div>
       <div class="fan" id="fan"></div>
       <ol class="steps3" aria-label="三步驟玩法">
@@ -373,6 +373,17 @@
 </div>
 <div id="season-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-label="賽季結算">
   <div class="care-card"><div id="season-body"></div><div class="btn-row"><button class="btn" id="season-ok" type="button">收下</button></div></div>
+</div>
+<div id="level-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="level-title">
+  <div class="care-card level-card">
+    <div class="care-h"><div class="seal">始</div><h3 id="level-title">你對投資理財熟悉嗎？</h3></div>
+    <p class="lead">選一個最接近你的，我們幫你調好難易度。之後隨時可以在標題畫面改難易度。</p>
+    <div class="level-opts">
+      <button class="level-opt" type="button" data-level="new"><b>完全新手</b><small>簡易難度（每題 30 秒），前 3 場休閒對戰只出初階題，對手也比較常擋失手</small></button>
+      <button class="level-opt" type="button" data-level="some"><b>懂一點</b><small>適中難度（每題 20 秒），先玩一場新手場熟悉規則</small></button>
+      <button class="level-opt" type="button" data-level="pro"><b>交易老手</b><small>略過新手場，直接開放所有功能</small></button>
+    </div>
+  </div>
 </div>
 <div id="rules-dlg" class="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="rules-title">
   <div class="care-card rules-card">

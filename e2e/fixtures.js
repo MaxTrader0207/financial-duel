@@ -8,6 +8,7 @@ export const test = base.extend({
   tutorialDone: [true, { option: true }],
   fastWaits: [true, { option: true }],      // test build: every in-game wait ≤ 15 ms (see core.js sleep)
   questsDone: [true, { option: true }],     // 新手任務 already finished, so their reward toasts stay out of other tests
+  levelSet: [true, { option: true }],       // the first-visit level question already answered (懂一點)
   errors: async ({ page }, use) => {
     const errs = [];
     page.on('pageerror', e => errs.push('pageerror: ' + e.message));
@@ -15,7 +16,7 @@ export const test = base.extend({
     await use(errs);
     expect(errs, 'no errors in the page').toEqual([]);
   },
-  page: async ({ page, tutorialDone, fastWaits, questsDone }, use) => {
+  page: async ({ page, tutorialDone, fastWaits, questsDone, levelSet }, use) => {
     await page.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
     /* the real server is never called: usage pings are answered here, everything else fails (a spec may route it) */
     await page.route(/financial-duel-api\./, r => {
@@ -27,6 +28,7 @@ export const test = base.extend({
     if (fastWaits) await page.addInitScript(() => { try { localStorage.setItem('soba-ketto.e2e.fast', '1'); } catch (e) {} });
     if (tutorialDone) await page.addInitScript(() => { try { localStorage.setItem('soba-ketto.tutorial.v1', 'done'); } catch (e) {} });
     if (questsDone) await page.addInitScript(() => { try { localStorage.setItem('soba-ketto.quests.v1', JSON.stringify({ claimed: ['tut', 'win', 'deck', 'daily', 'nb', 'ranked'], marks: {}, grad: true })); } catch (e) {} });
+    if (levelSet) await page.addInitScript(() => { try { localStorage.setItem('soba-ketto.level.v1', '{"level":"some"}'); } catch (e) {} });
     await use(page);
   },
 });

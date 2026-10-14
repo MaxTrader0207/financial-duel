@@ -20,7 +20,7 @@ function pickQuestion(cat, rank) {
   }
   const pool = bankFor().filter(q => q.category === cat);
   const src = pool.length ? pool : bankFor();
-  const pref = G.tutorial ? [1] : { 1: [1], 2: [1, 2], 3: [2], 4: [3, 2] }[rank] || [1, 2, 3];   // the tutorial asks 初階 only
+  const pref = G.tutorial || G.newbie ? [1] : { 1: [1], 2: [1, 2], 3: [2], 4: [3, 2] }[rank] || [1, 2, 3];   // the tutorial asks 初階 only
   let cand = src.filter(q => pref.includes(q.difficulty) && !G.used.has(q.id));
   if (!cand.length) cand = src.filter(q => !G.used.has(q.id));
   if (!cand.length) { src.forEach(q => G.used.delete(q.id)); cand = src.slice(); }

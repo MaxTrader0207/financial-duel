@@ -78,6 +78,7 @@ export function defendFail(m, foe, s) {
    A good block lets only damage − DEF through. Unlike our blocks it never reflects: a right answer should not cost us LP.
    The opponent's skills do not fire when it blocks. */
 export const FOE_BLOCK = { easy: 0.45, normal: 0.5, hard: 0.55 };   // tuned with sim/ (see sim/README.md)
+export const NEWBIE_BLOCK_CUT = 0.1;                    // 新手保護: the opponent blocks less in a 完全新手's first casual duels
 export const FOE_BLOCK_SENSE = { easy: 0.5, normal: 0.75, hard: 1 };
 const dkOf = () => Object.keys(DIFFS).find(k => DIFFS[k] === G.diff) || 'normal';
 export function foePickBlocker(m) {
@@ -99,7 +100,7 @@ export function foeProfile(rnd = Math.random) {
 export function foeAcc(cat) {
   const p = G.foeProf || {}, base = FOE_BLOCK[dkOf()] ?? 0.45;
   const s = (p.strong || []).includes(cat) ? FOE_FORTE : (p.weak || []).includes(cat) ? -FOE_FORTE : 0;
-  return Math.min(0.95, Math.max(0.05, base + s + (G.foeBoost || 0) - KB.blockCut(G.kb)));     // foeBoost: top ranked tiers; blockCut: 知識加成（陷阱卡）
+  return Math.min(0.95, Math.max(0.05, base + s + (G.foeBoost || 0) - KB.blockCut(G.kb) - (G.newbie ? NEWBIE_BLOCK_CUT : 0)));     // foeBoost: top ranked tiers; blockCut: 知識加成（陷阱卡）
 }
 /* returns null when the opponent has no card; otherwise the blocker, its answer and what actually lands */
 export function foeBlock(m, dmg) {

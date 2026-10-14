@@ -18,6 +18,7 @@ import { show } from './view.js';
 import { G } from './game.js';
 import * as K from './knowledge.js';
 import { openKnow } from './knowledgeui.js';
+import { easierHTML, setDifficulty } from './newbie.js';
 
 
 /* ---------- result ---------- */
@@ -31,6 +32,7 @@ function renderResult(win) {
   $('#result').innerHTML = `
     <div class="eyebrow">對戰結果 · 難易度 ${G.diff.name} · 第 ${G.turn} 回合結束</div>
     <div class="verdict"><h2 class="verdict-big ${win ? '' : 'lose'}">${win ? '勝利' : '敗北'}</h2><div class="verdict-side"><span class="verdict-seal" aria-hidden="true"><span>決</span><span>勝</span></span><span class="verdict-en">${win ? '大獲全勝' : '再接再厲'}</span></div></div>
+    ${win ? '' : easierHTML()}
     <div class="stat-row">
       <div class="stat"><div class="n">${s.correct}/${s.total}</div><div class="l">答對題數</div></div>
       <div class="stat"><div class="n">${pct}%</div><div class="l">正確率</div></div>
@@ -65,6 +67,7 @@ function renderResult(win) {
   downloadsP.then(dl => { if (!dl && window.claude && $('#btn-pdf')) { $('#btn-pdf').disabled = $('#btn-png').disabled = true; $('#export-result-status').textContent = '這個檢視畫面無法儲存檔案。請在 claude.ai 開啟此頁面後再輸出。'; } });
   if ($('#btn-to-nb')) $('#btn-to-nb').onclick = () => { renderNotebook(); show('notebook'); };
   $('#btn-again').onclick = () => Actions.startDuel();
+  if ($('#btn-easier')) $('#btn-easier').onclick = () => { setDifficulty('easy'); Actions.startDuel(); };
   $('#btn-home').onclick = () => { renderTitle(); show('title'); };
 }
 

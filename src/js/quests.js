@@ -19,12 +19,27 @@ export const QUESTS = [
   { id: 'ranked', title: '打一場排位賽', desc: '依段位配對手、依表現計分，每月賽季發放限定稱號與卡背。', go: '#btn-ranked', test: s => s.ranked },
 ];
 
+/* features opened step by step; a 交易老手, a skipped quest list or a finished one opens everything */
+export const LOCKS = [
+  { sel: '#btn-ranked', need: 'win', label: '贏一場後開放', hint: '排位賽會在你贏得第一場休閒對戰後開放。先用休閒對戰熟悉規則吧！' },
+  { sel: '#btn-challenge', need: 'win', label: '贏一場後開放', hint: '好友挑戰會在你贏得第一場休閒對戰後開放。' },
+  { sel: '#btn-bank', need: 'win', label: '贏一場後開放', hint: '題庫管理（匯入自訂題目、回報）會在你贏得第一場休閒對戰後開放。' },
+  { sel: '#btn-tree', need: 'deck', label: '整理牌組後開放', hint: '卡牌族譜會在你儲存一次牌組後開放，到「牌組編輯」看看吧。' },
+];
+
 let Q = null;                        // loaded on first use: the title screen may render before init()
 const save = () => Store.trySave(QUEST_KEY, QUEST_V, Q);
 const q = () => Q || load();
 export function load() { Q = { claimed: [], marks: {}, grad: false, ...Store.load(QUEST_KEY, { version: QUEST_V, fallback: () => ({}), validate: isObj }) }; return Q; }
 export const state = () => q();
 /* things the game cannot read back from its other records */
+export function openAll() { q(); Q.open = true; save(); }
+export function skip() { q(); Q.open = true; Q.skip = true; save(); }
+export const isOpen = (lock, p = progress()) => !!(q().open || Q.grad || p.done.includes(lock.need) || Q.claimed.includes(lock.need));
+export function applyLocks(p = progress()) {
+  for (const l of LOCKS) { const b = $(l.sel); if (!b) continue; const open = isOpen(l, p);
+    b.classList.toggle('locked', !open); if (open) { b.removeAttribute('aria-disabled'); delete b.dataset.lock; } else { b.setAttribute('aria-disabled', 'true'); b.dataset.lock = l.label; } }
+}
 export function mark(k) { q(); if (Q.marks[k]) return; Q.marks[k] = Date.now(); save(); }
 
 export function facts() {
@@ -55,8 +70,9 @@ export function renderQuests() {
     const names = c.fresh.map(id => `「${QUESTS.find(q => q.id === id).title}」`).join('、');
     toast(c.grad ? `新手任務全部完成！獲得 ${QUEST_SHARDS * c.fresh.length} 碎片與稱號「${GRAD_TITLE.name}」。` : `完成新手任務${names}，獲得 ${QUEST_SHARDS * c.fresh.length} 碎片。`);
   }
-  card.hidden = !p.next;
-  if (!p.next) return;
+  applyLocks(p);
+  card.hidden = !p.next || !!Q.skip;
+  if (card.hidden) return;
   $('#qc-prog').textContent = `${p.done.length} / ${p.total}`;
   $('#qc-dots').innerHTML = QUESTS.map(q => `<i class="${p.done.includes(q.id) ? 'on' : q === p.next ? 'now' : ''}" title="${q.title}"></i>`).join('');
   $('#qc-title').textContent = p.next.title;
@@ -68,4 +84,11 @@ export function renderQuests() {
 export function init() {
   q();
   $('#qc-go').onclick = e => { const t = $(e.currentTarget.dataset.go); if (t && !t.hidden) t.click(); };
+  $('#qc-skip').onclick = () => { skip(); renderQuests(); toast('已略過新手任務，所有功能都已開放。'); };
+  /* a locked feature explains itself instead of opening (capture phase: runs before the button's own handler) */
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('.locked[data-lock]'); if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    const l = LOCKS.find(x => b.matches(x.sel)); if (l) toast(l.hint);
+  }, true);
 }

@@ -1,6 +1,6 @@
 {
   "name": "financial-duel",
-  "version": "3.26.0",
+  "version": "3.27.0",
   "description": "金融決鬥：金融知識卡牌對決遊戲",
   "scripts": {
     "dev": "vite",

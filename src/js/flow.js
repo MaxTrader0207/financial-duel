@@ -27,6 +27,7 @@ import { draw, makeDeck } from './deck.js';
 import { G, reserveUids, setGame } from './game.js';
 import { renderAll, renderHands, setPhase } from './board.js';
 import { Tutor } from './tutor.js';
+import * as Newbie from './newbie.js';
 import * as Market from './market.js';
 import * as Ranked from './ranked.js';
 import * as Online from './online.js';
@@ -84,7 +85,7 @@ async function resumeDuel() {
   setGame({ fsm: createMachine(), diff: DIFFS[d.diffKey] || DIFFS.normal, lp: d.lp, deck: d.deck, hand: d.hand, turn: d.turn, phase: 'idle', busy: false,
         used: new Set(d.used), streak: d.streak, maxStreak: d.maxStreak, history: d.history || [], startedAt: new Date(d.startedAt), endedAt: null, win: null,
         stats: d.stats, missed: d.missed || [], foeCard: d.foe ? MON[d.foe] : null, over: false, dealt: d.dealt || 0, taken: d.taken || 0,
-        mods: { myAtk: 0, foeAtk: 0, skipFoe: false, skipMe: false, ...(d.mods || {}) }, flags: d.flags || {}, extraUsed: !!d.extraUsed, nbAdded: d.nbAdded || 0, bg: d.bg || BG.pick(),
+        mods: { myAtk: 0, foeAtk: 0, skipFoe: false, skipMe: false, ...(d.mods || {}) }, flags: d.flags || {}, extraUsed: !!d.extraUsed, nbAdded: d.nbAdded || 0, newbie: !!d.newbie, bg: d.bg || BG.pick(),
         deckList: d.deckList && Array.isArray(d.deckList.p) ? d.deckList : null, weak: d.weak && CATS[d.weak] ? d.weak : null,
         mode: ['casual', 'ranked', 'challenge'].includes(d.mode) && (d.mode !== 'challenge' || d.challenge) ? d.mode : 'casual', challenge: d.challenge || null, answerLog: Array.isArray(d.answerLog) ? d.answerLog : [], marketPlan: Array.isArray(d.marketPlan) ? d.marketPlan : null, market: d.market && typeof d.market === 'object' ? d.market : null,
         perf: d.perf && typeof d.perf === 'object' ? d.perf : { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 },
@@ -118,6 +119,7 @@ async function startDuel(opts = {}) {
   newGame();
   const tutorial = !!opts.tutorial || (!Tutor.done() && opts.mode !== 'challenge');   // a friend's challenge link is never blocked by the tutorial
   G.mode = tutorial ? 'tutorial' : ['ranked', 'challenge'].includes(opts.mode) ? opts.mode : 'casual';
+  Newbie.applyProtection();
   G.perf = { atk: 0, smartAtk: 0, defChances: 0, smartDef: 0, maxHit: 0 };
   G.fsm.go('intro');
   G.bg = BG.pick(); BG.apply(G.bg);

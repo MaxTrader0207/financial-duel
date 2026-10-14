@@ -1241,3 +1241,19 @@ html[data-back="hall"] .card.back .mark{color:#ffe08a;border-color:#ffe08a;box-s
 .qc-now .btn{flex:none}
 .qc-reward{font-size:12px;color:var(--muted)}
 .toast{pointer-events:none}
+/* locked features (新手任務 opens them step by step) */
+.btn.locked{opacity:.5;cursor:help;flex-direction:column;gap:0;line-height:1.25}
+.btn.locked::after{content:attr(data-lock);font-size:10.5px;font-weight:400;letter-spacing:0;color:var(--muted)}
+.qc-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px}
+.qc-foot .linkbtn{font-size:12px;color:var(--muted)}
+/* first-visit level question */
+.level-card{width:min(560px,100%)}
+.level-opts{display:grid;gap:10px}
+.level-opt{display:grid;gap:4px;text-align:left;padding:14px 16px;background:var(--ink3);border:1px solid var(--line);color:var(--text);font:inherit;cursor:pointer}
+.level-opt:hover,.level-opt:focus-visible{border-color:var(--gold)}
+.level-opt b{font-size:17px;font-weight:600;color:var(--gold-hi)}
+.level-opt small{font-size:13px;color:var(--muted);line-height:1.55}
+/* result: two losses in a row → suggest 簡易 */
+.easier-tip{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 16px;background:color-mix(in oklab,var(--gold) 10%,var(--ink2));border-left:4px solid var(--gold)}
+.easier-tip span{flex:1;min-width:220px;font-size:14px;line-height:1.6}
+.easier-tip b{color:var(--gold-hi)}

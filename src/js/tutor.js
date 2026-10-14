@@ -122,6 +122,7 @@ Tutor = (() => {
     foeBlock: '對手也會答題防禦：你答對後，對手派一張卡抵擋，並回答同屬性的題目；答對時你只造成「傷害 − 守備力」。對手資金下方寫著它這場擅長與不擅長的屬性，用它不擅長的屬性攻擊，比較容易打穿。',
     reward: '勝利可以從 3 張未收集的卡中選 1 張，之後到「牌組編輯」把它放進牌組。',
     market: '市場事件：從第 2 回合起每 3 回合翻出一個金融事件（升息、股市暴跌…），某些屬性的攻擊力 ×1.2、某個 ×0.8，雙方都適用。手牌上標著「事件 ×1.2」的卡，這段期間出手比較划算。',
+    nbFirst: '答錯的題目已經收進「錯題本」，之後的對戰會再出給你，也可以在標題畫面的錯題本集中複習。答錯不可怕，複習過才算真的學會。',
     record: '每場對戰都會記在「學習紀錄」，可以看各屬性的正確率趨勢和最常答錯的題目。',
   };
   let seen = new Set(Store.load(TIP_KEY, { version: TIP_V, fallback: () => [], validate: Array.isArray }));
@@ -141,7 +142,7 @@ Tutor = (() => {
     box(TIPS[key]); return true;
   }
   return {
-    done, tip, TIPS, nudge, clearNudge,
+    done, markDone, tip, TIPS, nudge, clearNudge,
     get active() { return active; },
     get step() { return current; },
     begin(on) { active = on; shown.clear(); hide(); suggest(null); },

@@ -116,7 +116,7 @@ function askWith(m, mode, foe, srv) {
       const nbBefore = !!(NB[q.id] && !NB[q.id].mastered);
       let nbRes = null;
       if (!lost) { nbRes = nbRecord(q, correct && !retried, correct ? firstPick : pos === -1 ? (firstPick ?? '') : q.options[order[pos]]); if (!srv) qsRecord(q, correct && !retried); }
-      if (!(correct && !retried) && !nbBefore && !lost) G.nbAdded = (G.nbAdded || 0) + 1;
+      if (!(correct && !retried) && !nbBefore && !lost) { G.nbAdded = (G.nbAdded || 0) + 1; if (!G.tutorial) Tutor.tip('nbFirst'); }
       if (!srv && (builtinSet || (builtinSet = new Set(BUILTIN))).has(q)) Usage.question(q.id, pos === -1 ? -1 : order[pos], q.answer);
       if (G.mode === 'ranked' && !srv) (G.answerLog || (G.answerLog = [])).push({ qid: q.id, pick: pos === -1 ? -1 : order[pos], ms: Math.round(time * 1000), mode });   // judged again by the server
       G.history.push({ turn: G.turn, mode, card: m.name, cat: q.category, diff: q.difficulty, q: q.q,
