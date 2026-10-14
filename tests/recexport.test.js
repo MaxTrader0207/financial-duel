@@ -22,7 +22,8 @@ describe('learning record export', () => {
     expect(lines[0].charCodeAt(0)).toBe(0xFEFF);
     expect(lines).toHaveLength(4);
     expect(lines[0]).toContain('技術分析 答對');
-    expect(lines[1]).toContain('"2026/10/01 20:00"'); expect(lines[1]).toContain('"勝利"'); expect(lines[1]).toContain('"80%"');
+    const d = new Date(T0), p2 = n => String(n).padStart(2, '0');
+    expect(lines[1]).toContain(`"${d.getFullYear()}/${p2(d.getMonth() + 1)}/${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}"`); expect(lines[1]).toContain('"勝利"'); expect(lines[1]).toContain('"80%"');
     expect(lines[3]).toContain('"投降"');
   });
   it('the question CSV lists answered questions, most missed first', () => {
