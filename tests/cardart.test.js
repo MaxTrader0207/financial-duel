@@ -5,10 +5,11 @@ import { MON, MONSTERS } from '../src/js/carddata.js';
 import { cardHTML } from '../src/js/cards.js';
 
 describe('card art', () => {
-  it('covers every 資金管理 card below 極稀有, and only real cards', () => {
-    const want = MONSTERS.filter(m => m.cat === 'money' && m.rank < 4).map(m => m.id).sort();
+  const DONE = ['money', 'tech'];                // attributes whose ★1–★3 cards have their own art so far
+  it('covers every ★1–★3 card of the finished attributes, and only real cards', () => {
+    const want = MONSTERS.filter(m => DONE.includes(m.cat) && m.rank < 4).map(m => m.id).sort();
     expect(OWN_IDS.slice().sort()).toEqual(want);
-    expect(want).toHaveLength(16);
+    expect(want).toHaveLength(16 * DONE.length);
   });
   it('each illustration is one well-formed SVG and is used by the card face', () => {
     for (const id of OWN_IDS) {
@@ -20,6 +21,6 @@ describe('card art', () => {
       expect(doc.getElementsByTagName('parsererror')).toHaveLength(0);
       expect(cardHTML(MON[id])).toContain('c-art-own');
     }
-    expect(cardHTML(MONSTERS.find(m => m.cat === 'tech' && m.rank === 1))).not.toContain('c-art-own');
+    expect(cardHTML(MONSTERS.find(m => !DONE.includes(m.cat) && m.rank === 1))).not.toContain('c-art-own');
   });
 });

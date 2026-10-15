@@ -92,7 +92,7 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
 | `ai.js`、`collection.js`、`records.js` | 對手策略、收藏與牌組、學習紀錄 |
 | `notebook.js`、`feedback.js`、`bank.js`、`bankui.js` | 錯題本（間隔複習：第 1 階立即、第 2 階隔 1 天、第 3 階隔 3 天；沒到期先答對不升階；記下上次選錯的答案；標題到期提醒與複習結果）、題目回報、題庫 |
 | `report.js`、`result.js` | PDF／PNG 對戰報告、結算畫面 |
-| `scenes.js`、`ur-art.js`、`card-art.js` | 每屬性第 2、3 種卡面場景、極稀有卡的專屬插圖；`card-art.js` 是普通～超稀有卡的專屬插圖（試做：資金管理 16 張） |
+| `scenes.js`、`ur-art.js`、`card-art.js` | 每屬性第 2、3 種卡面場景、極稀有卡的專屬插圖；`card-art.js` 是普通～超稀有卡的專屬插圖（已完成：資金管理、技術分析） |
 | `perf.js`、`pwa.js` | 簡化特效、可安裝 App |
 | `market.js` | 市場事件：休閒與排位對戰中每 3 回合翻出的金融事件，依屬性調整雙方攻擊力 |
 | `rankrules.js` | 排位計分規則（段位、勝負加減分、段位保護、賽季重置、表現分檢查、台灣時間的賽季）。不 import 任何東西：遊戲和排行榜伺服器共用同一份 |

@@ -1,3 +1,4 @@
+import { OWN_IDS } from '../src/js/card-art.js';
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { MON, MONSTERS, cardHTML } from '../src/js/cards.js';
 import { urArt, UR_IDS } from '../src/js/ur-art.js';
@@ -118,7 +119,8 @@ describe('card art by rarity', () => {
     expect(cardHTML(MON.gamma_tyrant)).toContain('c-art-ur');
   });
   it('★3 cards show a crest with their sigil; ★1–2 keep the shared scenes', () => {
-    const sr = MONSTERS.find(m => m.rank === 3), n = MONSTERS.find(m => m.rank === 1);
+    const plain = m => !OWN_IDS.includes(m.id);          // cards without an exclusive illustration yet (card-art.js)
+    const sr = MONSTERS.find(m => m.rank === 3 && plain(m)), n = MONSTERS.find(m => m.rank === 1 && plain(m));
     expect(cardHTML(sr)).toContain('c-crest'); expect(cardHTML(sr)).toContain(sr.sigil);
     expect(cardHTML(n)).not.toContain('c-crest'); expect(cardHTML(n)).not.toContain('c-art-ur');
   });

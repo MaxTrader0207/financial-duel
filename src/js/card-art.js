@@ -1,9 +1,9 @@
-// card-art.js — exclusive illustrations for ★1–★3 cards (pilot: the 16 「資金管理」 cards below 極稀有).
+// card-art.js — exclusive illustrations for ★1–★3 cards (so far: 資金管理 and 技術分析, 16 cards each).
 // Each picture shows what the card is about (a ledger, an abacus with budget envelopes, a snowball…), so the card can
 // be recognised at a glance instead of sharing one of three attribute backdrops. Same 100 × 70 box as the scenes;
 // never hue-shifted or mirrored. Rarity still shows in the frame: ★1–★2 on the plain sky, ★3 with a soft sunburst
 // (極稀有 keep their full gold sunburst in ur-art.js).
-const INK = { money: '#14031a' };
+const INK = { money: '#14031a', tech: '#04102e' };
 const G = '#f3dc95', GH = '#fff2b0', W = '#f4ead2', R = '#e14b32', PK = '#f2a6e6', BL = '#9fd8ff', GR = '#7fdcae';
 const f1 = n => Math.round(n * 10) / 10;
 const rays = (cx, cy, n = 14, r = 80) => `<g fill="#fff4c8" opacity=".11">${Array.from({ length: n }, (_, i) => {
@@ -17,6 +17,11 @@ const stack = (x, y, n, r = 2.4) => Array.from({ length: n }, (_, i) => `<ellips
 const fig = (x, y, s, k, more = '') => `<g fill="${k}" stroke="${G}" stroke-width=".45" stroke-linejoin="round"><circle cx="${x}" cy="${y}" r="${f1(2.6 * s)}"/>
   <path d="M${f1(x - 3.6 * s)} ${f1(y + 13 * s)} Q${f1(x - 3.8 * s)} ${f1(y + 4.4 * s)} ${x} ${f1(y + 3.2 * s)} Q${f1(x + 3.8 * s)} ${f1(y + 4.4 * s)} ${f1(x + 3.6 * s)} ${f1(y + 13 * s)}Z"/>${more}</g>`;
 const txt = (x, y, t, size = 4, c = GH, anchor = 'middle') => `<text x="${x}" y="${y}" font-size="${size}" font-family="serif" fill="${c}" text-anchor="${anchor}">${t}</text>`;
+const UP = '#ff6b5a', DN = '#3fcf8e';                    // Taiwan colours: red up, green down
+/* a candle at x: open o, close c, high h, low l (y coordinates) */
+const candle = (x, o, c, h, l, w = 3.6) => { const col = c < o ? UP : DN; return `<path d="M${x} ${h}V${l}" stroke="${col}" stroke-width=".55"/><rect x="${f1(x - w / 2)}" y="${Math.min(o, c)}" width="${w}" height="${Math.max(.6, Math.abs(o - c))}" fill="${col}"/>`; };
+const grid = (c = '#7cbcff', o = .18) => `<g stroke="${c}" stroke-width=".3" opacity="${o}">${[12, 24, 36, 48].map(y => `<path d="M0 ${y}H100"/>`).join('')}${[20, 40, 60, 80].map(x => `<path d="M${x} 0V62"/>`).join('')}</g>`;
+const poly = (pts, c, w = 1.2, extra = '') => `<path d="M${pts.map(p => p.join(' ')).join(' L')}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round" ${extra}/>`;
 const cloud = (x, y, s = 1, c = '#3a2244') => `<g fill="${c}"><ellipse cx="${x}" cy="${y}" rx="${8 * s}" ry="${3.2 * s}"/><ellipse cx="${x - 4 * s}" cy="${y - 2 * s}" rx="${4.4 * s}" ry="${3 * s}"/><ellipse cx="${x + 3 * s}" cy="${y - 2.6 * s}" rx="${5 * s}" ry="${3.4 * s}"/></g>`;
 
 const ART = {
@@ -142,6 +147,102 @@ const ART = {
     <path d="M46 34 V20" stroke="${G}" stroke-width=".7"/><path d="M46 20 h8 v5 h-8Z" fill="${R}"/>
     <path d="M78 58 L84 30" stroke="${GR}" stroke-width="1.2"/><path d="M82.6 30.6 L84.6 27.4 L86 31.2Z" fill="${GR}"/>${txt(86, 46, '獲利', 3, GR, 'start')}
     ${fig(18, 36, 1.15, k, `<path d="M12.6 33 Q18 28 23.4 33 L22 31 Q18 27.6 14 31Z" fill="${G}"/><path d="M18 30 L15 25 M18 30 L21 25" stroke="${G}" stroke-width=".8"/><path d="M22.4 42 L30 36" stroke="#e9ecf6" stroke-width=".8"/>`)}`, [46, 22]),
+
+  /* 技術分析 */
+  ma_samurai: k => svg('tech', `${grid()}${ground(k)}
+    ${poly([[4, 50], [20, 46], [36, 42], [52, 36], [68, 26], [84, 18], [96, 14]], GH, 1.3)}
+    ${poly([[4, 30], [22, 34], [40, 37], [56, 37.5], [72, 34], [88, 30], [96, 28]], BL, 1.3)}
+    <circle cx="52" cy="36.6" r="3" fill="none" stroke="${G}" stroke-width=".8"/>${txt(52, 30.4, '黃金交叉', 3.4, GH)}
+    ${txt(96, 11, '短均', 2.8, GH, 'end')}${txt(96, 25.6, '長均', 2.8, BL, 'end')}
+    <path d="M30 58 L70 18" stroke="#e9ecf6" stroke-width="1" stroke-linecap="round" opacity=".9"/><path d="M28 60 L33 55" stroke="${R}" stroke-width="2" stroke-linecap="round"/>
+    ${fig(20, 44, .85, k, `<path d="M23 48 L29 54" stroke="${k}" stroke-width="1.6" stroke-linecap="round"/><path d="M17.6 41 L22.4 41 L20 38Z" fill="${G}"/>`)}`),
+  vol_ghost: k => svg('tech', `${grid()}${ground(k)}
+    ${poly([[6, 40], [18, 36], [30, 32], [42, 27], [54, 22], [66, 18], [78, 15], [92, 12]], UP, 1.3)}
+    <g fill="${BL}" opacity=".75">${[16, 14, 12, 10, 8, 6.4, 5, 3.6].map((h, i) => `<rect x="${4 + i * 11.6}" y="${62 - h}" width="6" height="${h}"/>`).join('')}</g>
+    <path d="M10 46 L90 6" stroke="${GH}" stroke-width=".5" stroke-dasharray="1.4 1"/>${txt(50, 12.6, '價漲', 3.2, UP)}${txt(84, 52, '量縮', 3.2, BL)}
+    <g transform="translate(70 30)" opacity=".85"><path d="M-6 8 Q-7 -6 0 -8 Q7 -6 6 8 L4 5 L2 8 L0 5 L-2 8 L-4 5Z" fill="#e9ecf6"/><circle cx="-2.2" cy="-2" r="1" fill="${k}"/><circle cx="2.2" cy="-2" r="1" fill="${k}"/></g>
+    ${txt(56, 40, '背離', 3.6, GH)}`),
+  kd_twins: k => svg('tech', `${ground(k)}
+    <rect x="4" y="8" width="92" height="8" fill="${UP}" opacity=".18"/><rect x="4" y="44" width="92" height="8" fill="${DN}" opacity=".18"/>
+    <path d="M4 16 H96 M4 44 H96" stroke="${GH}" stroke-width=".4" stroke-dasharray="1.4 1"/>${txt(97, 14.4, '80', 3, GH, 'end')}${txt(97, 49, '20', 3, GH, 'end')}
+    ${poly([[4, 40], [14, 30], [24, 18], [34, 12], [44, 11], [54, 13], [64, 26], [74, 40], [84, 46], [94, 36]], GH, 1.3)}
+    ${poly([[4, 44], [14, 37], [24, 26], [34, 18], [44, 14], [54, 14], [64, 20], [74, 32], [84, 42], [94, 42]], PK, 1.3)}
+    ${txt(24, 22, 'K', 4, GH)}${txt(32, 26, 'D', 4, PK)}${txt(44, 7, '高檔鈍化', 3, GH)}
+    ${fig(66, 48, .7, k, '')}${fig(74, 48, .7, k, '')}`),
+  gap_swallow: k => svg('tech', `${grid()}${ground(k)}
+    ${candle(18, 50, 42, 39, 54, 5)}${candle(28, 44, 36, 34, 47, 5)}${candle(56, 24, 16, 13, 27, 5)}${candle(66, 18, 12, 10, 21, 5)}
+    <rect x="30.5" y="27" width="23" height="7" fill="${GH}" opacity=".16"/><path d="M30.5 34 H53.5 M30.5 27 H53.5" stroke="${GH}" stroke-width=".4" stroke-dasharray="1.2 1"/>
+    ${txt(42, 32.2, '缺口', 3.6, GH)}
+    <path d="M30 40 Q42 22 56 20" fill="none" stroke="#e9ecf6" stroke-width=".5" stroke-dasharray="1 1"/>
+    <g transform="translate(44 18) rotate(-14)" fill="${k}" stroke="#e9ecf6" stroke-width=".4"><path d="M-7 0 Q-2 -2 4 0 L9 -4 L6 0 L9 3 L4 1 Q-2 2 -7 0Z"/><path d="M-2 -1 L-6 -7 L1 -1Z"/><path d="M-1 1 L-3 6 L2 1Z" fill="${R}" stroke="none"/></g>`),
+  doji_miko: k => svg('tech', `${ground(k)}
+    <path d="M50 8 V56" stroke="${GH}" stroke-width="1.6"/><rect x="38" y="31" width="24" height="2.4" fill="${GH}"/>
+    ${txt(50, 64.5, '開盤 ＝ 收盤', 3.4, GH)}
+    <path d="M20 22 L34 30" stroke="${UP}" stroke-width=".8"/><path d="M80 22 L66 30" stroke="${DN}" stroke-width=".8"/>${txt(18, 19, '多', 4.2, UP)}${txt(82, 19, '空', 4.2, DN)}
+    ${fig(76, 40, .95, k, `<path d="M72.6 44 Q76 42.6 79.4 44 L80 50 L72 50Z" fill="${W}" stroke="${G}" stroke-width=".3"/><path d="M72 50 H80 L81 53 H71Z" fill="${R}" stroke="none"/><path d="M73 37.8 Q76 34 79 37.8" fill="${k}"/><path d="M74.6 45 L76 42 L77.4 45" fill="none" stroke="${k}" stroke-width=".5"/>`)}`),
+  rsi_scout: k => svg('tech', `${ground(k)}
+    <rect x="4" y="6" width="92" height="12" fill="${UP}" opacity=".2"/><rect x="4" y="42" width="92" height="12" fill="${DN}" opacity=".2"/>
+    <path d="M4 18 H96 M4 42 H96" stroke="${GH}" stroke-width=".5" stroke-dasharray="1.6 1"/>${txt(6, 15, '70 超買', 3.2, UP, 'start')}${txt(6, 51.6, '30 超賣', 3.2, DN, 'start')}
+    ${poly([[30, 34], [38, 22], [46, 12], [54, 16], [62, 30], [70, 46], [78, 48], [86, 36], [94, 28]], GH, 1.3)}
+    <circle cx="46" cy="12" r="2" fill="${UP}"/><circle cx="76" cy="48" r="2" fill="${DN}"/>
+    ${fig(14, 30, .85, k, `<path d="M17 32 L26 27" stroke="${G}" stroke-width="1.8" stroke-linecap="round"/><path d="M26 27 L28 26" stroke="${GH}" stroke-width="2.2"/>`)}${txt(50, 64, 'RSI', 3.6, GH)}`),
+  macd_drummer: k => svg('tech', `${ground(k)}
+    <path d="M4 34 H96" stroke="${GH}" stroke-width=".4"/>
+    ${[3, 6, 9, 11, 9, 5, 1, -3, -7, -10, -8, -4, 1, 5, 8].map((h, i) => `<rect x="${f1(5 + i * 6)}" y="${h > 0 ? 34 - h : 34}" width="4" height="${Math.abs(h)}" fill="${h > 0 ? UP : DN}" opacity=".9"/>`).join('')}
+    ${poly([[4, 30], [20, 20], [32, 18], [44, 26], [58, 40], [70, 42], [84, 30], [96, 24]], GH, 1)}${poly([[4, 32], [20, 25], [32, 21], [44, 24], [58, 33], [70, 38], [84, 34], [96, 28]], BL, 1)}
+    <g transform="translate(80 52)"><ellipse rx="9" ry="3" fill="${R}" stroke="${G}" stroke-width=".5"/><path d="M-9 0 V6 Q0 9 9 6 V0" fill="#8a2a1a" stroke="${G}" stroke-width=".5"/><path d="M-4 -3 L-10 -10 M4 -3 L10 -10" stroke="${W}" stroke-width=".8" stroke-linecap="round"/></g>
+    ${txt(20, 58, '翻紅翻綠', 3.4, GH)}`),
+  support_wall: k => svg('tech', `${grid()}
+    ${poly([[4, 18], [14, 34], [22, 46], [28, 38], [36, 30], [44, 46], [50, 40], [58, 32], [66, 46], [72, 38], [82, 24], [94, 14]], DN, 1.3)}
+    ${[[22, 46], [44, 46], [66, 46]].map(([x, y]) => `<path d="M${x} ${y + 1} l-2.4 -4 M${x} ${y + 1} l2.4 -4" stroke="${GH}" stroke-width=".6"/>`).join('')}
+    <g fill="#5a6290" stroke="${k}" stroke-width=".5">${Array.from({ length: 10 }, (_, i) => `<rect x="${i * 10}" y="48" width="10" height="5"/><rect x="${i * 10 - 5}" y="53" width="10" height="5"/>`).join('')}</g>
+    ${ground(k, 'M0 58 H100 V70 H0Z')}${txt(50, 66, '支撐', 4, GH)}`),
+  breakout_hare: k => svg('tech', `${grid()}${ground(k)}
+    <path d="M4 28 H96" stroke="${R}" stroke-width=".9" stroke-dasharray="2 1.2"/>${txt(6, 25.6, '壓力線', 3, '#ff9c86', 'start')}
+    ${poly([[4, 48], [12, 36], [20, 44], [30, 30], [38, 42], [48, 31], [56, 38], [64, 26], [72, 16], [84, 10]], UP, 1.3)}
+    <g fill="${BL}" opacity=".75">${[4, 5, 4, 6, 5, 4, 5, 14, 12].map((h, i) => `<rect x="${6 + i * 8}" y="${62 - h}" width="5" height="${h}"/>`).join('')}</g>
+    <g transform="translate(74 10)" fill="${W}" stroke="${k}" stroke-width=".4"><ellipse cx="0" cy="0" rx="6" ry="3.2"/><circle cx="6" cy="-2" r="2.4"/><path d="M6 -4 L5 -10 L7.4 -4.4Z"/><path d="M7.4 -4 L9 -9.6 L8.6 -3.6Z"/><path d="M-4 2 L-9 5 M3 2 L6 6" stroke="${W}" stroke-width="1.2"/></g>`),
+  head_shoulder: k => svg('tech', `${grid()}${ground(k)}
+    ${poly([[4, 52], [16, 30], [26, 40], [42, 12], [56, 40], [68, 28], [80, 42], [92, 56]], GH, 1.4)}
+    <path d="M14 41 H90" stroke="${R}" stroke-width=".9" stroke-dasharray="2 1.2"/>${txt(94, 40, '頸線', 3, '#ff9c86', 'end')}
+    ${txt(16, 26, '左肩', 3.2, GH)}${txt(42, 8.6, '頭', 3.6, GH)}${txt(68, 24, '右肩', 3.2, GH)}
+    <circle cx="82.6" cy="44.6" r="2" fill="none" stroke="${DN}" stroke-width=".8"/><path d="M88 48 L92 56" stroke="${DN}" stroke-width="1.2"/><path d="M90.4 56.6 L92.6 57 L92.4 54.6Z" fill="${DN}"/>`),
+  fib_weaver: k => svg('tech', `${ground(k)}
+    ${[[10, '0', GH], [22.6, '0.382', PK], [30, '0.5', PK], [37.4, '0.618', G], [52, '1', GH]].map(([y, t, c]) => `<path d="M10 ${y} H94" stroke="${c}" stroke-width=".55" stroke-dasharray="${t === '0.618' ? '' : '1.4 1'}"/>${txt(96, y + 1, t, 2.8, c, 'end')}`).join('')}
+    ${poly([[10, 52], [22, 40], [34, 22], [44, 10], [56, 24], [66, 37], [74, 30], [86, 16]], UP, 1.3)}
+    <circle cx="66" cy="37.4" r="2.2" fill="none" stroke="${G}" stroke-width=".8"/>
+    <g stroke="${W}" stroke-width=".35" opacity=".6">${[0, 1, 2, 3].map(i => `<path d="M4 ${50 - i * 4} Q12 ${44 - i * 6} 20 ${50 - i * 4}"/>`).join('')}</g>
+    ${fig(10, 40, .7, k, `<path d="M12 44 L18 42" stroke="${W}" stroke-width=".5"/>`)}`),
+  trendline_ranger: k => svg('tech', `${grid()}${ground(k)}
+    ${poly([[4, 54], [16, 44], [24, 50], [36, 34], [46, 40], [60, 24], [70, 30], [84, 14], [94, 18]], UP, 1.2)}
+    <path d="M6 58 L98 24" stroke="${GH}" stroke-width="1.2"/>${[[24, 50.4], [46, 42.2]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" fill="${G}" stroke="${k}" stroke-width=".4"/>`).join('')}
+    ${txt(30, 60, '連接兩個低點', 3, GH)}
+    ${fig(70, 27, .75, k, `<path d="M72.4 28 L76 23" stroke="${G}" stroke-width=".6"/><path d="M67.6 27 L73 27" stroke="${R}" stroke-width=".6"/><path d="M66.4 25.4 Q70 21 73.6 25.4" fill="${DN}" stroke="none"/>`)}`),
+  /* ★3 */
+  boll_dragon: k => { const up = [[4, 10], [28, 20], [48, 27], [64, 29], [80, 18], [96, 6]], lo = [[4, 56], [28, 46], [48, 39], [64, 37], [80, 48], [96, 58]];
+    return svg('tech', `${grid()}${ground(k)}
+    <path d="M${up.map(p => p.join(' ')).join(' L')} L${lo.slice().reverse().map(p => p.join(' ')).join(' L')}Z" fill="${BL}" opacity=".16"/>
+    ${poly(up, BL, 1)}${poly(lo, BL, 1)}${poly(up.map((p, i) => [p[0], (p[1] + lo[i][1]) / 2]), GH, .7, 'stroke-dasharray="1.4 1"')}
+    ${poly([[4, 36], [16, 30], [28, 38], [40, 31], [52, 35], [62, 32], [70, 22], [78, 12]], W, 1)}
+    ${txt(56, 44.6, '通道收窄', 3, GH)}${txt(8, 8, '+2σ', 2.8, BL, 'start')}${txt(8, 62, '−2σ', 2.8, BL, 'start')}
+    <path d="M62 33 Q70 24 76 14" fill="none" stroke="${UP}" stroke-width="2.4" stroke-linecap="round" filter="url(#glow)"/>
+    <g transform="translate(80 15) scale(1.25)"><path d="M-7 4 Q-3 -5 5 -5 Q9 -4 8 -1 L4 0 L7 2.6 Q2 6 -7 4Z" fill="${k}" stroke="${G}" stroke-width=".4"/><path d="M-2 -4 L-4 -8 L0 -5Z M2 -5 L1 -9 L4 -5Z" fill="${G}"/><circle cx="3.6" cy="-2.6" r=".8" fill="${R}"/><path d="M8 -1.6 Q13 -5 12.6 1.4 Q10.4 -.6 7.6 1Z" fill="#ffb347"/></g>`, [84, 12]); },
+  ichimoku_general: k => svg('tech', `${grid()}${ground(k)}
+    <path d="M4 44 Q24 40 40 42 Q60 44 76 36 Q88 30 96 30 L96 42 Q86 44 76 46 Q58 50 40 50 Q22 50 4 52Z" fill="${DN}" opacity=".45" stroke="${DN}" stroke-width=".5"/>${txt(30, 48.6, '雲帶', 3.6, '#bff5d9')}
+    ${poly([[4, 40], [20, 34], [36, 30], [52, 24], [68, 22], [84, 16], [96, 12]], UP, 1.3)}
+    ${poly([[4, 38], [24, 36], [44, 32], [64, 28], [96, 20]], GH, .7)}
+    ${txt(50, 64, '9 · 26 · 52', 3.4, GH)}
+    ${fig(80, 26, .9, k, `<path d="M74.6 23 Q80 18 85.4 23 L84 21 Q80 17.6 76 21Z" fill="${G}"/><path d="M84.6 32 V10" stroke="${G}" stroke-width=".5"/><path d="M84.6 10 h6 v4 h-6Z" fill="${W}"/>`)}`, [80, 12]),
+  wyckoff_strategist: k => svg('tech', `${grid()}${ground(k)}
+    ${poly([[4, 48], [12, 44], [18, 50], [26, 45], [32, 49], [40, 36], [50, 22], [58, 16], [64, 20], [70, 15], [76, 19], [84, 34], [96, 50]], GH, 1.3)}
+    ${[[18, 56, '吸籌', DN], [44, 31, '拉抬', UP], [67, 10.6, '派發', PK], [90, 40, '殺跌', DN]].map(([x, y, t, c]) => `<rect x="${x - 6}" y="${y - 4}" width="12" height="5.4" rx="1" fill="${k}" stroke="${c}" stroke-width=".5"/>${txt(x, y, t, 3.2, c)}`).join('')}
+    ${fig(48, 46, .75, k, `<path d="M51 49 L56 45 L57 50Z" fill="${W}" stroke="${k}" stroke-width=".3"/>`)}`, [50, 22]),
+  dow_elder: k => svg('tech', `${grid()}${ground(k)}
+    ${poly([[4, 44], [16, 36], [24, 40], [38, 28], [48, 32], [62, 20], [72, 24], [92, 10]], UP, 1.3)}${txt(94, 8, '工業', 3, UP, 'end')}
+    ${poly([[4, 54], [16, 48], [24, 51], [38, 42], [48, 45], [62, 36], [72, 39], [92, 26]], GH, 1.3)}${txt(94, 24, '運輸', 3, GH, 'end')}
+    ${[[38, 28], [62, 20], [38, 42], [62, 36]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="none" stroke="${G}" stroke-width=".6"/>`).join('')}
+    <path d="M50 25 V39" stroke="${G}" stroke-width=".5" stroke-dasharray="1 1"/>${txt(50, 47.6, '互相確認', 3, GH)}
+    ${fig(16, 16, .9, k, `<path d="M19.6 18 V30" stroke="${G}" stroke-width=".7"/><circle cx="19.6" cy="17.4" r="1" fill="${G}"/><path d="M14 18.6 Q16 22 18 18.6" fill="${W}" stroke="none"/>`)}`, [50, 30]),
 };
 
 const CACHE = {};
