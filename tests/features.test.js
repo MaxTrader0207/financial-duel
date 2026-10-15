@@ -118,10 +118,9 @@ describe('card art by rarity', () => {
     expect(new Set(arts).size).toBe(ur.length);
     expect(cardHTML(MON.gamma_tyrant)).toContain('c-art-ur');
   });
-  it('★3 cards show a crest with their sigil; ★1–2 keep the shared scenes', () => {
-    const plain = m => !OWN_IDS.includes(m.id);          // cards without an exclusive illustration yet (card-art.js)
-    const sr = MONSTERS.find(m => m.rank === 3 && plain(m)), n = MONSTERS.find(m => m.rank === 1 && plain(m));
-    expect(cardHTML(sr)).toContain('c-crest'); expect(cardHTML(sr)).toContain(sr.sigil);
-    expect(cardHTML(n)).not.toContain('c-crest'); expect(cardHTML(n)).not.toContain('c-art-ur');
+  it('every ★1–★3 card has its own illustration with its sigil (no shared scene or crest any more)', () => {
+    for (const m of MONSTERS.filter(m => m.rank < 4)) { const h = cardHTML(m);
+      expect(h).toContain('c-art-own'); expect(h).not.toContain('c-crest'); expect(h).toContain(m.sigil); }
+    expect(OWN_IDS).toHaveLength(MONSTERS.filter(m => m.rank < 4).length);
   });
 });

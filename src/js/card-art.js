@@ -1,9 +1,9 @@
-// card-art.js — exclusive illustrations for ★1–★3 cards (so far: 資金管理, 技術分析, 基本面 and ETF, 16 cards each).
+// card-art.js — exclusive illustrations for ★1–★3 cards (all nine attributes, 16 cards each).
 // Each picture shows what the card is about (a ledger, an abacus with budget envelopes, a snowball…), so the card can
 // be recognised at a glance instead of sharing one of three attribute backdrops. Same 100 × 70 box as the scenes;
 // never hue-shifted or mirrored. Rarity still shows in the frame: ★1–★2 on the plain sky, ★3 with a soft sunburst
 // (極稀有 keep their full gold sunburst in ur-art.js).
-const INK = { money: '#14031a', tech: '#04102e', fund: '#021a14', etf: '#0a1403' };
+const INK = { money: '#14031a', tech: '#04102e', fund: '#021a14', etf: '#0a1403', fx: '#021419', chips: '#1a0f02', risk: '#1e0604', deriv: '#08021a', crypto: '#10020f' };
 const G = '#f3dc95', GH = '#fff2b0', W = '#f4ead2', R = '#e14b32', PK = '#f2a6e6', BL = '#9fd8ff', GR = '#7fdcae';
 const f1 = n => Math.round(n * 10) / 10;
 const rays = (cx, cy, n = 14, r = 80) => `<g fill="#fff4c8" opacity=".11">${Array.from({ length: n }, (_, i) => {
@@ -22,6 +22,14 @@ const UP = '#ff6b5a', DN = '#3fcf8e';                    // Taiwan colours: red 
 const candle = (x, o, c, h, l, w = 3.6) => { const col = c < o ? UP : DN; return `<path d="M${x} ${h}V${l}" stroke="${col}" stroke-width=".55"/><rect x="${f1(x - w / 2)}" y="${Math.min(o, c)}" width="${w}" height="${Math.max(.6, Math.abs(o - c))}" fill="${col}"/>`; };
 const grid = (c = '#7cbcff', o = .18) => `<g stroke="${c}" stroke-width=".3" opacity="${o}">${[12, 24, 36, 48].map(y => `<path d="M0 ${y}H100"/>`).join('')}${[20, 40, 60, 80].map(x => `<path d="M${x} 0V62"/>`).join('')}</g>`;
 const poly = (pts, c, w = 1.2, extra = '') => `<path d="M${pts.map(p => p.join(' ')).join(' L')}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round" ${extra}/>`;
+/* a coin stamped with a currency sign */
+const cur = (x, y, r, sym, c = G, ink = '#2a1a05') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#6b470f" stroke-width=".35"/><text x="${x}" y="${f1(y + r * .42)}" font-size="${f1(r * 1.2)}" font-family="serif" fill="${ink}" text-anchor="middle">${sym}</text>`;
+/* a blockchain block (isometric cube) */
+const blk = (x, y, s = 1, c = '#d9467f') => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 -5 L5 -2.4 L0 .2 L-5 -2.4Z" fill="#ffd2e6" stroke="#10020f" stroke-width=".3"/><path d="M-5 -2.4 L0 .2 V6 L-5 3.4Z" fill="${c}" stroke="#10020f" stroke-width=".3"/><path d="M5 -2.4 L0 .2 V6 L5 3.4Z" fill="#8a1a4a" stroke="#10020f" stroke-width=".3"/></g>`;
+/* a heater shield */
+const shield = (x, y, s, fill, stroke = G) => `<path d="M${x} ${f1(y - 9 * s)} L${f1(x + 8 * s)} ${f1(y - 6 * s)} Q${f1(x + 8 * s)} ${f1(y + 6 * s)} ${x} ${f1(y + 10 * s)} Q${f1(x - 8 * s)} ${f1(y + 6 * s)} ${f1(x - 8 * s)} ${f1(y - 6 * s)}Z" fill="${fill}" stroke="${stroke}" stroke-width=".6"/>`;
+/* option payoff axes: zero line at y0 */
+const axes = (y0 = 40, c = '#b9a6e0') => `<path d="M6 ${y0} H94" stroke="${c}" stroke-width=".5"/><path d="M50 8 V60" stroke="${c}" stroke-width=".3" opacity=".5"/>`;
 const cloud = (x, y, s = 1, c = '#3a2244') => `<g fill="${c}"><ellipse cx="${x}" cy="${y}" rx="${8 * s}" ry="${3.2 * s}"/><ellipse cx="${x - 4 * s}" cy="${y - 2 * s}" rx="${4.4 * s}" ry="${3 * s}"/><ellipse cx="${x + 3 * s}" cy="${y - 2.6 * s}" rx="${5 * s}" ry="${3.4 * s}"/></g>`;
 
 const ART = {
@@ -427,6 +435,342 @@ const ART = {
     <g transform="translate(76 34)">${[-14, -5, 4, 13].map((y, i) => `<rect x="-8" y="${y - 3}" width="16" height="6" rx="1" fill="${i === 3 ? '#5a3a3a' : '#2f5a4a'}" stroke="${G}" stroke-width=".4" opacity="${i === 3 ? .5 : 1}"/>`).join('')}
       ${txt(0, -12.6, '強', 3, GR)}${txt(0, 15.4, '弱', 3, '#ff9c86')}<path d="M10 13 Q18 13 18 4" fill="none" stroke="${GH}" stroke-width=".6"/><path d="M16.6 5.4 L18 2.6 L19.4 5.4Z" fill="${GH}"/></g>
     ${txt(76, 60, '汰弱留強', 3.4, GH)}`, [36, 34]),
+
+  /* 外匯 — currency coins, globes, ships and flags */
+  pip_sprite: k => svg('fx', `${ground(k)}
+    ${txt(50, 26, '1.0852', 11, GH)}<rect x="69.4" y="15" width="7.6" height="13" fill="none" stroke="${UP}" stroke-width=".7"/>${txt(73.2, 36, '+1 pip', 3.6, UP)}
+    <g transform="translate(30 46)" fill="#bff5ee" stroke="${k}" stroke-width=".3"><circle r="2.4"/><path d="M-1 -1 Q-8 -8 -9 0 Q-6 2 -1 0Z M1 -1 Q8 -8 9 0 Q6 2 1 0Z" opacity=".85"/></g>
+    ${txt(50, 56, '萬分之一的跳動', 3.4, GH)}`),
+  carry_crane: k => svg('fx', `${ground(k)}
+    ${cur(18, 44, 7, '¥', '#cfd6e0')}${txt(18, 56, '借 0.1%', 3, '#cfd6e0')}${cur(82, 44, 7, '$', G)}${txt(82, 56, '存 5%', 3, GR)}
+    <path d="M27 44 Q50 34 73 44" fill="none" stroke="${GH}" stroke-width=".7" stroke-dasharray="1.4 1"/><path d="M71 42 L74 44.4 L70.6 45.6Z" fill="${GH}"/>
+    <g transform="translate(50 20)" fill="#fff" stroke="${k}" stroke-width=".35"><path d="M-14 0 Q-6 -6 0 -1 Q6 -6 14 0 Q6 -2 0 2 Q-6 -2 -14 0Z"/><path d="M0 -1 L3 -6 L6 -6.4" fill="none" stroke="#fff" stroke-width=".9"/><circle cx="6.4" cy="-6.6" r=".8" fill="${R}" stroke="none"/></g>
+    ${txt(50, 33, '每晚收利差', 3.2, GH)}`),
+  spot_merchant: k => svg('fx', `${ground(k)}
+    <rect x="16" y="28" width="68" height="30" fill="#2a4a4a" stroke="${G}" stroke-width=".5"/><path d="M12 28 L50 16 L88 28Z" fill="#a83a2a" stroke="${G}" stroke-width=".4"/>
+    ${[['T', 26], ['T+1', 50], ['T+2', 74]].map(([t, x], i) => `<rect x="${x - 9}" y="36" width="18" height="14" fill="${i === 2 ? GR : W}" stroke="${k}" stroke-width=".4"/>${txt(x, 45, t, 4, i === 2 ? '#04281c' : '#3a2a05')}`).join('')}
+    ${txt(26, 34, '成交', 2.8, GH)}${txt(74, 34, '交割', 2.8, GH)}<path d="M36 43 H40 M60 43 H64" stroke="${GH}" stroke-width=".7"/>`),
+  forward_clerk: k => svg('fx', `${ground(k)}
+    <g transform="translate(40 30)"><rect x="-18" y="-16" width="36" height="30" fill="${W}" stroke="#a87a3a" stroke-width=".6"/>${txt(0, -8, '遠期契約', 4, '#3a2a05')}
+      ${txt(0, 0, '3 個月後', 3.4, '#3a2a05')}${txt(0, 7, 'USD/TWD 32.0', 3.4, '#b0472f')}<circle cx="11" cy="10" r="2.6" fill="${R}"/></g>
+    <path d="M60 20 L74 34" stroke="${W}" stroke-width="1.4" stroke-linecap="round"/>
+    ${fig(80, 36, .9, k, `<path d="M76 40 L70 36" stroke="${k}" stroke-width="1.4" stroke-linecap="round"/>`)}${txt(80, 62, '先鎖匯率', 3, GH)}`),
+  traveler_exchanger: k => svg('fx', `${ground(k)}
+    <rect x="30" y="16" width="56" height="26" fill="#1a2a3a" stroke="${G}" stroke-width=".5"/>${txt(58, 22.6, '買入　賣出', 3.2, GH)}
+    ${[['USD', '31.6', '32.3'], ['JPY', '0.205', '0.218']].map(([c, b, a], i) => `${txt(38, 30 + i * 7, c, 3, W)}${txt(56, 30 + i * 7, b, 3, GR)}${txt(74, 30 + i * 7, a, 3, UP)}`).join('')}
+    <path d="M58 44 V50" stroke="${GH}" stroke-width=".5"/>${txt(58, 54, '價差', 3.4, '#ff9c86')}
+    ${fig(16, 40, .9, k, `<rect x="19" y="46" width="6" height="8" rx="1" fill="#8a5a2a" stroke="${G}" stroke-width=".3"/><path d="M12.6 37 Q16 33 19.4 37Z" fill="${G}" stroke="none"/>`)}
+    <path d="M86 8 L96 4 L94 7 Z" fill="#e9ecf6"/>`),
+  yen_tanuki: k => svg('fx', `${cloud(20, 10, 1.2, '#1a2a3a')}${cloud(80, 12, 1, '#1a2a3a')}<g stroke="${BL}" stroke-width=".5" opacity=".6">${Array.from({ length: 10 }, (_, i) => `<path d="M${8 + i * 9} ${18 + (i % 2) * 3} l-2 5"/>`).join('')}</g>${ground(k)}
+    <g transform="translate(50 44)"><ellipse cx="0" cy="6" rx="12" ry="11" fill="#8a6a4a" stroke="${k}" stroke-width=".5"/><circle cx="0" cy="-8" r="8" fill="#8a6a4a" stroke="${k}" stroke-width=".5"/><path d="M-7 -12 L-6 -17 L-3 -14Z M7 -12 L6 -17 L3 -14Z" fill="#8a6a4a"/>
+      <ellipse cx="-3" cy="-8" rx="2.4" ry="1.8" fill="#3a2a1a"/><ellipse cx="3" cy="-8" rx="2.4" ry="1.8" fill="#3a2a1a"/><circle cx="-3" cy="-8" r=".6" fill="#fff"/><circle cx="3" cy="-8" r=".6" fill="#fff"/>
+      ${cur(0, 6, 7, '¥', G)}</g>${txt(84, 50, '避險貨幣', 3.4, GH)}`),
+  dxy_general: k => svg('fx', `${ground(k)}
+    ${fig(50, 18, 1.2, k, `<path d="M44.6 15 Q50 10 55.4 15Z" fill="${G}" stroke="none"/>`)}${cur(50, 30, 4, '$', G)}
+    ${(() => { let x = 8; return [['€', 57.6, '#3f7fe0'], ['¥', 13.6, R], ['£', 11.9, '#8a2a5a'], ['C$', 9.1, '#2f9e74'], ['kr', 4.2, '#c3902e'], ['Fr', 3.6, '#7a7a8a']].map(([sym, w, c]) => { const ww = w * .84, r = `<rect x="${f1(x)}" y="46" width="${f1(ww)}" height="10" fill="${c}" stroke="${k}" stroke-width=".3"/>${ww > 5 ? txt(f1(x + ww / 2), 52.6, sym, 3.6, '#fff') : ''}`; x += ww; return r; }).join(''); })()}
+    ${txt(32, 43, '歐元近六成', 3, GH)}`),
+  ppp_monk: k => svg('fx', `${ground(k)}
+    ${[[22, '$5.7', '美'], [50, '¥450', '日'], [78, 'NT$75', '台']].map(([x, p, n]) => `<g transform="translate(${x} 40)"><path d="M-8 -2 Q-8 -8 0 -8 Q8 -8 8 -2Z" fill="#d9a35a" stroke="${k}" stroke-width=".3"/><rect x="-8.4" y="-2" width="16.8" height="2" fill="${GR}"/><rect x="-8.4" y="0" width="16.8" height="2.4" fill="#6a3a1a"/><path d="M-8 2.4 H8 Q8 5 0 5 Q-8 5 -8 2.4Z" fill="#d9a35a" stroke="${k}" stroke-width=".3"/>
+      ${txt(0, 12, p, 3.4, GH)}${txt(0, -12, n, 3.6, W)}</g>`).join('')}
+    ${txt(50, 18, '一個漢堡道出匯率', 3.4, GH)}`),
+  irp_scholar: k => svg('fx', `${ground(k)}
+    <g transform="translate(50 40)"><path d="M0 14 L-4 18 H4Z" fill="${G}"/><path d="M-30 4 L30 14" stroke="#a87a3a" stroke-width="1.6"/>
+      <g transform="translate(-24 -6)">${cur(0, 0, 7, '%', G)}${txt(0, -10, '高利率', 3, GR)}</g><g transform="translate(24 4)">${cur(0, 0, 5, '%', '#cfd6e0')}${txt(0, -8, '低利率', 3, W)}</g></g>
+    ${txt(50, 14, '高利率貨幣 → 遠期貼水', 3.4, GH)}`),
+  swap_twins: k => svg('fx', `${ground(k)}
+    ${fig(28, 26, 1, k, '')}${fig(72, 26, 1, k, '')}
+    <path d="M36 32 Q50 24 64 32" fill="none" stroke="${GR}" stroke-width=".9"/><path d="M62 30 L65 32.6 L61.4 33.4Z" fill="${GR}"/>${txt(50, 23, '今日買入', 3, GR)}
+    <path d="M64 44 Q50 52 36 44" fill="none" stroke="${UP}" stroke-width=".9"/><path d="M38 46 L35 43.4 L38.6 42.6Z" fill="${UP}"/>${txt(50, 56, '日後賣回', 3, UP)}
+    ${cur(50, 38, 4, '$', G)}`),
+  central_hand: k => svg('fx', `${ground(k)}
+    ${poly([[4, 16], [20, 22], [34, 32], [46, 44], [54, 48]], DN, 1.3)}${poly([[54, 48], [66, 40], [80, 34], [96, 32]], UP, 1.3)}
+    <path d="M42 70 Q42 56 50 54 L54 50 Q56 48 58 50 L58 46 Q60 44 62 46 L62 52 Q66 56 64 70Z" fill="#cfd6e0" opacity=".55" stroke="${GH}" stroke-width=".4"/>
+    ${txt(24, 10, '匯率急貶', 3.4, DN)}${txt(80, 26, '央行進場', 3.4, GH)}`),
+  eurusd_knights: k => svg('fx', `${ground(k)}
+    ${[[30, '#3f7fe0', '€'], [66, R, '$']].map(([x, c, sym]) => `<g transform="translate(${x} 44)" fill="${k}" stroke="${G}" stroke-width=".4"><path d="M-12 4 Q-10 -4 0 -4 L8 -4 Q12 -6 14 -10 L16 -8 L13 -2 Q13 4 8 5 L7 14 L4 14 L4 6 L-6 6 L-7 14 L-10 14 L-10 6 Q-13 6 -12 4Z"/><path d="M-2 -4 Q0 -12 2 -14 Q4 -12 4 -4Z"/><circle cx="2" cy="-16" r="2.4"/></g>${shield(x - 6, 40, .5, c)}${txt(x - 6, 41.4, sym, 3.6, '#fff')}`).join('')}
+    ${txt(50, 14, 'EUR / USD', 6, GH)}${txt(50, 22, '成交量最大的貨幣對', 3, GH)}`),
+  /* ★3 */
+  reserve_dragon: k => svg('fx', `${ground(k)}
+    <path d="M10 50 Q20 30 36 40 Q50 50 60 34 Q70 20 84 28" fill="none" stroke="${G}" stroke-width="7" stroke-linecap="round"/>
+    ${Array.from({ length: 12 }, (_, i) => { const t = i / 11, x = 10 + t * 74; return cur(f1(x), f1(50 - Math.sin(t * 6) * 9 - t * 12), 2.2, '$', GH); }).join('')}
+    <g transform="translate(86 26)" fill="${k}" stroke="${G}" stroke-width=".5"><path d="M-6 2 Q-2 -6 6 -5 Q9 -3 8 0 L4 1 L7 3 Q2 6 -6 2Z"/><circle cx="3" cy="-2.4" r=".8" fill="${R}"/></g>
+    ${txt(30, 62, '外匯存底', 3.4, GH)}`, [60, 30]),
+  london_bell: k => svg('fx', `${ground(k)}
+    <rect x="42" y="18" width="16" height="44" fill="#6a5a3a" stroke="${G}" stroke-width=".5"/><path d="M40 18 L50 6 L60 18Z" fill="#4a3a2a" stroke="${G}" stroke-width=".5"/>
+    <circle cx="50" cy="28" r="6" fill="${W}" stroke="${G}" stroke-width=".6"/><path d="M50 28 V24 M50 28 L53 29" stroke="#3a2a05" stroke-width=".6"/>
+    ${[[18, 30, '$'], [82, 30, '€'], [22, 50, '¥'], [78, 50, '£']].map(([x, y, sym]) => `${cur(x, y, 4, sym)}<path d="M${x < 50 ? x + 5 : x - 5} ${y} L${x < 50 ? 40 : 60} 36" stroke="${GH}" stroke-width=".4" stroke-dasharray="1 1"/>`).join('')}
+    ${txt(50, 68, '全球近四成成交', 3, GH)}`, [50, 28]),
+  devalue_storm: k => svg('fx', `<g fill="#1a2a3a">${[18, 50, 82].map(x => `<ellipse cx="${x}" cy="10" rx="16" ry="6"/>`).join('')}</g>
+    <path d="M30 14 Q50 24 40 40 Q34 50 46 58" fill="none" stroke="#cfd6e0" stroke-width="2.4" opacity=".5"/><path d="M60 14 Q74 26 62 40" fill="none" stroke="#cfd6e0" stroke-width="1.6" opacity=".4"/>
+    ${ground(k)}${cur(50, 40, 9, '₩', '#cfd6e0')}<path d="M44 30 L52 40 L46 44 L56 52" fill="none" stroke="${k}" stroke-width=".9"/>
+    ${poly([[66, 26], [74, 34], [80, 44], [92, 56]], DN, 1.4)}${txt(84, 30, '幣值重挫', 3.4, DN)}`, [50, 40]),
+  hotmoney_tide: k => svg('fx', `<path d="M0 44 Q12 38 24 44 T48 44 T72 44 T96 44 V70 H0Z" fill="#0d4a5a"/><path d="M0 50 Q12 44 24 50 T48 50 T72 50 T100 50 V70 H0Z" fill="#0a3a4a"/>
+    ${[[14, 42], [30, 40], [46, 42], [62, 40], [78, 42]].map(([x, y]) => cur(x, y, 2.6, '$', G)).join('')}
+    <path d="M10 30 H44" stroke="${GR}" stroke-width=".9"/><path d="M42 28 L46 30 L42 32Z" fill="${GR}"/>${txt(27, 26, '利差開：湧入', 3.2, GR)}
+    <path d="M90 22 H56" stroke="${UP}" stroke-width=".9"/><path d="M58 20 L54 22 L58 24Z" fill="${UP}"/>${txt(73, 18, '利差收：退去', 3.2, UP)}
+    <circle cx="84" cy="8" r="4.4" fill="#fff6d8" opacity=".9"/>`, [84, 8]),
+
+  /* 籌碼與市場 — the trading hall, order tickets and the crowd */
+  daytrade_ronin: k => svg('chips', `${ground(k)}
+    <circle cx="16" cy="14" r="5" fill="url(#sun-gold)"/>${txt(16, 26, '09:00', 3.2, GH)}<circle cx="84" cy="14" r="5" fill="#ffb08a" opacity=".7"/>${txt(84, 26, '13:30', 3.2, GH)}
+    <path d="M20 30 Q50 18 80 30" fill="none" stroke="${GH}" stroke-width=".5" stroke-dasharray="1.4 1"/>
+    ${fig(50, 32, 1.1, k, `<path d="M54 40 L64 30" stroke="#e9ecf6" stroke-width="1" stroke-linecap="round"/><path d="M45.4 29 Q50 24.6 54.6 29Z" fill="${k}"/>`)}${txt(50, 64, '不留倉過夜', 3.2, GH)}`),
+  oddlot_apprentice: k => svg('chips', `${ground(k)}
+    <rect x="58" y="22" width="30" height="36" fill="${W}" stroke="${G}" stroke-width=".5"/>${txt(73, 30, '1 張', 3.6, '#3a2a05')}${txt(73, 35, '＝1000 股', 2.8, '#3a2a05')}
+    ${Array.from({ length: 30 }, (_, i) => `<rect x="${60.6 + (i % 6) * 4.4}" y="${39 + Math.floor(i / 6) * 3.6}" width="3.6" height="2.8" fill="${i < 11 ? G : '#d9cfb8'}"/>`).join('')}
+    ${fig(28, 34, 1, k, `<rect x="31" y="40" width="4" height="4" fill="${G}" stroke="${k}" stroke-width=".3"/>`)}${txt(28, 62, '一股一股買', 3.2, GH)}`),
+  afterhours_monk: k => svg('chips', `${ground(k)}
+    <g transform="translate(72 26)"><circle r="12" fill="${W}" stroke="${G}" stroke-width=".8"/>${Array.from({ length: 12 }, (_, i) => { const a = i * Math.PI / 6; return `<path d="M${f1(10 * Math.cos(a))} ${f1(10 * Math.sin(a))} L${f1(11.4 * Math.cos(a))} ${f1(11.4 * Math.sin(a))}" stroke="#3a2a05" stroke-width=".5"/>`; }).join('')}<path d="M0 0 V-8" stroke="#3a2a05" stroke-width="1"/><path d="M0 0 L6.4 3.6" stroke="#3a2a05" stroke-width=".8"/></g>${txt(72, 46, '14:00', 4, GH)}
+    <path d="M10 40 H50" stroke="${GH}" stroke-width=".8"/>${txt(30, 36, '收盤價', 3.4, GH)}
+    ${fig(30, 44, .9, k, `<path d="M25.6 47 Q30 45 34.4 47" fill="none" stroke="${W}" stroke-width=".6"/><circle cx="30" cy="43.4" r="2.4" fill="#3a1a28" stroke="none"/>`)}`),
+  retail_crowd: k => svg('chips', `${ground(k)}
+    ${Array.from({ length: 14 }, (_, i) => fig(8 + i * 6.6, 42 + (i % 3) * 3, .62, k, '')).join('')}
+    <g transform="translate(84 14)"><path d="M-10 -5 H10 V5 H2 L0 9 L-2 5 H-10Z" fill="${W}" stroke="${k}" stroke-width=".4"/>${txt(0, 1.4, '利多!', 3.6, '#b0472f')}</g>
+    ${txt(30, 20, '最後一個知道', 3.4, GH)}<path d="M40 22 L76 16" stroke="${GH}" stroke-width=".4" stroke-dasharray="1 1"/>`),
+  auction_bell: k => svg('chips', `${ground(k)}
+    <g transform="translate(34 30)"><path d="M-10 10 Q-10 -10 0 -12 Q10 -10 10 10Z" fill="${G}" stroke="#6b470f" stroke-width=".6"/><path d="M-12 10 H12" stroke="#6b470f" stroke-width="1.4"/><circle cx="0" cy="13" r="2" fill="#6b470f"/><path d="M-14 -4 Q-18 0 -16 6 M14 -4 Q18 0 16 6" fill="none" stroke="${GH}" stroke-width=".6"/></g>
+    <rect x="58" y="16" width="32" height="28" fill="#2a1a0a" stroke="${G}" stroke-width=".5"/>${txt(74, 23, '13:25–13:30', 3, GH)}
+    ${[0, 1, 2].map(i => `<rect x="61" y="${26 + i * 5}" width="${8 + i * 4}" height="3" fill="${GR}"/><rect x="${87 - (6 + i * 3)}" y="${26 + i * 5}" width="${6 + i * 3}" height="3" fill="${UP}"/>`).join('')}
+    ${txt(74, 52, '只收單不成交', 3, GH)}${txt(34, 56, '收盤價', 3.4, GH)}`),
+  dealer_hedger: k => svg('chips', `${ground(k)}
+    <g transform="translate(26 30)"><rect x="-12" y="-10" width="24" height="18" fill="${W}" stroke="${G}" stroke-width=".5"/>${txt(0, -3, '權證', 4.4, '#b0472f')}${txt(0, 4, '發行', 3, '#3a2a05')}</g>
+    <path d="M40 30 Q50 22 60 30" fill="none" stroke="${GH}" stroke-width=".7"/><path d="M58 28 L61 30.6 L57.4 31.4Z" fill="${GH}"/><path d="M60 38 Q50 46 40 38" fill="none" stroke="${GH}" stroke-width=".7"/>
+    <g transform="translate(74 34)">${[0, 1, 2].map(i => `<rect x="-10" y="${-10 + i * 7}" width="20" height="5" fill="${['#c3902e', '#a87a3a', '#8a6a2a'][i]}" stroke="${k}" stroke-width=".3"/>`).join('')}${txt(0, 16, '現貨避險', 3, GH)}</g>
+    ${txt(50, 60, '日日調整部位', 3.2, GH)}`),
+  whale_holder: k => svg('chips', `<path d="M0 40 Q25 36 50 40 T100 40 V70 H0Z" fill="#3a2a10"/><path d="M0 46 Q25 42 50 46 T100 46" fill="none" stroke="#c9a86a" stroke-width=".5"/>
+    <g transform="translate(48 38)" fill="${k}" stroke="${G}" stroke-width=".5"><path d="M-26 0 Q-18 -14 4 -12 Q20 -10 24 -2 Q26 4 18 6 Q0 10 -20 6 Q-28 4 -26 0Z"/><path d="M24 -2 L32 -10 L30 0 L34 6 L22 4Z"/><circle cx="-16" cy="-4" r="1.2" fill="${GH}"/></g>
+    <path d="M-2 -14 Q0 -20 2 -14" transform="translate(40 26)" fill="none" stroke="#bff5ee" stroke-width=".6"/>
+    ${txt(50, 14, '千張大戶', 4, GH)}${[16, 26, 36].map((x, i) => `<rect x="${x + 50}" y="${62 - (i + 1) * 4}" width="6" height="${(i + 1) * 4}" fill="${G}"/>`).join('')}${txt(76, 66, '每週增持', 2.8, GH)}`),
+  short_scout: k => svg('chips', `${ground(k)}
+    ${poly([[6, 18], [22, 24], [38, 32], [54, 40], [70, 46], [88, 50]], DN, 1.3)}
+    <circle cx="14" cy="21" r="2" fill="${UP}"/>${txt(14, 15, '借來賣出', 3, UP)}<circle cx="80" cy="48.6" r="2" fill="${GR}"/>${txt(80, 42, '低點還券', 3, GR)}
+    ${fig(48, 46, .75, k, `<path d="M51 47 L58 42" stroke="${G}" stroke-width="1.4" stroke-linecap="round"/><path d="M58 42 L60 41" stroke="${GH}" stroke-width="1.8"/>`)}`),
+  broker_tracker: k => svg('chips', `${ground(k)}
+    <rect x="44" y="12" width="46" height="44" fill="${W}" stroke="#a87a3a" stroke-width=".5"/>${txt(67, 19, '分點進出', 3.4, '#3a2a05')}
+    ${[['凱基-台北', '+1,250', UP], ['元大-松山', '+980', UP], ['富邦-建國', '−420', '#2f7d4f'], ['美林', '+760', UP]].map(([a, b, c], i) => `${txt(47, 26 + i * 7, a, 2.8, '#3a2a05', 'start')}${txt(88, 26 + i * 7, b, 2.8, c, 'end')}`).join('')}
+    <circle cx="70" cy="24.6" r="4.6" fill="none" stroke="${R}" stroke-width=".6"/>
+    ${fig(22, 32, 1, k, `<circle cx="30" cy="30" r="4" fill="none" stroke="${G}" stroke-width="1"/><path d="M27 33 L25 36" stroke="${G}" stroke-width="1.2"/>`)}`),
+  window_dresser: k => svg('chips', `${ground(k)}
+    ${poly([[6, 50], [20, 48], [34, 46], [48, 44], [58, 36], [66, 26], [74, 16]], UP, 1.4)}
+    <rect x="62" y="8" width="26" height="10" fill="${W}" stroke="${G}" stroke-width=".5"/>${txt(75, 15, '季底', 4, '#b0472f')}
+    ${fig(40, 40, .8, k, `<path d="M43 42 L52 34" stroke="${k}" stroke-width="1.4" stroke-linecap="round"/>`)}${fig(52, 40, .8, k, `<path d="M55 42 L62 30" stroke="${k}" stroke-width="1.4" stroke-linecap="round"/>`)}
+    ${txt(30, 62, '重倉股拉上高點', 3.2, GH)}`),
+  margin_crow: k => svg('chips', `${ground(k)}
+    <rect x="18" y="34" width="64" height="28" fill="#3a2a1a" stroke="${G}" stroke-width=".5"/><path d="M14 34 L50 22 L86 34Z" fill="#2a1a0a" stroke="${G}" stroke-width=".5"/>${txt(50, 46, '營業廳', 3.4, GH)}
+    <rect x="30" y="50" width="40" height="8" fill="#5a1a1a" stroke="${k}" stroke-width=".3"/>${txt(50, 56, '維持率 128%', 3.4, '#ff9c86')}
+    <g transform="translate(50 12)" fill="${k}" stroke="${G}" stroke-width=".35"><path d="M-14 0 Q-6 -6 0 -1 Q6 -6 14 0 Q6 -2 0 2 Q-6 -2 -14 0Z"/><circle cx="0" cy="-1" r="2"/><path d="M1.6 -1 L4 -.4 L1.6 .2Z" fill="${G}"/></g>`),
+  lending_envoy: k => svg('chips', `${ground(k)}
+    ${fig(20, 26, 1.1, k, `<path d="M15.6 23 Q20 18 24.4 23Z" fill="${G}" stroke="none"/>`)}${txt(20, 52, '大股東', 3, GH)}
+    <g transform="translate(46 30)"><rect x="-8" y="-6" width="16" height="12" fill="${W}" stroke="${k}" stroke-width=".4"/>${txt(0, 1.4, '股票', 3.4, '#3a2a05')}</g>
+    <path d="M28 30 H38" stroke="${GH}" stroke-width=".6"/><path d="M36 28 L39 30 L36 32Z" fill="${GH}"/>
+    ${poly([[56, 50], [64, 30], [70, 18], [76, 30], [86, 50]], DN, 1.3)}<circle cx="70" cy="18" r="2" fill="${UP}"/>${txt(70, 12, '高點放出', 3, UP)}
+    <g transform="translate(64 50)" opacity=".85"><path d="M-5 8 Q-6 -5 0 -7 Q6 -5 5 8 L3 5 L1 8 L-1 5 L-3 8Z" fill="#5a4a6a"/><circle cx="-2" cy="-2" r=".8" fill="${R}"/><circle cx="2" cy="-2" r=".8" fill="${R}"/></g>`),
+  /* ★3 */
+  three_generals: k => svg('chips', `${ground(k)}
+    ${[['外資', 22, '#3f7fe0'], ['投信', 50, R], ['自營', 78, '#2f9e74']].map(([t, x, c]) => `${fig(x, 22, 1.2, k, `<path d="M${x - 5.6} 19 Q${x} 13.6 ${x + 5.6} 19Z" fill="${c}" stroke="none"/><path d="M${x + 5} 26 V8" stroke="${G}" stroke-width=".5"/><path d="M${x + 5} 8 h6 v4 h-6Z" fill="${c}"/>`)}<rect x="${x - 9}" y="44" width="18" height="7" rx="1" fill="${k}" stroke="${c}" stroke-width=".6"/>${txt(x, 49.4, t, 3.6, W)}`).join('')}
+    ${txt(50, 60, '盤後點兵', 3.4, GH)}`, [50, 22]),
+  foreign_fleet: k => svg('chips', `<path d="M0 46 Q25 42 50 46 T100 46 V70 H0Z" fill="#1a3a4a"/><path d="M0 52 Q25 48 50 52 T100 52" fill="none" stroke="#7fd0e0" stroke-width=".5"/>
+    <g transform="translate(48 40)"><path d="M-30 0 H30 L24 8 H-24Z" fill="#3a3a4a" stroke="${G}" stroke-width=".6"/><rect x="-18" y="-10" width="30" height="10" fill="#4a4a5a" stroke="${G}" stroke-width=".4"/><rect x="-8" y="-18" width="10" height="8" fill="#5a5a6a" stroke="${G}" stroke-width=".4"/>
+      ${txt(-3, -2, 'MSCI', 4, GH)}</g>
+    <rect x="80" y="20" width="14" height="26" fill="#3a2a1a" stroke="${G}" stroke-width=".4"/>${txt(87, 36, '港', 4, GH)}${txt(26, 14, '尾盤一次靠港', 3.4, GH)}`, [48, 30]),
+  index_envoy: k => svg('chips', `${ground(k)}
+    <rect x="30" y="12" width="40" height="36" fill="${W}" stroke="${G}" stroke-width=".5"/>${txt(50, 19, '成分股', 3.6, '#3a2a05')}
+    ${Array.from({ length: 8 }, (_, i) => `<rect x="${34 + (i % 4) * 8.4}" y="${23 + Math.floor(i / 4) * 8}" width="7" height="6" fill="${i === 5 ? GR : '#c9b98f'}"/>`).join('')}
+    <path d="M14 30 H30" stroke="${GR}" stroke-width=".9"/><path d="M28 28 L31 30 L28 32Z" fill="${GR}"/>${txt(14, 26, '納入', 3, GR)}
+    <path d="M70 38 H86" stroke="${UP}" stroke-width=".9"/><path d="M84 36 L87 38 L84 40Z" fill="${UP}"/>${txt(86, 34, '剔除', 3, UP)}
+    ${[18, 30, 42, 54, 66, 78].map(x => coin(x, 56, 1.8)).join('')}${txt(50, 64, '收盤被動資金湧入', 3, GH)}`, [50, 30]),
+  main_force: k => svg('chips', `${ground(k)}
+    ${poly([[4, 50], [16, 48], [28, 50], [40, 48], [52, 46], [60, 30], [70, 14], [78, 20], [86, 36], [96, 52]], GH, 1.4)}
+    <path d="M60 46 V30" stroke="${UP}" stroke-width="3"/>${txt(18, 42, '低檔吃貨', 3.2, GR)}${txt(64, 50, '長紅', 3.2, UP)}${txt(80, 12, '出貨', 3.2, '#ff9c86')}
+    ${Array.from({ length: 5 }, (_, i) => fig(74 + i * 4, 40 + i, .4, k, '')).join('')}${txt(84, 62, '散戶追進', 2.8, GH)}`, [70, 14]),
+
+  /* 風險管理 — shields, barriers and armour */
+  stop_bushi: k => svg('risk', `${ground(k)}
+    ${poly([[6, 20], [22, 26], [36, 36], [48, 44], [60, 52]], DN, 1.2)}<path d="M6 40 H94" stroke="${R}" stroke-width="1" stroke-dasharray="2 1.2"/>${txt(92, 37, '停損線', 3.2, '#ff9c86', 'end')}
+    <circle cx="44" cy="40" r="2.4" fill="none" stroke="${GH}" stroke-width=".8"/>
+    ${fig(72, 24, 1.05, k, `<path d="M68 30 L62 40" stroke="#e9ecf6" stroke-width="1" stroke-linecap="round"/><path d="M67.4 21 Q72 16.6 76.6 21Z" fill="${k}"/>`)}${txt(28, 62, '先決定退路', 3.2, GH)}`),
+  diversify_master: k => svg('risk', `${ground(k)}
+    ${[16, 34, 52, 70, 88].map((x, i) => `<path d="M${x - 7} 44 H${x + 7} L${x + 5} 54 H${x - 5}Z" fill="#8a6a2a" stroke="${G}" stroke-width=".4"/><ellipse cx="${x}" cy="42" rx="3" ry="3.8" fill="${W}" stroke="${k}" stroke-width=".3"/>`).join('')}
+    ${txt(50, 24, '不把雞蛋放在同一個籃子', 3.6, GH)}`),
+  trailing_ninja: k => svg('risk', `${ground(k)}
+    ${poly([[6, 50], [18, 42], [28, 46], [40, 34], [50, 38], [62, 26], [72, 30], [86, 16]], UP, 1.3)}
+    ${poly([[6, 56], [18, 50], [28, 50], [40, 42], [50, 42], [62, 34], [72, 34], [86, 24]], '#ff9c86', .9, 'stroke-dasharray="1.6 1"')}${txt(92, 30, '停利點跟上', 3, '#ff9c86', 'end')}
+    ${fig(86, 6.6, .55, k, `<path d="M84 6 L80 5" stroke="${R}" stroke-width=".5"/>`)}`),
+  hedge_monk: k => svg('risk', `${ground(k)}
+    ${fig(50, 20, 1.2, k, `<path d="M44.6 24 Q50 22 55.4 24" fill="none" stroke="${W}" stroke-width=".6"/><circle cx="50" cy="19" r="3" fill="#3a1a28" stroke="none"/>`)}
+    <rect x="16" y="30" width="18" height="10" rx="1" fill="#5a1a1a" stroke="${G}" stroke-width=".4"/>${txt(25, 37, '多單', 3.6, UP)}<rect x="66" y="30" width="18" height="10" rx="1" fill="#1a3a2a" stroke="${G}" stroke-width=".4"/>${txt(75, 37, '空單', 3.6, GR)}
+    <g stroke="#cfd6e0" stroke-width=".6" opacity=".6"><path d="M4 14 Q12 12 18 16"/><path d="M96 14 Q88 12 82 16"/></g>${txt(50, 58, '風往哪吹都站得住', 3.2, GH)}`),
+  cash_keeper: k => svg('risk', `${ground(k)}
+    <g transform="translate(36 38)"><circle r="16" fill="#5a2a1a" stroke="${G}" stroke-width=".6"/><path d="M0 0 L0 -16 A16 16 0 0 1 15.2 -4.9Z" fill="${GR}"/>${txt(6, -6, '30%', 3.4, '#04281c')}${txt(-4, 6, '持股', 3.6, W)}</g>
+    ${stack(70, 52, 7, 4)}${txt(70, 36, '現金', 3.6, GR)}
+    ${fig(86, 36, .85, k, `<path d="M90 33 V54" stroke="${G}" stroke-width=".7"/>`)}${txt(50, 64, '崩盤日的子彈', 3, GH)}`),
+  journal_scribe: k => svg('risk', `${ground(k)}
+    <g transform="translate(50 34)"><path d="M-28 -18 Q-14 -22 0 -16 Q14 -22 28 -18 V16 Q14 12 0 18 Q-14 12 -28 16Z" fill="${W}" stroke="${G}" stroke-width=".6"/><path d="M0 -16 V18" stroke="#b9a36a" stroke-width=".5"/>
+      ${[['買 2330', '理由：突破'], ['賣 2330', '錯：太早出'], ['停損', '紀律 ✓']].map(([a, b], i) => `${txt(-24, -9 + i * 8, a, 3, '#3a2a05', 'start')}${txt(4, -9 + i * 8, b, 3, i === 1 ? '#b0472f' : '#2f7d4f', 'start')}`).join('')}</g>
+    ${txt(50, 62, '錯誤不再犯第二次', 3.2, GH)}`),
+  mdd_barrier: k => svg('risk', `${ground(k)}
+    ${poly([[6, 40], [20, 26], [34, 14], [46, 30], [56, 46], [68, 36], [82, 22], [94, 14]], GH, 1.3)}
+    <path d="M34 14 H62 M56 46 H62" stroke="${R}" stroke-width=".5" stroke-dasharray="1 1"/><path d="M60 14 V46" stroke="${R}" stroke-width="1"/><path d="M58.6 16 L60 13 L61.4 16Z M58.6 44 L60 47 L61.4 44Z" fill="${R}"/>${txt(72, 32, '最大回撤', 3.4, '#ff9c86', 'start')}
+    <path d="M8 52 Q50 44 92 52" fill="none" stroke="#ffb08a" stroke-width="1.6" opacity=".5"/>${txt(30, 62, '結界的厚度', 3, GH)}`),
+  sizing_officer: k => svg('risk', `${ground(k)}
+    ${[['單筆風險', '1%', 18], ['停損距離', '5%', 50], ['部位', '20%', 82]].map(([a, b, x], i) => `<rect x="${x - 12}" y="22" width="24" height="18" rx="1.4" fill="${k}" stroke="${i === 2 ? GR : G}" stroke-width=".6"/>${txt(x, 29, a, 3, GH)}${txt(x, 37, b, 5, i === 2 ? GR : W)}`).join('')}
+    ${txt(34, 33, '÷', 5, GH)}${txt(66, 33, '＝', 5, GH)}${fig(50, 46, .7, k, '')}`),
+  black_swan: k => svg('risk', `<path d="M0 50 Q50 44 100 50 V70 H0Z" fill="#2a0a0a"/><path d="M0 54 Q50 48 100 54" fill="none" stroke="#ff9c86" stroke-width=".4"/>
+    <g transform="translate(50 40)" fill="#05010a" stroke="${G}" stroke-width=".5"><path d="M-18 6 Q-14 -4 -2 -2 Q4 -1 8 2 Q14 6 16 4 Q12 10 0 10 Q-12 10 -18 6Z"/><path d="M6 1 Q10 -10 4 -16 Q2 -18 0 -16 Q4 -10 2 0" fill="none" stroke-width="2.4"/><path d="M0 -16 L-4 -15 L0 -14Z" fill="${R}" stroke="none"/></g>
+    ${poly([[6, 16], [30, 14], [50, 15], [62, 14], [66, 30], [70, 34]], '#ff9c86', 1)}${txt(80, 22, '百年一見', 3.4, GH)}`),
+  var_watchman: k => svg('risk', `${ground(k)}
+    <path d="M10 52 Q30 52 40 34 Q50 12 60 34 Q70 52 90 52" fill="none" stroke="${GH}" stroke-width="1.2"/>
+    <path d="M10 52 Q18 52 22 46 L22 52Z" fill="${R}" opacity=".8"/>${txt(16, 40, '最壞 5%', 3, '#ff9c86')}<path d="M22 30 V54" stroke="${R}" stroke-width=".6" stroke-dasharray="1 1"/>${txt(50, 60, '95% 信心水準', 3.2, GH)}
+    <circle cx="82" cy="12" r="5" fill="#fff6d8" opacity=".85"/>${fig(70, 18, .8, k, `<path d="M74 22 V36" stroke="${G}" stroke-width=".6"/><circle cx="74" cy="21" r="1.4" fill="#ffb347" stroke="none"/>`)}`),
+  corr_spider: k => svg('risk', `${ground(k)}
+    ${[[20, 18, '股'], [80, 18, '債'], [20, 50, '金'], [80, 50, '匯'], [50, 10, '房']].map(([x, y, t]) => `<path d="M50 32 L${x} ${y}" stroke="#e9ecf6" stroke-width=".4"/><circle cx="${x}" cy="${y}" r="5" fill="${k}" stroke="${G}" stroke-width=".5"/>${txt(x, y + 1.6, t, 4, GH)}`).join('')}
+    <path d="M20 18 L80 18 L80 50 L20 50Z" fill="none" stroke="#e9ecf6" stroke-width=".25"/>${txt(36, 16, '+0.8', 2.6, UP)}${txt(64, 54, '−0.3', 2.6, GR)}
+    <g transform="translate(50 32)" fill="${k}" stroke="${G}" stroke-width=".4"><ellipse rx="4" ry="3"/><circle cy="-3.6" r="2"/>${[-1, 1].map(d => `<path d="M${d * 3} -1 L${d * 8} -5 M${d * 3} 0 L${d * 8} 1 M${d * 3} 1 L${d * 7} 5" fill="none" stroke-width=".6"/>`).join('')}</g>`),
+  rebalance_gardener: k => svg('risk', `${ground(k)}
+    ${[[22, 30, '股', GR], [50, 44, '債', BL], [78, 38, '金', G]].map(([x, h, t, c]) => `<rect x="${x - 6}" y="${62 - h}" width="12" height="${h}" fill="${c}" opacity=".8" stroke="${k}" stroke-width=".4"/>${txt(x, 60, t, 3.6, k)}`).join('')}
+    <path d="M10 26 H90" stroke="${GH}" stroke-width=".6" stroke-dasharray="1.6 1"/>${txt(92, 24, '目標比例', 2.8, GH, 'end')}
+    <path d="M18 30 L26 32" stroke="#e9ecf6" stroke-width="1.2"/>${txt(30, 22, '修剪', 3, '#ff9c86')}<path d="M50 14 Q50 18 50 18" stroke="${BL}"/>${txt(50, 14, '補給', 3, GR)}
+    ${fig(64, 14, .6, k, '')}`),
+  /* ★3 */
+  kelly_tactician: k => svg('risk', `${ground(k)}
+    <rect x="18" y="14" width="64" height="18" rx="2" fill="${W}" stroke="${G}" stroke-width=".6"/>${txt(50, 25.4, 'f ＝ (bp − q) ÷ b', 5, '#3a2a05')}
+    ${[[30, 1], [40, 1], [50, .5], [60, .5]].map(([x, o], i) => fig(x, 40, .6, k, '').replace('<g ', `<g opacity="${i < 2 ? 1 : .35}" `)).join('')}${txt(50, 62, '半數出擊，保長久', 3.2, GH)}
+    ${fig(80, 38, .9, k, `<path d="M83 42 L88 38 L89 43Z" fill="${W}" stroke="${k}" stroke-width=".3"/>`)}`, [50, 22]),
+  parity_saint: k => svg('risk', `${ground(k)}
+    <path d="M50 14 V54" stroke="${G}" stroke-width="1"/><path d="M42 58 H58 L54 54 H46Z" fill="${G}"/><path d="M18 22 H82" stroke="${G}" stroke-width=".9"/>
+    ${[[22, '股', GR, 3], [50, '', '', 0], [78, '債', BL, 9]].filter(a => a[1]).map(([x, t, c, n]) => `<path d="M${x} 22 L${x - 6} 34 M${x} 22 L${x + 6} 34" stroke="${G}" stroke-width=".4"/><path d="M${x - 8} 34 Q${x} 40 ${x + 8} 34Z" fill="${G}"/><rect x="${x - 4}" y="${30 - n * .6}" width="8" height="${3 + n * .6}" fill="${c}"/>${txt(x, 46, t + (n > 5 ? ' 多' : ' 少'), 3, c)}`).join('')}
+    ${txt(50, 10, '每種資產風險相同', 3.4, GH)}`, [50, 22]),
+  tail_hedger: k => svg('risk', `${ground(k)}
+    <path d="M8 54 Q20 54 30 40 Q40 16 50 14 Q60 16 70 40 Q80 54 92 54" fill="none" stroke="${GH}" stroke-width="1.1"/>
+    <path d="M8 54 Q12 54 16 50 L16 54Z" fill="${R}"/>${shield(16, 42, .7, '#2a5a7a')}${txt(16, 32, '尾部', 3, '#ff9c86')}
+    ${txt(64, 62, '平時付保費，等百年一遇', 3, GH)}`, [16, 42]),
+  monte_carlo: k => svg('risk', `${ground(k)}
+    ${Array.from({ length: 14 }, (_, i) => { let y = 36, d = 'M6 36'; for (let x = 12; x <= 90; x += 6) { y += Math.sin(i * 7.3 + x * .37) * 3 + (i - 7) * .25; d += ` L${x} ${f1(y)}`; } return `<path d="${d}" fill="none" stroke="${i === 9 ? GH : '#ffb08a'}" stroke-width="${i === 9 ? 1.4 : .35}" opacity="${i === 9 ? 1 : .5}"/>`; }).join('')}
+    ${txt(50, 10, '一萬條路徑', 3.6, GH)}<g transform="translate(86 54)"><rect x="-5" y="-5" width="10" height="10" rx="1.6" fill="${W}" stroke="${k}" stroke-width=".4"/>${[[-2, -2], [2, 2], [0, 0]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".9" fill="${R}"/>`).join('')}</g>`, [50, 36]),
+
+  /* 衍生性商品 — payoff diagrams and the spirits of the option chain */
+  margin_oni: k => svg('deriv', `${ground(k)}
+    <rect x="12" y="14" width="40" height="40" fill="#1a0a2a" stroke="${G}" stroke-width=".5"/><rect x="16" y="${54 - 16}" width="32" height="12" fill="${UP}" opacity=".7"/>${txt(32, 22, '權益數', 3.4, GH)}
+    <path d="M10 34 H54" stroke="${R}" stroke-width=".9" stroke-dasharray="1.6 1"/>${txt(32, 32, '維持線', 3, '#ff9c86')}
+    <g transform="translate(74 30)"><circle r="9" fill="#6a1a1a" stroke="${G}" stroke-width=".5"/><path d="M-5 -6 L-7 -13 L-2 -8Z M5 -6 L7 -13 L2 -8Z" fill="${W}"/><path d="M-4 -1 L-1 0 M4 -1 L1 0" stroke="${GH}" stroke-width=".9"/><path d="M-4 4 L-2 3 L0 4 L2 3 L4 4" fill="none" stroke="${W}" stroke-width=".6"/></g>${txt(74, 50, '追繳！', 4, '#ff9c86')}`),
+  spread_blade: k => svg('deriv', `${ground(k)}${axes(40)}
+    ${poly([[6, 50], [36, 50], [64, 26], [94, 26]], GH, 1.4)}<path d="M6 50 H36 M64 26 H94" stroke="${GH}" stroke-width="1.4"/>
+    ${txt(80, 22, '獲利上限', 3, GR)}${txt(20, 56, '虧損下限', 3, '#ff9c86')}${txt(36, 46, '買', 3.4, UP)}${txt(64, 34, '賣', 3.4, DN)}
+    <path d="M30 14 L44 6 M58 6 L72 14" stroke="#e9ecf6" stroke-width="1" stroke-linecap="round"/>`),
+  put_guard: k => svg('deriv', `${ground(k)}${axes(40)}
+    ${poly([[6, 46], [40, 46], [94, 12]], GH, 1.4)}<path d="M6 46 H40" stroke="${GR}" stroke-width="2"/>${txt(22, 52, '持股的底線', 3, GR)}
+    ${shield(22, 30, .8, '#3a2a6a')}${txt(22, 31.4, 'P', 4, GH)}`),
+  covered_ferry: k => svg('deriv', `<path d="M0 46 Q25 42 50 46 T100 46 V70 H0Z" fill="#1a1a4a"/><path d="M0 52 Q25 48 50 52 T100 52" fill="none" stroke="#b9a6e0" stroke-width=".5"/>
+    <g transform="translate(50 42)"><path d="M-22 0 H22 L16 7 H-16Z" fill="#6a4a1a" stroke="${G}" stroke-width=".5"/><rect x="-12" y="-8" width="10" height="8" fill="${W}" stroke="${k}" stroke-width=".3"/>${txt(-7, -2.4, '持股', 2.6, '#3a2a05')}<path d="M8 0 V-20" stroke="${G}" stroke-width=".6"/><path d="M8 -20 L18 -8 H8Z" fill="${W}"/></g>
+    ${[[20, 22], [28, 18], [36, 22]].map(([x, y]) => coin(x, y, 2)).join('')}${txt(28, 12, '每月收船資', 3.2, GH)}${txt(82, 20, '賣出買權', 3.2, '#b9a6e0')}`),
+  tick_imp: k => svg('deriv', `${ground(k)}
+    <rect x="16" y="14" width="68" height="20" fill="#1a0a2a" stroke="${G}" stroke-width=".5"/>${txt(36, 28, '22,450', 7, GH)}${txt(70, 28, '+1', 6, UP)}
+    ${txt(50, 44, '1 點 ＝ 200 元', 4, GH)}
+    <g transform="translate(50 54)"><circle r="4" fill="#6a2a8a" stroke="${G}" stroke-width=".4"/><path d="M-3 -2 L-4 -6 L-1 -3Z M3 -2 L4 -6 L1 -3Z" fill="#6a2a8a"/><path d="M-4 3 L-7 7 M4 3 L7 7" stroke="#6a2a8a" stroke-width=".9"/></g>`),
+  basis_ronin: k => svg('deriv', `${ground(k)}
+    ${poly([[6, 30], [24, 26], [44, 30], [64, 24], [94, 22]], GH, 1.3)}${poly([[6, 40], [24, 36], [44, 38], [64, 30], [94, 23]], '#b9a6e0', 1.3)}${txt(94, 18, '期貨', 3, GH, 'end')}${txt(20, 46, '現貨', 3, '#b9a6e0')}
+    <path d="M44 30 V38" stroke="${R}" stroke-width="1.2"/>${txt(52, 36, '基差', 3.4, '#ff9c86', 'start')}${txt(80, 34, '結算收斂', 3, GH)}
+    ${fig(30, 50, .7, k, `<path d="M32 51 L38 46" stroke="#e9ecf6" stroke-width=".6"/>`)}`),
+  delta_archer: k => svg('deriv', `${ground(k)}${axes(48)}
+    <path d="M8 46 Q50 44 70 22 Q80 12 92 10" fill="none" stroke="${GH}" stroke-width="1.3"/><path d="M40 40 L70 22" stroke="${UP}" stroke-width=".9"/>${txt(58, 38, 'Δ ＝ 斜率', 3.4, UP)}
+    <g transform="translate(22 28)"><path d="M-4 -12 Q8 0 -4 12" fill="none" stroke="${G}" stroke-width="1"/><path d="M-4 -12 L-4 12" stroke="#e9ecf6" stroke-width=".3"/><path d="M-4 0 L20 -6" stroke="#e9ecf6" stroke-width=".7"/><path d="M18 -7.4 L22 -6.4 L18.6 -4.6Z" fill="${G}"/></g>`),
+  vega_mage: k => svg('deriv', `${ground(k)}
+    <g stroke="#cfd6e0" stroke-width=".8" fill="none" opacity=".7"><path d="M6 20 Q20 14 30 22 Q38 28 30 32"/><path d="M8 34 Q22 28 34 36"/><path d="M6 46 Q18 42 26 48"/></g>${txt(20, 12, '隱含波動率 ↑', 3, GH)}
+    <g transform="translate(70 32)"><circle r="${10}" fill="#6a2a8a" opacity=".35"/><circle r="15" fill="#6a2a8a" opacity=".18"/>${cur(0, 0, 6, '權', G)}</g>${txt(70, 56, '權利金膨脹', 3.2, GH)}
+    ${fig(40, 34, .8, k, `<path d="M43 37 L50 30" stroke="${G}" stroke-width=".6"/><circle cx="50" cy="30" r="1.2" fill="#d9a6ff" stroke="none"/>`)}`),
+  straddle_janus: k => svg('deriv', `${ground(k)}${axes(44)}
+    ${poly([[8, 12], [50, 50], [92, 12]], GH, 1.4)}${txt(16, 22, '大跌賺', 3, GR)}${txt(84, 22, '大漲賺', 3, GR)}${txt(50, 58, '不動最怕', 3.2, '#ff9c86')}
+    <g transform="translate(50 26)"><circle r="6" fill="${k}" stroke="${G}" stroke-width=".5"/><path d="M0 -6 V6" stroke="${G}" stroke-width=".4"/><circle cx="-2.6" cy="-1" r=".7" fill="${GH}"/><circle cx="2.6" cy="-1" r=".7" fill="${GH}"/></g>`),
+  iron_condor: k => svg('deriv', `${ground(k)}${axes(44)}
+    ${poly([[6, 54], [22, 54], [36, 30], [64, 30], [78, 54], [94, 54]], GH, 1.4)}${txt(50, 26, '區間內獲利', 3.2, GR)}
+    <g transform="translate(50 14)" fill="${k}" stroke="${G}" stroke-width=".4"><path d="M-22 2 Q-10 -6 0 0 Q10 -6 22 2 Q10 -1 0 4 Q-10 -1 -22 2Z"/><circle cy="-1" r="2"/><path d="M1.4 -1 L4 0 L1.4 .6Z" fill="${G}"/></g>
+    ${[22, 36, 64, 78].map(x => `<path d="M${x} 44 V48" stroke="#b9a6e0" stroke-width=".7"/>`).join('')}`),
+  warrant_kappa: k => svg('deriv', `<path d="M0 44 Q25 40 50 44 T100 44 V70 H0Z" fill="#1a2a4a"/><path d="M0 50 Q25 46 50 50 T100 50" fill="none" stroke="#7fd0e0" stroke-width=".5"/>
+    <g fill="#cfe8ff" opacity=".7">${[[30, 34, 4], [40, 26, 6], [56, 22, 7], [70, 30, 5]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')}</g>${txt(56, 14, '數倍水花', 3.4, GH)}
+    <g transform="translate(22 42)"><ellipse cx="0" cy="2" rx="6" ry="5" fill="#2f7d4f" stroke="${G}" stroke-width=".4"/><circle cx="0" cy="-5" r="4" fill="#2f7d4f" stroke="${G}" stroke-width=".4"/><ellipse cx="0" cy="-8.6" rx="3" ry="1" fill="#cfe8ff"/></g>${coin(30, 44, 1.6)}${txt(14, 62, '小本金', 3, GH)}`),
+  rollover_monk: k => svg('deriv', `${ground(k)}
+    <rect x="12" y="20" width="26" height="20" fill="${W}" stroke="${G}" stroke-width=".5"/>${txt(25, 28, '近月', 4, '#3a2a05')}${txt(25, 35, '10 月', 3, '#3a2a05')}
+    <rect x="62" y="20" width="26" height="20" fill="${W}" stroke="${G}" stroke-width=".5"/>${txt(75, 28, '遠月', 4, '#3a2a05')}${txt(75, 35, '11 月', 3, '#3a2a05')}
+    <path d="M40 30 H60" stroke="${GH}" stroke-width=".9"/><path d="M58 28 L61 30 L58 32Z" fill="${GH}"/>${txt(50, 26, '轉倉', 3.4, GH)}
+    ${fig(50, 42, .8, k, `<circle cx="50" cy="41.6" r="2" fill="#3a1a28" stroke="none"/>`)}`),
+  /* ★3 */
+  theta_reaper: k => svg('deriv', `${ground(k)}
+    <path d="M10 18 Q50 20 70 36 Q80 46 86 56" fill="none" stroke="${GH}" stroke-width="1.4"/>${txt(20, 14, '時間價值', 3.2, GH)}${txt(86, 62, '結算日', 3, '#ff9c86')}
+    ${[[20, 18], [40, 21], [58, 29], [72, 40]].map(([x, y]) => coin(x, y, 1.6)).join('')}
+    <g transform="translate(40 44)" fill="${k}" stroke="${G}" stroke-width=".5"><path d="M-8 14 Q-8 -2 0 -6 Q8 -2 8 14Z"/><circle cy="-8" r="3.4"/><path d="M8 -4 L14 -18" stroke="#cfd6e0" stroke-width=".9"/><path d="M14 -18 Q6 -20 2 -14" fill="none" stroke="#e9ecf6" stroke-width="1.2"/></g>`, [70, 36]),
+  settle_lord: k => svg('deriv', `${ground(k)}
+    <g transform="translate(36 32)"><rect x="-18" y="-16" width="36" height="32" fill="${W}" stroke="${G}" stroke-width=".6"/><rect x="-18" y="-16" width="36" height="6" fill="#6a2a8a"/>${txt(0, -11.6, '每月', 3.2, '#fff')}
+      ${['一', '二', '三', '四', '五'].map((d, i) => txt(-14 + i * 7, -5, d, 2.6, '#3a2a05')).join('')}${Array.from({ length: 15 }, (_, i) => `<rect x="${-16 + (i % 5) * 7}" y="${-3 + Math.floor(i / 5) * 6}" width="5" height="4.4" fill="${i === 12 ? R : '#d9cfb8'}"/>`).join('')}</g>
+    ${txt(36, 56, '第三個星期三', 3.4, GH)}${fig(76, 24, 1.2, k, `<path d="M70.6 21 Q76 15.6 81.4 21Z" fill="${G}" stroke="none"/>`)}`, [76, 24]),
+  iv_witch: k => svg('deriv', `${ground(k)}
+    <path d="M8 50 Q30 48 40 40 Q50 30 60 34 Q70 38 80 18 L92 10" fill="none" stroke="#d9a6ff" stroke-width="1.3"/>${txt(84, 22, 'IV ↑', 3.6, '#d9a6ff')}${txt(26, 58, '市場越恐懼', 3.2, GH)}
+    ${fig(30, 26, 1, k, `<path d="M24 23 L30 10 L36 23Z" fill="${k}"/><path d="M33 30 L44 18" stroke="#8a6a4a" stroke-width=".8"/><circle cx="44" cy="18" r="1.6" fill="#d9a6ff" stroke="none" filter="url(#glow)"/>`)}
+    ${cur(64, 50, 4.4, '貴', '#ffb08a')}`, [44, 18]),
+  arbitrage_twins: k => svg('deriv', `${ground(k)}
+    ${fig(24, 22, 1, k, '')}${fig(76, 22, 1, k, '')}
+    <rect x="12" y="38" width="24" height="10" rx="1" fill="#5a1a1a" stroke="${G}" stroke-width=".4"/>${txt(24, 45, '買 低價', 3.2, UP)}<rect x="64" y="38" width="24" height="10" rx="1" fill="#1a3a2a" stroke="${G}" stroke-width=".4"/>${txt(76, 45, '賣 高價', 3.2, GR)}
+    <path d="M36 43 H64" stroke="${GH}" stroke-width=".6" stroke-dasharray="1.4 1"/>${coin(50, 43, 3)}${txt(50, 34, '同時成交', 3.2, GH)}${txt(50, 60, '無風險利潤，稍縱即逝', 3, GH)}`, [50, 40]),
+
+  /* 虛擬貨幣 — blocks, chains, keys and wallets */
+  sat_sprite: k => svg('crypto', `${ground(k)}
+    ${cur(34, 32, 16, '₿', '#f7931a', '#fff')}<path d="M54 32 H66" stroke="${GH}" stroke-width=".6" stroke-dasharray="1 1"/>
+    <circle cx="74" cy="32" r="1.4" fill="#f7931a"/><circle cx="74" cy="32" r="4" fill="none" stroke="${GH}" stroke-width=".4"/>${txt(74, 44, '1 聰', 3.6, GH)}${txt(50, 60, '一億分之一顆', 3.4, GH)}`),
+  miner_dwarf: k => svg('crypto', `${ground(k)}
+    ${blk(70, 28, 2.2)}${txt(70, 46, '區塊獎勵', 3, GH)}
+    <rect x="10" y="12" width="40" height="14" fill="#1a0a1a" stroke="${G}" stroke-width=".4"/>${txt(30, 21, '0000a3f…', 3.6, GR)}
+    ${fig(30, 38, 1, k, `<path d="M33 42 L42 34" stroke="#8a6a4a" stroke-width="1"/><path d="M38 31 L46 37" stroke="#cfd6e0" stroke-width="1.6"/><path d="M25.4 35 Q30 30.6 34.6 35Z" fill="#ffb347" stroke="none"/>`)}`),
+  cold_golem: k => svg('crypto', `${ground(k)}
+    <g fill="#4a5a7a" stroke="${G}" stroke-width=".5"><rect x="38" y="24" width="24" height="22" rx="2"/><rect x="42" y="14" width="16" height="10" rx="2"/><rect x="30" y="26" width="8" height="16" rx="2"/><rect x="62" y="26" width="8" height="16" rx="2"/><rect x="40" y="46" width="8" height="14"/><rect x="52" y="46" width="8" height="14"/></g>
+    <rect x="44" y="30" width="12" height="10" rx="1" fill="#10020f" stroke="#7fd0e0" stroke-width=".5"/><path d="M47 34 h6 M50 31 V37" stroke="#7fd0e0" stroke-width=".7"/>
+    <g transform="translate(82 18)"><path d="M-6 0 Q0 -8 6 0" fill="none" stroke="#cfd6e0" stroke-width=".8"/><path d="M-3 2 Q0 -2 3 2" fill="none" stroke="#cfd6e0" stroke-width=".8"/><path d="M-8 -6 L8 8" stroke="${R}" stroke-width="1"/></g>${txt(82, 32, '離線', 3.2, GH)}`),
+  seed_bard: k => svg('crypto', `${ground(k)}
+    <rect x="40" y="10" width="54" height="40" fill="${W}" stroke="${G}" stroke-width=".5"/>
+    ${['apple', 'river', 'tiger', 'moon', 'salt', 'cloud', 'brave', 'ocean', 'pilot', 'echo', 'lamp', 'zero'].map((w, i) => txt(46 + (i % 3) * 16, 17 + Math.floor(i / 3) * 8, `${i + 1}.${w}`, 2.6, '#3a2a05', 'start')).join('')}
+    ${fig(20, 30, 1, k, `<path d="M24 34 Q30 30 28 40" fill="none" stroke="${G}" stroke-width=".8"/><path d="M15.4 27 Q20 22.6 24.6 27Z" fill="${PK}" stroke="none"/>`)}${txt(30, 60, '忘一個就回不了家', 3, GH)}`),
+  gas_imp: k => svg('crypto', `${ground(k)}
+    ${Array.from({ length: 10 }, (_, i) => blk(14 + (i % 5) * 9, 40 - Math.floor(i / 5) * 9, .9)).join('')}${txt(32, 56, '鏈上擁擠', 3.2, GH)}
+    <g transform="translate(74 30)"><path d="M0 -12 Q8 -4 4 4 Q2 8 0 8 Q-2 8 -4 4 Q-8 -4 0 -12Z" fill="#ffb347" stroke="${G}" stroke-width=".4" filter="url(#glow)"/><circle cx="-1.6" cy="0" r=".8" fill="${k}"/><circle cx="1.6" cy="0" r=".8" fill="${k}"/></g>${txt(74, 48, '手續費 ↑', 3.6, '#ff9c86')}`),
+  airdrop_fairy: k => svg('crypto', `${ground(k)}
+    ${[[24, 14], [50, 8], [76, 16]].map(([x, y]) => `<path d="M${x - 8} ${y} Q${x} ${y - 9} ${x + 8} ${y}Z" fill="${W}" stroke="${k}" stroke-width=".3"/><path d="M${x - 8} ${y} L${x} ${y + 12} L${x + 8} ${y}" fill="none" stroke="${W}" stroke-width=".3"/>${cur(x, y + 14, 3, 'T', '#ffd2e6', '#8a1a4a')}`).join('')}
+    ${txt(30, 56, '禮物？', 3.6, GR)}${txt(70, 56, '陷阱？', 3.6, '#ff9c86')}`),
+  hodl_turtle: k => svg('crypto', `${ground(k)}
+    ${poly([[6, 16], [20, 12], [34, 44], [48, 50], [62, 40], [76, 22], [94, 8]], GH, 1)}${txt(40, 58, '−80%', 3.4, '#ff9c86')}
+    <g transform="translate(48 46)"><ellipse rx="14" ry="8" fill="#4a7a4a" stroke="${G}" stroke-width=".5"/><path d="M-8 -4 L0 -7 L8 -4 M-10 2 H10 M0 -7 V6" stroke="${G}" stroke-width=".4" fill="none"/><circle cx="16" cy="2" r="3" fill="#4a7a4a" stroke="${G}" stroke-width=".4"/></g>${txt(80, 34, '四年一循環', 3, GH)}`),
+  stable_knight: k => svg('crypto', `${ground(k)}
+    ${fig(36, 18, 1.2, k, `<path d="M30.6 15 Q36 9.6 41.4 15Z" fill="#cfd6e0" stroke="none"/>`)}${shield(36, 40, 1.1, '#2a5a7a')}${txt(36, 42, '1:1', 5, GH)}
+    ${cur(70, 24, 6, 'USDT', '#26a17b', '#fff')}<path d="M70 32 V38" stroke="${GH}" stroke-width=".5"/>${cur(70, 46, 6, '$1', G)}${txt(70, 60, '足額儲備', 3.2, GH)}`),
+  defi_alchemist: k => svg('crypto', `${ground(k)}
+    <path d="M32 26 Q30 44 40 50 H60 Q70 44 68 26Z" fill="#cfe8ff" opacity=".25" stroke="${W}" stroke-width=".6"/><path d="M33 38 Q50 34 67 38 Q68 46 60 50 H40 Q32 46 33 38Z" fill="#d9467f" opacity=".6"/>
+    ${[[42, 44], [50, 42], [58, 45]].map(([x, y]) => blk(x, y, .6)).join('')}${txt(50, 20, '流動性池', 3.4, GH)}
+    <g fill="${G}">${[[74, 30], [78, 24], [82, 18]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.4"/>`).join('')}</g>${txt(86, 12, '收益', 3, GR)}`),
+  pump_shark: k => svg('crypto', `${ground(k)}
+    ${poly([[6, 50], [30, 48], [44, 46], [50, 30], [56, 10], [62, 14]], UP, 1.4)}${txt(70, 12, '×10', 5, UP)}
+    <path d="M10 56 Q24 44 40 54 L36 46 Q42 50 46 56" fill="#3a3a5a" stroke="${G}" stroke-width=".4"/><path d="M22 50 L26 42 L30 50" fill="#3a3a5a" stroke="${G}" stroke-width=".4"/>
+    <g transform="translate(80 40)"><path d="M-10 -5 H10 V5 H2 L0 9 L-2 5 H-10Z" fill="${W}" stroke="${k}" stroke-width=".4"/>${txt(0, 1.4, '衝！', 4, '#b0472f')}</g>`),
+  contract_scribe: k => svg('crypto', `${ground(k)}
+    <rect x="14" y="12" width="56" height="40" rx="2" fill="#1a0a1a" stroke="${G}" stroke-width=".5"/>
+    ${[['if (價格 ≥ 目標)', GR], ['  transfer(買方)', '#d9a6ff'], ['else', GR], ['  refund()', '#d9a6ff']].map(([t, c], i) => txt(18, 21 + i * 8, t, 3.2, c, 'start')).join('')}
+    ${blk(84, 30, 1.6)}<path d="M70 30 H76" stroke="${GH}" stroke-width=".6"/>${txt(50, 62, '條件成立，自動執行', 3, GH)}`),
+  funding_wisp: k => svg('crypto', `${ground(k)}
+    <path d="M10 40 L50 34 L90 40" stroke="#a87a3a" stroke-width="1.4" fill="none"/><path d="M50 34 L46 40 H54Z" fill="${G}"/>
+    <rect x="10" y="30" width="16" height="8" fill="#5a1a1a" stroke="${G}" stroke-width=".4"/>${txt(18, 36, '多', 4, UP)}<rect x="78" y="34" width="10" height="6" fill="#1a3a2a" stroke="${G}" stroke-width=".4"/>${txt(83, 39, '空', 3.4, GR)}
+    ${[[30, 18], [50, 14], [70, 18]].map(([x, y]) => `<path d="M${x} ${y - 6} Q${x + 4} ${y} ${x} ${y + 4} Q${x - 4} ${y} ${x} ${y - 6}Z" fill="#7fd0ff" opacity=".7" filter="url(#glow)"/>`).join('')}${txt(50, 56, '每 8 小時燃起一次', 3, GH)}`),
+  /* ★3 */
+  halving_phoenix: k => svg('crypto', `${ground(k)}
+    <g transform="translate(50 30)"><path d="M0 -14 Q6 -8 4 0 Q16 -10 28 -6 Q16 0 8 6 Q4 12 0 16 Q-4 12 -8 6 Q-16 0 -28 -6 Q-16 -10 -4 0 Q-6 -8 0 -14Z" fill="#ff6b3a" stroke="${G}" stroke-width=".5" filter="url(#glow)"/></g>
+    ${[['6.25', 18], ['3.125', 50], ['1.5625', 82]].map(([t, x]) => txt(x, 58, `${t} ₿`, 3.2, GH)).join('')}${txt(50, 64, '每 21 萬個區塊減半', 2.8, GH)}`, [50, 30]),
+  bridge_thief: k => svg('crypto', `<path d="M0 50 Q50 46 100 50 V70 H0Z" fill="#1a0a2a"/>
+    <path d="M10 36 Q50 20 90 36" fill="none" stroke="${G}" stroke-width="1.2"/><path d="M10 36 V50 M90 36 V50" stroke="${G}" stroke-width="1.2"/>${Array.from({ length: 9 }, (_, i) => `<path d="M${18 + i * 8} ${f1(36 - Math.sin((i + 1) / 10 * Math.PI) * 16 * .9)} V40" stroke="${G}" stroke-width=".4"/>`).join('')}
+    <path d="M48 26 L52 30 L48 32 L52 36" fill="none" stroke="${R}" stroke-width="1"/>${blk(10, 30, 1.2)}${blk(90, 30, 1.2, '#7f3fdc')}${txt(10, 20, '鏈 A', 3, GH)}${txt(90, 20, '鏈 B', 3, GH)}
+    ${fig(62, 38, .7, k, `<path d="M57.4 36 H66.6" stroke="${k}" stroke-width="1.6"/>`)}${txt(50, 62, '一個漏洞，捲走數億', 3, '#ff9c86')}`, [50, 26]),
+  stake_guard: k => svg('crypto', `${ground(k)}
+    ${stack(26, 52, 8, 4)}${txt(26, 36, '押上代幣', 3, GH)}
+    ${fig(54, 22, 1.2, k, `<path d="M60 26 V48" stroke="${G}" stroke-width=".7"/><path d="M58.6 26 L60 21 L61.4 26Z" fill="${W}"/>`)}${shield(54, 40, .8, '#5a2a6a')}${txt(54, 41.4, 'PoS', 3.6, GH)}
+    ${txt(82, 30, '作惡', 3.2, '#ff9c86')}${txt(82, 36, '＝罰沒', 3.2, '#ff9c86')}`, [54, 30]),
+  amm_kitsune: k => svg('crypto', `${ground(k)}
+    <path d="M14 10 V54 H90" stroke="#b9a6e0" stroke-width=".5" fill="none"/>${txt(10, 12, 'y', 3.4, GH)}${txt(92, 58, 'x', 3.4, GH)}
+    <path d="M18 12 Q24 40 40 46 Q60 52 88 52" fill="none" stroke="${GH}" stroke-width="1.4"/><circle cx="40" cy="46" r="1.8" fill="${R}"/>${txt(60, 26, 'x × y ＝ k', 5, GH)}
+    <g transform="translate(70 40)" fill="#e9a65a" stroke="${G}" stroke-width=".4"><path d="M-6 4 Q-4 -3 2 -2 L5 -6 L6 -1 Q8 1 7 4Z"/><path d="M-6 4 Q-14 2 -12 -5 Q-9 0 -4 1Z" fill="${W}"/></g>`, [60, 26]),
 };
 
 const CACHE = {};

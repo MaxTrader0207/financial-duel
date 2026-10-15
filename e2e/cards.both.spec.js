@@ -1,4 +1,4 @@
-// Card faces: every ★4 card's own art, ★3 crests, the lazily drawn 圖鑑, long-press zoom, and no text spilling out.
+// Card faces: every card's own art, the lazily drawn 圖鑑, long-press zoom, and no text spilling out.
 import { test, expect, open, startDuel, until } from './fixtures.js';
 
 test('the 圖鑑 draws cards as they scroll into view, with the right art per rarity', async ({ page, errors }) => {
@@ -12,7 +12,8 @@ test('the 圖鑑 draws cards as they scroll into view, with the right art per ra
   for (const item of await page.locator('#dex .dex-item').all()) { await item.scrollIntoViewIfNeeded(); }
   await page.waitForTimeout(300);
   await expect(page.locator('#dex .c-art-ur svg.ur')).toHaveCount(4);
-  await expect(page.locator('#dex .c-crest')).toHaveCount(4);
+  await expect(page.locator('#dex .c-art-own svg.own')).toHaveCount(16);        // ★1–★3: each card's own illustration
+  await expect(page.locator('#dex .c-crest')).toHaveCount(0);
 });
 
 test('long-press opens the zoom view instead of playing the card', async ({ page, errors }, info) => {

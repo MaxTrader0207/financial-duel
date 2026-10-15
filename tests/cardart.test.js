@@ -5,7 +5,7 @@ import { MON, MONSTERS } from '../src/js/carddata.js';
 import { cardHTML } from '../src/js/cards.js';
 
 describe('card art', () => {
-  const DONE = ['money', 'tech', 'fund', 'etf'];                // attributes whose ★1–★3 cards have their own art so far
+  const DONE = ['money', 'tech', 'fund', 'etf', 'fx', 'chips', 'risk', 'deriv', 'crypto'];                // attributes whose ★1–★3 cards have their own art so far
   it('covers every ★1–★3 card of the finished attributes, and only real cards', () => {
     const want = MONSTERS.filter(m => DONE.includes(m.cat) && m.rank < 4).map(m => m.id).sort();
     expect(OWN_IDS.slice().sort()).toEqual(want);
@@ -21,6 +21,5 @@ describe('card art', () => {
       expect(doc.getElementsByTagName('parsererror')).toHaveLength(0);
       expect(cardHTML(MON[id])).toContain('c-art-own');
     }
-    expect(cardHTML(MONSTERS.find(m => !DONE.includes(m.cat) && m.rank === 1))).not.toContain('c-art-own');
   });
 });
