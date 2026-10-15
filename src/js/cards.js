@@ -2,6 +2,7 @@
 // The card data itself is carddata.js (re-exported here so screens can import everything card-related from one place).
 import { SCENE_B, SCENE_C } from './scenes.js';
 import { urArt } from './ur-art.js';
+import { ownArt } from './card-art.js';
 import { esc } from './core.js';
 import { SKILLS } from './skills.js';
 import { CATS, CAT_ALIAS, MON, MONSTERS, RARITY, RARITY_FULL, RARITY_TC } from './carddata.js';
@@ -20,11 +21,13 @@ function cardHTML(m) {
   </div>`;
 }
 
-/* card art by rarity: N / R = one of the three shared scenes (hue-shifted, mirrored per card);
+/* card art by rarity (a card with its own illustration in card-art.js uses that instead): N / R = one of the three shared scenes (hue-shifted, mirrored per card);
    SR = the scene behind a family-crest medallion with the card's sigil; UR = its own illustration (ur-art.js) */
 function artHTML(m, rar) {
   const ur = rar === 'UR' && urArt(m);
   if (ur) return `<div class="c-art c-art-ur">${ur}<span class="c-seal">${esc(m.sigil)}</span></div>`;
+  const own = rar !== 'UR' && ownArt(m);                  // exclusive illustration (card-art.js), when the card has one
+  if (own) return `<div class="c-art c-art-own${rar === 'SR' ? ' sr' : ''}">${own}<span class="c-seal">${esc(m.sigil)}</span></div>`;
   const scene = [SCENE, SCENE_B, SCENE_C][(m.v || 0) % 3][m.cat];
   const style = `--hue:${VAR_HUE[m.v || 0]}deg;--flip:${(m.v || 0) % 2 ? -1 : 1}`;
   if (rar === 'SR') return `<div class="c-art c-art-sr" style="${style}">${scene}<span class="c-crest" aria-hidden="true"><i>${esc(m.sigil)}</i></span></div>`;

@@ -1297,3 +1297,6 @@ html[data-back="hall"] .card.back .mark{color:#ffe08a;border-color:#ffe08a;box-s
 @media (max-width:640px){ .ls-st{display:none} .ls-opts.cards{gap:6px} .ls-opt-card{font-size:12px;--cw:min(96px,100%)} }
 .ls-quit{justify-self:start;font-size:13px;color:var(--muted)}
 .ls-chip{flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;color:#fff;font-family:var(--f-name);font-size:14px;box-shadow:0 0 0 1.5px #fff}
+/* cards with their own illustration (card-art.js) */
+.c-art-own{box-shadow:inset 0 0 0 .08em #ffffff30}
+.c-art-own.sr::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;box-shadow:inset 0 0 0 .1em #f3dc95aa,inset 0 0 .6em #f3dc9555}
