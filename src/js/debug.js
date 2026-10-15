@@ -41,6 +41,8 @@ import * as treeui from './treeui.js';
 import * as recexport from './recexport.js';
 import * as newbie from './newbie.js';
 import * as quests from './quests.js';
+import * as lessons from './lessons.js';
+import * as lessonsui from './lessonsui.js';
 import * as skilltree from './skilltree.js';
 import * as notebook from './notebook.js';
 
@@ -53,5 +55,5 @@ window.__T = {
   get COL() { return col.COL; }, get DECK() { return col.DECK; }, get RECS() { return rec.RECS; }, get QS() { return rec.QS; }, get SET() { return SET; },
   advOf, weakCat: rec.weakCat, lifetimeByCat: rec.lifetimeByCat, cpuPick, cpuScore, autoDeck: col.autoDeck, deckValid: col.deckValid,
   rewardOffer: col.rewardOffer, claimReward: col.claimReward, cpuDeckList: col.cpuDeckList, renderRecord, openDeck, recordGame: rec.recordGame,
-  get BANK() { return DATA.questions.questions; }, get Store() { return Store; }, cardHTML: (...a) => cards.cardHTML(...a), migrateSave, fitDeck: col.fitDeck, openZoom, fsm, calc, renderMarket, daily, openDaily, renderDailyCard, knowledge, openKnow, ranked, market, openRanked, online, openBoard, usage, challenge, openChallenge, sharecard, version, nbexport, notebook, treeui, skilltree, recexport, newbie, quests,
+  get BANK() { return DATA.questions.questions; }, get Store() { return Store; }, cardHTML: (...a) => cards.cardHTML(...a), migrateSave, fitDeck: col.fitDeck, openZoom, fsm, calc, renderMarket, daily, openDaily, renderDailyCard, knowledge, openKnow, ranked, market, openRanked, online, openBoard, usage, challenge, openChallenge, sharecard, version, nbexport, notebook, treeui, skilltree, recexport, newbie, quests, lessons, lessonsui,
 };

@@ -1257,3 +1257,43 @@ html[data-back="hall"] .card.back .mark{color:#ffe08a;border-color:#ffe08a;box-s
 .easier-tip{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 16px;background:color-mix(in oklab,var(--gold) 10%,var(--ink2));border-left:4px solid var(--gold)}
 .easier-tip span{flex:1;min-width:220px;font-size:14px;line-height:1.6}
 .easier-tip b{color:var(--gold-hi)}
+/* 教學中心 */
+.ls-count{margin:0;color:var(--muted);font-size:14px}
+.ls-count b{color:var(--gold-hi)}
+.ls-list{display:grid;gap:10px}
+.ls-item{display:flex;align-items:center;gap:14px;width:100%;padding:14px 16px;text-align:left;background:var(--ink2);border:1px solid var(--line);color:var(--text);font:inherit;cursor:pointer}
+.ls-item:hover,.ls-item:focus-visible{border-color:var(--gold)}
+.ls-n{flex:none;display:grid;place-items:center;width:34px;height:34px;background:var(--ink3);color:var(--gold-hi);font-family:var(--f-name);font-size:18px}
+.ls-item.done .ls-n{background:var(--gold);color:var(--ink)}
+.ls-t{flex:1;min-width:0;display:grid;gap:2px}
+.ls-t b{font-size:16px;font-weight:600}
+.ls-t small{font-size:13px;color:var(--muted);line-height:1.5}
+.ls-st{flex:none;font-size:12px;color:var(--muted);text-align:right;max-width:9em}
+.ls-item.done .ls-st{color:var(--good)}
+.ls-lesson{display:grid;gap:14px;padding:18px;background:var(--ink2);border:1px solid var(--line)}
+.ls-lesson h4{margin:0;font-weight:600;font-size:19px;color:var(--gold-hi)}
+.ls-intro{margin:0;padding-left:1.2em;display:grid;gap:8px;font-size:15px;line-height:1.65}
+.ls-prog{font-size:13px;color:var(--muted);letter-spacing:.06em}
+.ls-q{margin:0;font-size:18px;font-weight:600;line-height:1.6}
+.ls-cards,.ls-foe{display:flex;align-items:center;gap:12px;--cw:110px}
+.ls-foe span{font-size:13px;color:var(--shu)}
+.ls-opts{display:grid;gap:8px}
+.ls-opts.cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ls-opt{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:11px 14px;background:var(--ink3);border:1px solid var(--line);color:var(--text);font:inherit;font-size:15px;line-height:1.5;cursor:pointer}
+.ls-opt .k{color:var(--gold);font-weight:600;flex:none}
+.ls-opt:hover:not(:disabled){border-color:var(--gold)}
+.ls-opt:disabled{cursor:default}
+.ls-opt.right{border-color:var(--good);background:color-mix(in oklab,var(--good) 22%,var(--ink3))}
+.ls-opt.wrong{border-color:var(--bad);background:color-mix(in oklab,var(--bad) 22%,var(--ink3))}
+.ls-opt-card{flex-direction:column;align-items:center;gap:8px;padding:10px 6px;--cw:min(110px,100%);font-size:13px;text-align:center}
+.ls-fb{display:grid;gap:8px;padding:12px 14px;background:var(--ink);border-left:4px solid var(--good)}
+.ls-fb.no{border-left-color:var(--bad)}
+.ls-fb b{font-size:17px;color:var(--good)} .ls-fb.no b{color:var(--bad)}
+.ls-fb p{margin:0;font-size:14px;line-height:1.65;color:var(--text)}
+.ls-fb .btn{justify-self:start}
+.ls-end{justify-items:start}
+.ls-score{font-family:var(--f-name);font-size:44px;color:var(--good)} .ls-score.no{color:var(--bad)}
+.ls-lesson .rw{max-width:360px}
+@media (max-width:640px){ .ls-st{display:none} .ls-opts.cards{gap:6px} .ls-opt-card{font-size:12px;--cw:min(96px,100%)} }
+.ls-quit{justify-self:start;font-size:13px;color:var(--muted)}
+.ls-chip{flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;color:#fff;font-family:var(--f-name);font-size:14px;box-shadow:0 0 0 1.5px #fff}

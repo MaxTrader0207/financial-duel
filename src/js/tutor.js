@@ -40,7 +40,7 @@ Tutor = (() => {
       text: `<ul class="tut-list">
         <li>出牌：屬性決定題目，攻擊力就是傷害</li><li>答題：限時作答，越快越好</li><li>解析與錯題本：答錯的題目會再出現</li>
         <li>對手也會答題：攻擊它不擅長的屬性</li><li>防禦：選守備高、相剋的卡</li><li>技能：長按卡片看全文</li></ul>
-        <p class="tut-next">把這場打完吧！勝利可以從 3 張新卡挑 1 張，之後到「牌組編輯」放進牌組；答錯的題目在「錯題本」複習。</p>` },
+        <p class="tut-next">把這場打完吧！勝利可以從 3 張新卡挑 1 張，之後到「牌組編輯」放進牌組；答錯的題目在「錯題本」複習；想把相剋、傷害計算練熟，可以到「教學中心」。</p>` },
   };
   let active = false, current = null, target = null, raf = 0, waiters = [];
   const shown = new Set();

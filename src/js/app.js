@@ -53,6 +53,7 @@ import { init as init_recexport } from './recexport.js';
 import { init as init_rulesref } from './rulesref.js';
 import { init as init_quests } from './quests.js';
 import { init as init_newbie } from './newbie.js';
+import { init as init_lessons } from './lessonsui.js';
 import { init as init_boot } from './boot.js';
 
 export function initAll() {
@@ -110,5 +111,6 @@ export function initAll() {
   init_rulesref();
   init_quests();
   init_newbie();
+  init_lessons();
   init_boot();
 }
