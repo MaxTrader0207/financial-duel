@@ -92,6 +92,7 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
 | `ai.js`、`collection.js`、`records.js` | 對手策略、收藏與牌組、學習紀錄 |
 | `notebook.js`、`feedback.js`、`bank.js`、`bankui.js` | 錯題本（間隔複習：第 1 階立即、第 2 階隔 1 天、第 3 階隔 3 天；沒到期先答對不升階；記下上次選錯的答案；標題到期提醒與複習結果）、題目回報、題庫 |
 | `report.js`、`result.js` | PDF／PNG 對戰報告、結算畫面 |
+| `art-parts.js`、`card-recipes.js` | 主體零件庫：繪圖基本元件、共用色盤、49 個零件（人物、妖獸、建築、代表物）、`compose()` 把配方組成卡面、`autoRecipe()` 依種族與屬性自動配；`card-recipes.js` 寫新卡的配方 |
 | `scenes.js`、`ur-art.js`、`card-art.js` | 每屬性第 2、3 種卡面場景、極稀有卡的專屬插圖；`card-art.js` 是全部 144 張普通～超稀有卡的專屬插圖（新卡沒有插圖時沿用屬性場景） |
 | `perf.js`、`pwa.js` | 簡化特效、可安裝 App |
 | `market.js` | 市場事件：休閒與排位對戰中每 3 回合翻出的金融事件，依屬性調整雙方攻擊力 |
@@ -128,6 +129,25 @@ GitHub Pages 版直接改 JSON 就會生效，不必重新建置；單檔版要�
 - 新模組只引用比自己低層的模組；需要呼叫上層（例如規則要更新畫面）時，透過 `ui.js` 或 `actions.js`。
 - 對戰中的資料一律放在 `G`，並在 `game.js` 的 JSDoc 補上欄位說明。
 - `npm test` 會擋下新的循環引用。
+
+## 新卡插圖（主體零件庫）
+
+卡面插圖分三層，越前面越優先：
+
+1. `card-art.js`／`ur-art.js`：手繪的專屬插圖（現有 180 張都有）。
+2. `card-recipes.js`：新卡的「主體零件＋代表物」配方，一行就是一張圖。
+3. 什麼都沒寫時，`autoRecipe()` 依卡的種族／名稱挑主體（武士、忍者、僧侶、龍、狐…），依屬性挑代表物（技術分析 K 線、基本面天秤、資金管理金幣、ETF 籃子、外匯貨幣、籌碼人群、風險管理盾、衍生性商品損益圖、虛擬貨幣區塊），超稀有自動加放射光。新卡上線就有一致畫風的插圖。
+
+新增一張卡的插圖：在 `card-recipes.js` 的 `RECIPES` 加一行，例如
+
+```js
+golden_cross_ronin: { subject: { part: 'samurai' }, props: [{ part: 'candles', s: 1.3 }], caption: '黃金交叉' },
+```
+
+- `subject`／`props` 可設 `part`（零件名稱，見 `PART_NAMES`）、`x`、`y`、`s`（大小）、`flip`（左右翻轉）、`c`（點綴色）、`t`（代表物上的字，例如貨幣符號）。
+- `sky`：`plain`、`sun`、`moon`、`night`、`rain`；`rays: true` 是超稀有的放射光；`caption` 是圖下方的小字。
+- 人物、妖獸、建築以 (x, y) 為腳底／地基；代表物以 (x, y) 為中心。卡面座標是 100 × 70。
+- 要新零件時加在 `art-parts.js` 的 `PARTS`，寫上 `kind` 與中文 `label`；`tests/artparts.test.js` 會檢查每個零件都畫得出合法的 SVG、配方只指向存在且沒有手繪圖的卡。
 
 ## 對戰狀態機（`fsm.js`）
 

@@ -3,6 +3,7 @@
 import { SCENE_B, SCENE_C } from './scenes.js';
 import { urArt } from './ur-art.js';
 import { ownArt } from './card-art.js';
+import { recipeArt } from './card-recipes.js';
 import { esc } from './core.js';
 import { SKILLS } from './skills.js';
 import { CATS, CAT_ALIAS, MON, MONSTERS, RARITY, RARITY_FULL, RARITY_TC } from './carddata.js';
@@ -26,7 +27,8 @@ function cardHTML(m) {
 function artHTML(m, rar) {
   const ur = rar === 'UR' && urArt(m);
   if (ur) return `<div class="c-art c-art-ur">${ur}<span class="c-seal">${esc(m.sigil)}</span></div>`;
-  const own = rar !== 'UR' && ownArt(m);                  // exclusive illustration (card-art.js), when the card has one
+  /* hand-made picture (card-art.js); otherwise the parts library draws one from a recipe or from the card's race */
+  const own = rar === 'UR' ? recipeArt(m) : ownArt(m) || recipeArt(m);
   if (own) return `<div class="c-art c-art-own${rar === 'SR' ? ' sr' : ''}">${own}<span class="c-seal">${esc(m.sigil)}</span></div>`;
   const scene = [SCENE, SCENE_B, SCENE_C][(m.v || 0) % 3][m.cat];
   const style = `--hue:${VAR_HUE[m.v || 0]}deg;--flip:${(m.v || 0) % 2 ? -1 : 1}`;

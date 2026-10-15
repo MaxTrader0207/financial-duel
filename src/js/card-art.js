@@ -3,34 +3,7 @@
 // be recognised at a glance instead of sharing one of three attribute backdrops. Same 100 × 70 box as the scenes;
 // never hue-shifted or mirrored. Rarity still shows in the frame: ★1–★2 on the plain sky, ★3 with a soft sunburst
 // (極稀有 keep their full gold sunburst in ur-art.js).
-const INK = { money: '#14031a', tech: '#04102e', fund: '#021a14', etf: '#0a1403', fx: '#021419', chips: '#1a0f02', risk: '#1e0604', deriv: '#08021a', crypto: '#10020f' };
-const G = '#f3dc95', GH = '#fff2b0', W = '#f4ead2', R = '#e14b32', PK = '#f2a6e6', BL = '#9fd8ff', GR = '#7fdcae';
-const f1 = n => Math.round(n * 10) / 10;
-const rays = (cx, cy, n = 14, r = 80) => `<g fill="#fff4c8" opacity=".11">${Array.from({ length: n }, (_, i) => {
-  const a = i * 2 * Math.PI / n, b = a + Math.PI / n * 0.5;
-  return `<path d="M${cx} ${cy}L${f1(cx + r * Math.cos(a))} ${f1(cy + r * Math.sin(a))}L${f1(cx + r * Math.cos(b))} ${f1(cy + r * Math.sin(b))}Z"/>`; }).join('')}</g>`;
-const svg = (cat, inner, sun = null) => `<svg class="scene ur own" viewBox="0 0 100 70" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="100" height="70" fill="url(#sky-${cat})"/>${sun ? rays(...sun) : ''}${inner}</svg>`;
-const ground = (k, d = 'M0 62 H100 V70 H0Z') => `<path d="${d}" fill="${k}"/>`;
-const coin = (x, y, r = 2.2) => `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#gold-v)" stroke="#6b470f" stroke-width=".3"/>`;
-const stack = (x, y, n, r = 2.4) => Array.from({ length: n }, (_, i) => `<ellipse cx="${x}" cy="${f1(y - i * 1.5)}" rx="${r}" ry="${f1(r * .45)}" fill="url(#gold-v)" stroke="#6b470f" stroke-width=".25"/>`).join('');
-/* a small robed figure: head centre (x, y), scale s */
-const fig = (x, y, s, k, more = '') => `<g fill="${k}" stroke="${G}" stroke-width=".45" stroke-linejoin="round"><circle cx="${x}" cy="${y}" r="${f1(2.6 * s)}"/>
-  <path d="M${f1(x - 3.6 * s)} ${f1(y + 13 * s)} Q${f1(x - 3.8 * s)} ${f1(y + 4.4 * s)} ${x} ${f1(y + 3.2 * s)} Q${f1(x + 3.8 * s)} ${f1(y + 4.4 * s)} ${f1(x + 3.6 * s)} ${f1(y + 13 * s)}Z"/>${more}</g>`;
-const txt = (x, y, t, size = 4, c = GH, anchor = 'middle') => `<text x="${x}" y="${y}" font-size="${size}" font-family="serif" fill="${c}" text-anchor="${anchor}">${t}</text>`;
-const UP = '#ff6b5a', DN = '#3fcf8e';                    // Taiwan colours: red up, green down
-/* a candle at x: open o, close c, high h, low l (y coordinates) */
-const candle = (x, o, c, h, l, w = 3.6) => { const col = c < o ? UP : DN; return `<path d="M${x} ${h}V${l}" stroke="${col}" stroke-width=".55"/><rect x="${f1(x - w / 2)}" y="${Math.min(o, c)}" width="${w}" height="${Math.max(.6, Math.abs(o - c))}" fill="${col}"/>`; };
-const grid = (c = '#7cbcff', o = .18) => `<g stroke="${c}" stroke-width=".3" opacity="${o}">${[12, 24, 36, 48].map(y => `<path d="M0 ${y}H100"/>`).join('')}${[20, 40, 60, 80].map(x => `<path d="M${x} 0V62"/>`).join('')}</g>`;
-const poly = (pts, c, w = 1.2, extra = '') => `<path d="M${pts.map(p => p.join(' ')).join(' L')}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round" ${extra}/>`;
-/* a coin stamped with a currency sign */
-const cur = (x, y, r, sym, c = G, ink = '#2a1a05') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#6b470f" stroke-width=".35"/><text x="${x}" y="${f1(y + r * .42)}" font-size="${f1(r * 1.2)}" font-family="serif" fill="${ink}" text-anchor="middle">${sym}</text>`;
-/* a blockchain block (isometric cube) */
-const blk = (x, y, s = 1, c = '#d9467f') => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 -5 L5 -2.4 L0 .2 L-5 -2.4Z" fill="#ffd2e6" stroke="#10020f" stroke-width=".3"/><path d="M-5 -2.4 L0 .2 V6 L-5 3.4Z" fill="${c}" stroke="#10020f" stroke-width=".3"/><path d="M5 -2.4 L0 .2 V6 L5 3.4Z" fill="#8a1a4a" stroke="#10020f" stroke-width=".3"/></g>`;
-/* a heater shield */
-const shield = (x, y, s, fill, stroke = G) => `<path d="M${x} ${f1(y - 9 * s)} L${f1(x + 8 * s)} ${f1(y - 6 * s)} Q${f1(x + 8 * s)} ${f1(y + 6 * s)} ${x} ${f1(y + 10 * s)} Q${f1(x - 8 * s)} ${f1(y + 6 * s)} ${f1(x - 8 * s)} ${f1(y - 6 * s)}Z" fill="${fill}" stroke="${stroke}" stroke-width=".6"/>`;
-/* option payoff axes: zero line at y0 */
-const axes = (y0 = 40, c = '#b9a6e0') => `<path d="M6 ${y0} H94" stroke="${c}" stroke-width=".5"/><path d="M50 8 V60" stroke="${c}" stroke-width=".3" opacity=".5"/>`;
-const cloud = (x, y, s = 1, c = '#3a2244') => `<g fill="${c}"><ellipse cx="${x}" cy="${y}" rx="${8 * s}" ry="${3.2 * s}"/><ellipse cx="${x - 4 * s}" cy="${y - 2 * s}" rx="${4.4 * s}" ry="${3 * s}"/><ellipse cx="${x + 3 * s}" cy="${y - 2.6 * s}" rx="${5 * s}" ry="${3.4 * s}"/></g>`;
+import { BL, DN, G, GH, GR, INK, PK, R, UP, W, axes, blk, candle, cloud, coin, cur, f1, fig, grid, ground, poly, rays, shield, stack, svg, txt } from './art-parts.js';
 
 const ART = {
   /* ★1 */
