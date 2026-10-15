@@ -5,7 +5,7 @@ import { MON, MONSTERS } from '../src/js/carddata.js';
 import { cardHTML } from '../src/js/cards.js';
 
 describe('card art', () => {
-  const DONE = ['money', 'tech', 'fund'];                // attributes whose ★1–★3 cards have their own art so far
+  const DONE = ['money', 'tech', 'fund', 'etf'];                // attributes whose ★1–★3 cards have their own art so far
   it('covers every ★1–★3 card of the finished attributes, and only real cards', () => {
     const want = MONSTERS.filter(m => DONE.includes(m.cat) && m.rank < 4).map(m => m.id).sort();
     expect(OWN_IDS.slice().sort()).toEqual(want);

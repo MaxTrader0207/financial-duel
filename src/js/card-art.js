@@ -1,9 +1,9 @@
-// card-art.js — exclusive illustrations for ★1–★3 cards (so far: 資金管理, 技術分析 and 基本面, 16 cards each).
+// card-art.js — exclusive illustrations for ★1–★3 cards (so far: 資金管理, 技術分析, 基本面 and ETF, 16 cards each).
 // Each picture shows what the card is about (a ledger, an abacus with budget envelopes, a snowball…), so the card can
 // be recognised at a glance instead of sharing one of three attribute backdrops. Same 100 × 70 box as the scenes;
 // never hue-shifted or mirrored. Rarity still shows in the frame: ★1–★2 on the plain sky, ★3 with a soft sunburst
 // (極稀有 keep their full gold sunburst in ur-art.js).
-const INK = { money: '#14031a', tech: '#04102e', fund: '#021a14' };
+const INK = { money: '#14031a', tech: '#04102e', fund: '#021a14', etf: '#0a1403' };
 const G = '#f3dc95', GH = '#fff2b0', W = '#f4ead2', R = '#e14b32', PK = '#f2a6e6', BL = '#9fd8ff', GR = '#7fdcae';
 const f1 = n => Math.round(n * 10) / 10;
 const rays = (cx, cy, n = 14, r = 80) => `<g fill="#fff4c8" opacity=".11">${Array.from({ length: n }, (_, i) => {
@@ -343,6 +343,90 @@ const ART = {
     <g stroke="#e9ecf6" stroke-width=".6" opacity=".7"><path d="M4 18 Q14 16 22 20"/><path d="M6 26 Q16 24 26 28"/></g>${txt(14, 12, '順風', 3.4, GH)}
     <g transform="translate(82 22)"><circle r="9" fill="${k}" stroke="${G}" stroke-width=".7"/><path d="M0 -7 L2 0 L0 7 L-2 0Z" fill="${R}"/><path d="M-7 0 L0 2 L7 0 L0 -2Z" fill="${W}" opacity=".7"/></g>
     ${txt(74, 40, '本益比 ÷ 成長率 &lt; 1', 3.2, GH)}`, [82, 22]),
+
+  /* ETF — baskets, crowds and little creatures (技術分析 draws charts, 基本面 objects) */
+  tracking_hound: k => svg('etf', `${ground(k)}
+    <path d="M4 50 Q40 44 96 50" fill="none" stroke="#c9b98f" stroke-width=".8" stroke-dasharray="2 1.4"/>
+    ${fig(68, 30, .9, k, `<path d="M71.4 30 L77 20" stroke="${G}" stroke-width=".6"/><path d="M77 20 h7 v5 h-7Z" fill="${GH}"/><path d="M64 40 L60 44 M72 40 L76 43" stroke="${k}" stroke-width="1.4" stroke-linecap="round"/>`)}${txt(80.5, 23.8, '指數', 2.6, '#3a3a05')}
+    <g transform="translate(40 44)" fill="${k}" stroke="${G}" stroke-width=".45" stroke-linejoin="round"><path d="M-12 0 Q-10 -6 -2 -6 L6 -6 L10 -11 L14 -9 L12 -5 L14 -2 L9 -3 L6 0 L4 4 L1 4 L2 0 L-6 0 L-8 4 L-11 4Z"/><path d="M-12 -2 L-17 -6" stroke-width="1"/><circle cx="11" cy="-8" r=".5" fill="${GH}" stroke="none"/></g>
+    <path d="M54 34 H62" stroke="${R}" stroke-width=".7"/><path d="M54 32 V36 M62 32 V36" stroke="${R}" stroke-width=".5"/>${txt(58, 30, '追蹤誤差', 3, '#ff9c86')}`),
+  dca_ant: k => svg('etf', `${ground(k)}
+    <path d="M58 62 Q74 26 92 62Z" fill="#6a5a2a" stroke="${G}" stroke-width=".5"/>${[[66, 56], [74, 52], [82, 56], [70, 46], [78, 44], [74, 36]].map(([x, y]) => coin(x, y, 2)).join('')}
+    ${[[12, 58], [26, 58], [40, 58], [52, 56]].map(([x, y], i) => `<g transform="translate(${x} ${y})" fill="${k}" stroke="${G}" stroke-width=".35"><ellipse cx="-3" cy="0" rx="2.4" ry="1.6"/><ellipse cx="0.6" cy="-.4" rx="1.4" ry="1.2"/><circle cx="3" cy="-1" r="1.2"/><path d="M-3 1 L-4.6 3 M-1 1 L-1 3 M1 1 L2.6 3" stroke-width=".5"/></g>${coin(x + 3, y - 4.4, 1.7)}${txt(x, y - 9, `${i + 1}月`, 2.6, GH)}`).join('')}
+    ${txt(30, 14, '每月扣款，不管漲跌', 3.4, GH)}`),
+  fee_mouse: k => svg('etf', `${ground(k)}
+    <g transform="translate(46 34)"><circle r="18" fill="url(#gold-v)" stroke="#6b470f" stroke-width=".6"/><circle r="13.4" fill="none" stroke="#6b470f" stroke-width=".5" opacity=".6"/>${txt(0, 2, '淨值', 6, '#4a2a05')}
+      <path d="M12 -12 Q16 -10 18 -6 Q14 -5 14 -2 Q10 -4 9 -8Z" fill="#05140a"/></g>
+    <g transform="translate(74 24)" fill="#8a8a96" stroke="${k}" stroke-width=".4"><ellipse cx="0" cy="2" rx="7" ry="4.6"/><circle cx="-6" cy="-1" r="3.4"/><circle cx="-6.6" cy="-4.6" r="1.8" fill="${PK}"/><circle cx="-8.4" cy="-.6" r=".5" fill="${k}"/><path d="M7 2 Q14 0 12 10" fill="none" stroke="#8a8a96" stroke-width=".8"/></g>
+    <g fill="${GH}">${[[66, 22], [64, 26], [68, 28]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".6"/>`).join('')}</g>
+    ${txt(78, 52, '每年 0.4%', 3.6, '#ff9c86')}`),
+  creation_envoy: k => svg('etf', `${ground(k)}
+    <g transform="translate(22 40)"><path d="M-14 -4 H14 L11 12 H-11Z" fill="#8a6a2a" stroke="${G}" stroke-width=".6"/><path d="M-14 -4 Q0 -14 14 -4" fill="none" stroke="#a87a3a" stroke-width="1.2"/>
+      ${[[-9, -7, '#3f7fe0'], [-3, -9, R], [3, -8, GR], [9, -6, G], [-6, -2, PK], [5, -2, BL]].map(([x, y, c]) => `<rect x="${x - 2.6}" y="${y - 2.6}" width="5.2" height="5.2" rx=".6" fill="${c}" stroke="${k}" stroke-width=".3"/>`).join('')}${txt(0, 8, '一籃子股票', 3, W)}</g>
+    <path d="M40 34 H58" stroke="${GH}" stroke-width=".8"/><path d="M56 32 L60 34 L56 36Z" fill="${GH}"/><path d="M58 42 H40" stroke="${GH}" stroke-width=".8"/><path d="M42 40 L38 42 L42 44Z" fill="${GH}"/>
+    <g transform="translate(76 38)"><rect x="-11" y="-12" width="22" height="22" fill="${W}" stroke="${G}" stroke-width=".6"/><path d="M-11 -12 V10 M11 -12 V10" stroke="#a87a3a" stroke-width="1.8"/>${txt(0, -4, '受益', 3.6, '#3a2a05')}${txt(0, 2, '憑證', 3.6, '#3a2a05')}<circle cx="5" cy="6" r="2" fill="${R}"/></g>
+    ${fig(50, 14, .7, k, '')}`),
+  premium_imp: k => svg('etf', `${ground(k)}
+    <rect x="22" y="34" width="18" height="28" fill="#5a6290" stroke="${k}" stroke-width=".5"/>${txt(31, 50, '淨值', 3.6, W)}
+    <rect x="52" y="24" width="18" height="38" fill="${UP}" stroke="${k}" stroke-width=".5" opacity=".85"/>${txt(61, 46, '市價', 3.6, '#fff')}
+    <path d="M18 34 H76" stroke="${GH}" stroke-width=".5" stroke-dasharray="1.4 1"/><path d="M76 24 V34" stroke="${GH}" stroke-width=".6"/><path d="M74.6 25.6 L76 23.6 L77.4 25.6Z" fill="${GH}"/>${txt(84, 31, '溢價', 3.6, GH)}
+    <g transform="translate(61 16)" fill="#6a1a3a" stroke="${G}" stroke-width=".4"><circle r="4.4"/><path d="M-3.4 -2.6 L-5 -7 L-1.6 -3.8Z M3.4 -2.6 L5 -7 L1.6 -3.8Z"/><path d="M-2 1.4 Q0 3 2 1.4" fill="none" stroke="${GH}" stroke-width=".5"/><circle cx="-1.6" cy="-.6" r=".6" fill="${GH}" stroke="none"/><circle cx="1.6" cy="-.6" r=".6" fill="${GH}" stroke="none"/><path d="M-3 4 Q-4 8 -2 8 M3 4 Q4 8 2 8" fill="none" stroke-width=".6"/><path d="M4 2 Q9 2 8 -3 L10 -4" fill="none" stroke-width=".6"/></g>`),
+  index_scroll: k => svg('etf', `${ground(k)}
+    <path d="M14 12 H86 V54 H14Z" fill="${W}" stroke="#a87a3a" stroke-width=".6"/><rect x="10" y="10" width="5" height="46" rx="2.4" fill="#8a5a2a" stroke="${G}" stroke-width=".4"/><rect x="85" y="10" width="5" height="46" rx="2.4" fill="#8a5a2a" stroke="${G}" stroke-width=".4"/>
+    ${txt(50, 20, '成分股 50 家', 4, '#3a2a05')}
+    ${Array.from({ length: 30 }, (_, i) => `<rect x="${f1(20 + (i % 6) * 10.4)}" y="${25 + Math.floor(i / 6) * 5.4}" width="8" height="3.4" rx=".6" fill="${['#3f7fe0', '#2f9e74', R, G, PK, BL][i % 6]}" opacity="${i === 23 ? .25 : .8}"/>`).join('')}
+    <path d="M70.4 44.4 h8" stroke="${R}" stroke-width=".7"/>${txt(50, 60, '定期改寫', 3.2, GH)}`),
+  mcap_giant: k => svg('etf', `${ground(k)}
+    ${[[22, 14, 1.9], [44, 26, 1.35], [60, 34, 1.0], [72, 39, .8], [82, 42, .65], [90, 44, .55]].map(([x, y, s]) => fig(x, y, s, k, '')).join('')}
+    ${txt(22, 8, '市值最大', 3.2, GH)}<path d="M8 60 L96 46" stroke="${GR}" stroke-width=".7" stroke-dasharray="1.4 1"/>${txt(72, 62, '越大越前面', 3, GR)}`),
+  dividend_lantern: k => svg('etf', `${ground(k)}
+    <path d="M4 14 Q50 26 96 14" fill="none" stroke="#a87a3a" stroke-width=".6"/>
+    ${[['Q1', 16, 17], ['Q2', 38, 21], ['Q3', 62, 21], ['Q4', 84, 17]].map(([q, x, y]) => `<path d="M${x} ${y} V${y + 3}" stroke="#a87a3a" stroke-width=".5"/><ellipse cx="${x}" cy="${y + 10}" rx="6" ry="7.4" fill="${R}" stroke="${G}" stroke-width=".5" filter="url(#glow)"/><path d="M${x - 6} ${y + 10} H${x + 6} M${x - 5} ${y + 6} H${x + 5} M${x - 5} ${y + 14} H${x + 5}" stroke="#ffb08a" stroke-width=".4"/><rect x="${x - 3}" y="${y + 2.6}" width="6" height="1.4" fill="${k}"/><rect x="${x - 3}" y="${y + 16.6}" width="6" height="1.4" fill="${k}"/>${txt(x, y + 11.4, q, 3.2, GH)}`).join('')}
+    <path d="M8 62 Q40 50 60 54 T96 46" fill="none" stroke="#f3d27a" stroke-width="1" opacity=".7" stroke-dasharray="1.6 1.2"/>
+    <path d="M80 50 L86 46 L92 50 V58 H80Z" fill="${W}" stroke="${G}" stroke-width=".4"/>${fig(30, 46, .7, k, '')}${txt(50, 46, '每季配息', 3.4, GH)}`),
+  leveraged_oni: k => svg('etf', `${ground(k)}
+    ${poly([[4, 40], [14, 28], [24, 44], [34, 30], [44, 46], [54, 32], [64, 48], [74, 34], [84, 50], [96, 38]], R, 1.2)}${poly([[4, 40], [14, 34], [24, 42], [34, 35], [44, 43], [54, 36], [64, 44], [74, 37], [84, 45], [96, 39]], GH, .8, 'stroke-dasharray="1.4 1"')}
+    ${txt(8, 60, '- - 指數', 3, GH, 'start')}${txt(36, 60, '— 正二', 3, '#ff9c86', 'start')}${txt(78, 60, '盤整耗損', 3, '#ff9c86')}
+    <g transform="translate(76 14)"><circle r="7" fill="#8a1a1a" stroke="${G}" stroke-width=".5"/><path d="M-4 -5 L-6 -11 L-2 -6Z M4 -5 L6 -11 L2 -6Z" fill="${W}"/><path d="M-3 -1 L-1 0 M3 -1 L1 0" stroke="${GH}" stroke-width=".8"/><path d="M-3 3 Q0 1.4 3 3" fill="none" stroke="${W}" stroke-width=".6"/></g>${txt(60, 17, '×2', 6, '#ff9c86')}`),
+  inverse_shade: k => svg('etf', `${ground(k)}
+    <path d="M4 34 H96" stroke="${W}" stroke-width=".3" opacity=".5"/>
+    ${poly([[4, 30], [20, 22], [36, 26], [52, 14], [68, 20], [84, 10], [96, 14]], GR, 1.3)}${poly([[4, 38], [20, 46], [36, 42], [52, 54], [68, 48], [84, 58], [96, 54]], '#b9a6e0', 1.3)}
+    ${txt(94, 8, '指數', 3.2, GR, 'end')}${txt(94, 62, '反向', 3.2, '#b9a6e0', 'end')}
+    <g transform="translate(30 40)" opacity=".8"><path d="M-6 10 Q-7 -6 0 -8 Q7 -6 6 10 L4 7 L2 10 L0 7 L-2 10 L-4 7Z" fill="#3a2a5a" stroke="#b9a6e0" stroke-width=".4"/><circle cx="-2.2" cy="-2" r="1" fill="#b9a6e0"/><circle cx="2.2" cy="-2" r="1" fill="#b9a6e0"/></g>
+    ${txt(30, 30, '鏡像', 3, GH)}`),
+  bond_etf_monk: k => svg('etf', `${ground(k)}
+    <path d="M50 52 L44 60 H56Z" fill="${G}"/><path d="M16 44 L84 58" stroke="#a87a3a" stroke-width="2" stroke-linecap="round"/>
+    <g transform="translate(22 34)"><rect x="-9" y="-6" width="18" height="10" rx="1" fill="#2f5a4a" stroke="${G}" stroke-width=".5"/>${txt(0, 1, '債券價格', 3, GR)}</g>${txt(22, 24, '↑', 6, GR)}
+    <g transform="translate(78 48)"><rect x="-8" y="-6" width="16" height="10" rx="1" fill="#5a2a2a" stroke="${G}" stroke-width=".5"/>${txt(0, 1, '利率', 3.4, '#ff9c86')}</g>${txt(78, 38, '↓', 6, '#ff9c86')}
+    ${fig(50, 16, .9, k, `<path d="M45.6 20 Q50 18 54.4 20" fill="none" stroke="${W}" stroke-width=".5"/><rect x="54" y="20" width="6" height="4" rx="1.6" fill="${W}" stroke="#a87a3a" stroke-width=".3"/><circle cx="50" cy="15.2" r="2.6" fill="#3a1a28" stroke="none"/>`)}`),
+  lp_merchant: k => svg('etf', `${ground(k)}
+    <rect x="18" y="20" width="64" height="8" fill="${R}" stroke="${G}" stroke-width=".4"/><path d="M18 20 Q50 12 82 20" fill="#a83a2a"/>
+    <rect x="22" y="28" width="56" height="30" fill="#3a2a1a" stroke="${G}" stroke-width=".5"/>
+    ${[0, 1, 2, 3].map(i => `<rect x="26" y="${31 + i * 6}" width="${14 - i * 2}" height="4" fill="${GR}" opacity=".85"/>${txt(44, 34.4 + i * 6, (25.6 - i * 0.05).toFixed(2), 2.6, GR)}<rect x="${74 - (8 + i * 2)}" y="${31 + i * 6}" width="${8 + i * 2}" height="4" fill="${UP}" opacity=".85"/>${txt(57, 34.4 + i * 6, (25.65 + i * 0.05).toFixed(2), 2.6, '#ff9c86')}`).join('')}
+    ${txt(30, 17, '委買', 3.4, GR)}${txt(70, 17, '委賣', 3.4, '#ff9c86')}
+    ${fig(50, 30, .7, k, '')}`),
+  /* ★3 */
+  factor_strategist: k => svg('etf', `${ground(k)}
+    ${Array.from({ length: 4 }, (_, r) => Array.from({ length: 6 }, (_, c) => `<rect x="${30 + c * 10}" y="${18 + r * 10}" width="10" height="10" fill="${(r + c) % 2 ? '#1a2a10' : '#3a4a20'}" stroke="${k}" stroke-width=".3"/>`).join('')).join('')}
+    ${[['價值', 35, 23, G], ['動能', 55, 33, UP], ['低波', 75, 43, BL], ['品質', 45, 43, PK], ['規模', 65, 23, GR]].map(([t, x, y, c]) => `<circle cx="${x}" cy="${y}" r="4.2" fill="${k}" stroke="${c}" stroke-width=".7"/>${txt(x, y + 1.2, t, 2.6, c)}`).join('')}
+    ${fig(16, 26, 1, k, `<path d="M19 30 L24 26 L26 31Z" fill="${W}" stroke="${k}" stroke-width=".3"/><path d="M12.6 23 Q16 19 19.4 23Z" fill="${G}" stroke="none"/>`)}`, [55, 33]),
+  theme_comet: k => svg('etf', `<g fill="#fff">${[[10, 50], [24, 58], [40, 44], [88, 52], [70, 60]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".6"/>`).join('')}</g>
+    <path d="M78 16 Q50 26 8 50" fill="none" stroke="${GH}" stroke-width="7" stroke-linecap="round" opacity=".18"/><path d="M78 16 Q52 25 18 44" fill="none" stroke="${GH}" stroke-width="3" stroke-linecap="round" opacity=".4"/>
+    <circle cx="78" cy="16" r="5" fill="#fff6d8" filter="url(#glow)"/>
+    ${[['AI', 62, 22], ['電動車', 46, 30], ['元宇宙', 28, 40]].map(([t, x, y], i) => txt(x, y, t, 3.4, GH).replace('fill', `opacity="${1 - i * .3}" fill`)).join('')}
+    ${ground(k)}${txt(80, 60, '熱潮一過便消失', 3, GH)}`, [78, 16]),
+  active_ronin: k => svg('etf', `${ground(k)}
+    <g transform="translate(64 24)"><rect x="-28" y="-9" width="56" height="16" rx="2" fill="${W}" stroke="${G}" stroke-width=".7"/>${txt(-6, 3, '00981', 8, '#3a2a05')}<circle cx="18" cy="-1" r="7" fill="${R}"/>${txt(18, 2, 'A', 8, '#fff')}</g>
+    ${txt(64, 42, '第六碼 A ＝ 主動式', 3.4, GH)}
+    ${fig(20, 30, 1.2, k, `<path d="M24 36 L40 22" stroke="#e9ecf6" stroke-width="1" stroke-linecap="round"/><path d="M24 36 L22 38" stroke="#6a4a1a" stroke-width="1.6"/><path d="M15.4 26.4 Q20 22 24.6 26.4Z" fill="${k}"/><path d="M14 29 L11 31" stroke="${R}" stroke-width=".7"/>`)}
+    <path d="M40 22 L52 50" stroke="${GH}" stroke-width=".4" stroke-dasharray="1 1"/>`, [64, 24]),
+  rebalance_clock: k => svg('etf', `${ground(k)}
+    <g transform="translate(36 34)"><circle r="20" fill="${W}" stroke="${G}" stroke-width="1"/><circle r="17" fill="none" stroke="#c9b98f" stroke-width=".4"/>
+      ${['Q1', 'Q2', 'Q3', 'Q4'].map((q, i) => { const a = -Math.PI / 2 + i * Math.PI / 2; return `<path d="M${f1(15 * Math.cos(a))} ${f1(15 * Math.sin(a))} L${f1(19 * Math.cos(a))} ${f1(19 * Math.sin(a))}" stroke="#3a2a05" stroke-width="1"/>${txt(f1(11 * Math.cos(a)), f1(11 * Math.sin(a) + 1.2), q, 3.2, '#3a2a05')}`; }).join('')}
+      <path d="M0 0 L0 -12" stroke="#3a2a05" stroke-width="1.2"/><path d="M0 0 L9 3" stroke="${R}" stroke-width=".9"/><circle r="1.4" fill="${R}"/></g>
+    <g transform="translate(76 34)">${[-14, -5, 4, 13].map((y, i) => `<rect x="-8" y="${y - 3}" width="16" height="6" rx="1" fill="${i === 3 ? '#5a3a3a' : '#2f5a4a'}" stroke="${G}" stroke-width=".4" opacity="${i === 3 ? .5 : 1}"/>`).join('')}
+      ${txt(0, -12.6, '強', 3, GR)}${txt(0, 15.4, '弱', 3, '#ff9c86')}<path d="M10 13 Q18 13 18 4" fill="none" stroke="${GH}" stroke-width=".6"/><path d="M16.6 5.4 L18 2.6 L19.4 5.4Z" fill="${GH}"/></g>
+    ${txt(76, 60, '汰弱留強', 3.4, GH)}`, [36, 34]),
 };
 
 const CACHE = {};
