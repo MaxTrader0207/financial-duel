@@ -1,9 +1,9 @@
-// card-art.js — exclusive illustrations for ★1–★3 cards (so far: 資金管理 and 技術分析, 16 cards each).
+// card-art.js — exclusive illustrations for ★1–★3 cards (so far: 資金管理, 技術分析 and 基本面, 16 cards each).
 // Each picture shows what the card is about (a ledger, an abacus with budget envelopes, a snowball…), so the card can
 // be recognised at a glance instead of sharing one of three attribute backdrops. Same 100 × 70 box as the scenes;
 // never hue-shifted or mirrored. Rarity still shows in the frame: ★1–★2 on the plain sky, ★3 with a soft sunburst
 // (極稀有 keep their full gold sunburst in ur-art.js).
-const INK = { money: '#14031a', tech: '#04102e' };
+const INK = { money: '#14031a', tech: '#04102e', fund: '#021a14' };
 const G = '#f3dc95', GH = '#fff2b0', W = '#f4ead2', R = '#e14b32', PK = '#f2a6e6', BL = '#9fd8ff', GR = '#7fdcae';
 const f1 = n => Math.round(n * 10) / 10;
 const rays = (cx, cy, n = 14, r = 80) => `<g fill="#fff4c8" opacity=".11">${Array.from({ length: n }, (_, i) => {
@@ -243,6 +243,106 @@ const ART = {
     ${[[38, 28], [62, 20], [38, 42], [62, 36]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="none" stroke="${G}" stroke-width=".6"/>`).join('')}
     <path d="M50 25 V39" stroke="${G}" stroke-width=".5" stroke-dasharray="1 1"/>${txt(50, 47.6, '互相確認', 3, GH)}
     ${fig(16, 16, .9, k, `<path d="M19.6 18 V30" stroke="${G}" stroke-width=".7"/><circle cx="19.6" cy="17.4" r="1" fill="${G}"/><path d="M14 18.6 Q16 22 18 18.6" fill="${W}" stroke="none"/>`)}`, [50, 30]),
+
+  /* 基本面 */
+  pe_sage: k => svg('fund', `${ground(k)}
+    <path d="M50 14 V54" stroke="${G}" stroke-width="1.2"/><path d="M42 58 H58 L54 54 H46Z" fill="${G}"/><path d="M18 20 L82 20" stroke="${G}" stroke-width="1"/><circle cx="50" cy="14" r="1.6" fill="${GH}"/>
+    <path d="M18 20 L12 34 M18 20 L24 34 M82 20 L76 34 M82 20 L88 34" stroke="${G}" stroke-width=".4"/>
+    <path d="M10 34 Q18 40 26 34Z" fill="${G}"/><path d="M74 34 Q82 40 90 34Z" fill="${G}"/>
+    <g transform="translate(18 28)"><path d="M-7 -6 H5 L8 -2 L5 2 H-7Z" fill="${W}" stroke="${k}" stroke-width=".4"/>${txt(-1, -.6, '股價', 3, '#3a2a10')}</g>
+    ${stack(82, 32, 3, 3)}${txt(82, 25, '每股盈餘', 2.8, GH)}
+    <rect x="34" y="40" width="32" height="10" rx="2" fill="${k}" stroke="${G}" stroke-width=".6"/>${txt(50, 47, '股價 ÷ EPS', 3.6, GH)}`),
+  div_fox: k => svg('fund', `<circle cx="78" cy="14" r="9" fill="#fff6d8" opacity=".95" filter="url(#glow)"/>${ground(k)}
+    <path d="M6 22 H94" stroke="${GH}" stroke-width=".5" stroke-dasharray="1.6 1"/>${txt(8, 20, '除息前', 2.8, GH, 'start')}
+    ${poly([[6, 24], [22, 22], [30, 22]], GH, 1.3)}<path d="M30 22 V36" stroke="${R}" stroke-width=".8" stroke-dasharray="1 1"/>${txt(34, 32, '除息', 3, '#ff9c86', 'start')}
+    ${poly([[30, 36], [44, 34], [56, 30], [66, 26], [76, 23], [88, 22]], GR, 1.3)}<circle cx="88" cy="22" r="1.8" fill="${GR}"/>${txt(84, 30, '填息', 3.4, GR)}
+    <g transform="translate(22 48)" fill="${k}" stroke="${G}" stroke-width=".4"><path d="M-8 4 Q-6 -3 2 -2 L5 -6 L6 -1 Q9 1 8 4Z"/><path d="M-8 4 Q-16 2 -15 -5 Q-12 0 -6 1Z" fill="${W}" stroke="${G}"/><path d="M3 -5 L4 -9 L6 -4Z"/></g>`),
+  margin_artisan: k => svg('fund', `${ground(k)}
+    <g transform="translate(50 15)"><rect x="-36" y="-5" width="72" height="10" fill="${k}" stroke="${G}" stroke-width=".5"/><rect x="-36" y="-5" width="43" height="10" fill="#5a6290"/><rect x="7" y="-5" width="29" height="10" fill="${GR}"/>
+      ${txt(-14.5, 1.4, '成本 60%', 3.2, W)}${txt(21.5, 1.4, '毛利 40%', 3.2, '#04281c')}${txt(0, -7.4, '售價', 3, GH)}</g>
+    <rect x="40" y="48" width="24" height="7" fill="#7a6a4a" stroke="${G}" stroke-width=".5"/><rect x="38" y="55" width="28" height="7" fill="#4a3a2a"/>
+    <path d="M44 46 L66 40" stroke="#e9ecf6" stroke-width="1.6" stroke-linecap="round"/><path d="M62 41 L70 38.6" stroke="#6a4a1a" stroke-width="2" stroke-linecap="round"/>
+    <g fill="${GH}">${[[48, 42], [52, 40], [46, 39]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".6"/>`).join('')}</g>
+    ${fig(30, 36, .95, k, `<path d="M33 41 L42 45" stroke="${k}" stroke-width="1.6" stroke-linecap="round"/><path d="M27 33 H33" stroke="${W}" stroke-width="1"/>`)}`),
+  buyback_monk: k => svg('fund', `${ground(k)}
+    ${Array.from({ length: 10 }, (_, i) => `<rect x="${6 + (i % 5) * 7}" y="${12 + Math.floor(i / 5) * 9}" width="5.4" height="7" rx=".6" fill="${i < 3 ? 'none' : W}" stroke="${i < 3 ? GH : k}" stroke-width=".4" stroke-dasharray="${i < 3 ? '1 .8' : ''}"/>`).join('')}
+    ${txt(23, 34, '流通股數 ↓', 3.2, GH)}
+    <path d="M44 20 Q56 18 64 30" fill="none" stroke="${GH}" stroke-width=".8"/><path d="M62.6 28 L64.6 31.6 L65.6 27.4Z" fill="${GH}"/>
+    <path d="M64 30 H90 V54 H64Z" fill="#3a4a3a" stroke="${G}" stroke-width=".6"/><circle cx="77" cy="42" r="6" fill="none" stroke="${G}" stroke-width="1"/><path d="M77 36 V48 M71 42 H83" stroke="${G}" stroke-width=".6"/>
+    ${txt(77, 60, '買回', 3.4, GH)}
+    ${fig(52, 38, .9, k, `<path d="M48.6 40.6 Q52 38.6 55.4 40.6" fill="none" stroke="${W}" stroke-width=".8"/><path d="M55 42 L62 36" stroke="${G}" stroke-width=".6"/><path d="M48 35.4 Q52 31 56 35.4Z" fill="${W}" stroke="none"/>`)}`),
+  eps_farmer: k => svg('fund', `<circle cx="16" cy="12" r="6" fill="url(#sun-gold)"/>
+    <path d="M0 42 Q50 36 100 42 V70 H0Z" fill="#2a4a20"/>${Array.from({ length: 6 }, (_, i) => `<path d="M0 ${46 + i * 4} Q50 ${40 + i * 4} 100 ${46 + i * 4}" fill="none" stroke="#4a7a30" stroke-width=".5"/>`).join('')}
+    ${['Q1', 'Q2', 'Q3', 'Q4'].map((q, i) => { const x = 30 + i * 16; return `<g transform="translate(${x} 46)"><path d="M0 0 L-3 -14 M0 0 L0 -15 M0 0 L3 -14" stroke="#e8c45a" stroke-width="1"/><path d="M-3 -5 H3" stroke="#a87a3a" stroke-width="1.2"/>${[-14, -15, -14].map((y, j) => `<ellipse cx="${(j - 1) * 3}" cy="${y - 1}" rx=".9" ry="2" fill="#f3d27a"/>`).join('')}${txt(0, 8, q, 3, GH)}</g>`; }).join('')}
+    ${fig(14, 34, .95, k, `<path d="M17 38 L22 34" stroke="${k}" stroke-width="1.4" stroke-linecap="round"/><path d="M22 34 Q26 30 24 26" fill="none" stroke="#e9ecf6" stroke-width=".8"/><path d="M9.4 31.4 L14 28 L18.6 31.4Z" fill="#c9a86a"/>`)}
+    ${txt(62, 20, 'EPS', 5, GH)}`),
+  pb_guard: k => svg('fund', `${ground(k)}
+    <path d="M22 62 V26 H30 V22 H36 V26 H64 V22 H70 V26 H78 V62Z" fill="#3a4a40" stroke="${G}" stroke-width=".6"/><path d="M42 62 V44 Q50 36 58 44 V62Z" fill="${k}"/>
+    <path d="M4 34 H96" stroke="${GH}" stroke-width=".9"/>${txt(96, 32, '每股淨值', 3, GH, 'end')}
+    ${poly([[4, 20], [14, 26], [24, 30], [34, 37], [44, 40], [52, 37], [62, 30], [72, 26], [86, 22]], DN, 1.2)}
+    <circle cx="44" cy="40" r="2" fill="none" stroke="${G}" stroke-width=".8"/>${txt(44, 50, 'PB &lt; 1', 3.4, GH)}
+    ${fig(86, 44, .9, k, `<path d="M90 41 V60" stroke="${G}" stroke-width=".7"/><path d="M88.6 41 L90 37 L91.4 41Z" fill="${W}"/><rect x="81.6" y="47" width="5" height="6" rx="1" fill="#5a6290" stroke="${G}" stroke-width=".3"/>`)}`),
+  yield_cat: k => svg('fund', `${ground(k)}
+    <g transform="translate(46 38)"><ellipse cx="0" cy="10" rx="13" ry="12" fill="${W}" stroke="${k}" stroke-width=".5"/><circle cx="0" cy="-6" r="10" fill="${W}" stroke="${k}" stroke-width=".5"/>
+      <path d="M-9 -12 L-7 -20 L-2 -14Z M9 -12 L7 -20 L2 -14Z" fill="${W}" stroke="${k}" stroke-width=".5"/><path d="M-7.6 -13 L-6.6 -17.4 L-4 -14Z M7.6 -13 L6.6 -17.4 L4 -14Z" fill="${PK}"/>
+      <path d="M-5 -6 Q-3.6 -7.6 -2 -6 M2 -6 Q3.6 -7.6 5 -6" fill="none" stroke="${k}" stroke-width=".7"/><path d="M-1.4 -2 Q0 -1 1.4 -2" fill="none" stroke="${k}" stroke-width=".5"/>
+      <path d="M-10 0 H10 V2.6 H-10Z" fill="${R}"/><circle cx="0" cy="4" r="2" fill="${G}" stroke="${k}" stroke-width=".3"/>
+      <path d="M10 2 Q18 -2 16 -14" fill="none" stroke="${W}" stroke-width="4.6" stroke-linecap="round"/><path d="M10 2 Q18 -2 16 -14" fill="none" stroke="${k}" stroke-width=".4" opacity=".4"/>
+      <ellipse cx="-4" cy="12" rx="6" ry="5" fill="url(#gold-v)" stroke="#6b470f" stroke-width=".3"/>${txt(-4, 13.4, '萬', 3.6, '#4a2a05')}</g>
+    ${[[16, 16], [24, 26], [76, 18], [84, 30], [70, 10]].map(([x, y]) => coin(x, y, 2)).join('')}
+    ${txt(80, 54, '殖利率', 3.6, GH)}${txt(80, 60, '5%', 4, GH)}`),
+  revenue_seer: k => svg('fund', `${ground(k)}
+    <g transform="translate(24 30)"><rect x="-16" y="-18" width="32" height="30" rx="1.4" fill="${W}" stroke="${G}" stroke-width=".5"/><rect x="-16" y="-18" width="32" height="6" fill="${R}"/>${txt(0, -13.6, '每月', 3.2, '#fff')}
+      ${Array.from({ length: 15 }, (_, i) => `<rect x="${-13 + (i % 5) * 5.6}" y="${-9 + Math.floor(i / 5) * 6.4}" width="4" height="4.4" fill="${i === 9 ? GR : '#d9cfb8'}"/>`).join('')}${txt(9.4, 0.4, '10', 2.6, '#04281c')}</g>
+    <g fill="${GR}">${[10, 12, 11, 14, 16, 19].map((h, i) => `<rect x="${52 + i * 6}" y="${54 - h}" width="4" height="${h}"/>`).join('')}</g><g fill="#5a6290">${[8, 9, 9, 10, 11, 12].map((h, i) => `<rect x="${52 + i * 6 + 4}" y="${54 - h}" width="1.6" height="${h}"/>`).join('')}</g>
+    ${txt(70, 30, '年增 +18%', 3.6, GR)}
+    <circle cx="70" cy="13" r="6" fill="#cfe8ff" opacity=".45" stroke="${GH}" stroke-width=".5"/><path d="M66 19 H74 L72 21 H68Z" fill="${G}"/>`),
+  dupont_sisters: k => svg('fund', `${ground(k)}
+    ${[['淨利率', 13, PK], ['周轉率', 35, BL], ['權益乘數', 57, G]].map(([t, x, c], i) => `${fig(x, 30, 1, k, `<path d="M${x - 2.6} 26.4 Q${x} 23 ${x + 2.6} 26.4Z" fill="${c}" stroke="none"/>`)}<rect x="${x - 9}" y="47" width="18" height="6" rx="1" fill="${k}" stroke="${c}" stroke-width=".6"/>${txt(x, 51.6, t, 3, c)}${i < 2 ? txt(x + 12, 38, '×', 5, GH) : ''}`).join('')}
+    ${txt(71, 38, '＝', 5, GH)}<rect x="76" y="30" width="18" height="12" rx="1.4" fill="${GR}" stroke="${k}" stroke-width=".5"/>${txt(85, 38.4, 'ROE', 4.2, '#04281c')}`),
+  roe_knight: k => svg('fund', `${ground(k)}
+    <g fill="${k}" stroke="${G}" stroke-width=".5" stroke-linejoin="round"><path d="M28 44 Q30 36 44 36 L60 36 Q66 34 70 28 L74 30 L70 38 Q70 44 64 46 L62 58 L58 58 L58 47 L40 47 L38 58 L34 58 L34 47 Q28 48 28 44Z"/>
+      <path d="M70 28 L76 24 L78 28 L74 31Z"/><path d="M44 36 Q46 26 50 22 Q54 26 54 36Z"/><circle cx="50" cy="19" r="3"/></g>
+    <path d="M52 22 L60 6" stroke="${G}" stroke-width=".7"/><path d="M60 6 L76 9 L60 13Z" fill="${GR}" stroke="${k}" stroke-width=".3"/>${txt(67, 11.2, 'ROE 15%', 2.8, '#04281c')}
+    <path d="M30 40 L24 44" stroke="${W}" stroke-width=".6"/>${txt(20, 20, '股東權益', 3, GH)}`),
+  inventory_monk: k => svg('fund', `${ground(k)}
+    <path d="M14 30 L50 14 L86 30Z" fill="#3a4a40" stroke="${G}" stroke-width=".5"/><rect x="18" y="30" width="64" height="32" fill="#2a3a30" stroke="${G}" stroke-width=".5"/>
+    <g transform="translate(50 45)"><circle r="11" fill="none" stroke="${GH}" stroke-width="1" stroke-dasharray="4 2"/><path d="M11 0 L13.6 -3 L8.4 -3Z M-11 0 L-13.6 3 L-8.4 3Z" fill="${GH}"/>
+      ${[[0, -11], [9.5, 5.5], [-9.5, 5.5]].map(([x, y]) => `<rect x="${x - 3}" y="${y - 2.6}" width="6" height="5.2" fill="#c99a3f" stroke="${k}" stroke-width=".3"/>`).join('')}${txt(0, 1.6, '周轉', 3.6, GH)}</g>
+    <path d="M70 26 Q72 20 76 18" fill="none" stroke="#cfd6e0" stroke-width=".8" opacity=".7"/>
+    ${fig(80, 42, .85, k, `<path d="M76 45 Q80 43 84 45" fill="none" stroke="${W}" stroke-width=".6"/><circle cx="80" cy="41.6" r="2.2" fill="#3a1a28" stroke="none"/>`)}`),
+  guidance_herald: k => svg('fund', `${ground(k)}
+    ${poly([[44, 52], [56, 52], [56, 42], [68, 42], [68, 32], [80, 32], [80, 22], [94, 22]], UP, 1.4)}${[[56, 47], [68, 37], [80, 27]].map(([x, y]) => txt(x + 4, y, '↑', 3.6, UP)).join('')}
+    <g transform="translate(26 22)"><rect x="-12" y="-7" width="24" height="16" fill="${W}" stroke="#a87a3a" stroke-width=".6"/><path d="M-13 -8 V10 M13 -8 V10" stroke="#8a5a2a" stroke-width="1.8" stroke-linecap="round"/>
+      ${txt(0, -1, '財測', 3.6, '#5a2a1a')}${txt(0, 5.6, '上修', 4.4, '#b0472f')}</g>
+    ${fig(26, 38, .95, k, `<path d="M22 41 L18 34 M30 41 L34 34" stroke="${k}" stroke-width="1.4" stroke-linecap="round"/><path d="M22.6 34.6 Q26 30.6 29.4 34.6Z" fill="${R}" stroke="none"/>`)}`),
+  /* ★3 */
+  fcf_colossus: k => svg('fund', `${ground(k)}
+    <path d="M4 18 H40" stroke="${BL}" stroke-width="3.4" stroke-linecap="round" opacity=".85"/>${txt(22, 14, '營業現金流', 3, GR)}
+    <path d="M40 18 Q46 18 46 26" fill="none" stroke="${BL}" stroke-width="3.4" opacity=".85"/><path d="M40 18 Q44 18 46 10 H58" fill="none" stroke="#ff9c86" stroke-width="2" opacity=".85"/>${txt(70, 11.6, '−資本支出', 3, '#ff9c86')}
+    <g fill="#5a6a70" stroke="${G}" stroke-width=".5" stroke-linejoin="round"><rect x="38" y="30" width="16" height="16" rx="1"/><rect x="42" y="22" width="8" height="8" rx="1.4"/><rect x="31" y="31" width="7" height="13" rx="1"/><rect x="54" y="31" width="7" height="13" rx="1"/><rect x="39" y="46" width="6" height="14"/><rect x="47" y="46" width="6" height="14"/></g>
+    <rect x="44" y="25" width="4" height="1.4" fill="${GH}"/><path d="M41 36 H51 M41 40 H51" stroke="${G}" stroke-width=".4"/>
+    ${[[66, 50], [72, 54], [78, 50], [84, 54]].map(([x, y]) => coin(x, y, 2)).join('')}${txt(76, 44, '自由現金流', 3.2, GH)}`, [46, 30]),
+  dcf_oracle: k => svg('fund', `${ground(k)}
+    <path d="M8 46 H94" stroke="${GH}" stroke-width=".6"/>${['今天', '1年', '2年', '3年', '4年', '5年'].map((t, i) => txt(12 + i * 16, 54, t, 2.8, GH)).join('')}
+    ${[0, 1, 2, 3, 4, 5].map(i => { const x = 12 + i * 16, r = 6.2 - i * .8; return i ? `${coin(x, 38, r)}<path d="M${x - 5} 30 Q${(x + 10) / 2} 22 12 32" fill="none" stroke="${GR}" stroke-width=".45" stroke-dasharray="1 .8"/>` : ''; }).join('')}
+    <circle cx="12" cy="38" r="7" fill="url(#gold-v)" stroke="${GH}" stroke-width=".8"/>${txt(12, 39.4, '現值', 3, '#4a2a05')}
+    ${txt(58, 18, '折現 ÷ (1+r)ⁿ', 3.8, GR)}
+    <circle cx="80" cy="14" r="6" fill="#cfe8ff" opacity=".4" stroke="${GH}" stroke-width=".5"/><path d="M76 20 H84 L82 22 H78Z" fill="${G}"/>`, [10, 38]),
+  capex_smith: k => svg('fund', `${ground(k)}
+    <path d="M58 62 V34 L68 40 V34 L78 40 V34 L88 40 V62Z" fill="#3a4a40" stroke="${G}" stroke-width=".5"/><rect x="82" y="22" width="4" height="12" fill="#3a4a40" stroke="${G}" stroke-width=".4"/>
+    <path d="M84 20 Q82 14 86 10 Q84 6 88 4" fill="none" stroke="#cfd6e0" stroke-width="1" opacity=".6"/>${txt(73, 54, '產線', 3.6, GH)}
+    <path d="M24 50 H44 L40 54 H28Z" fill="#5a5a6a" stroke="${G}" stroke-width=".5"/><rect x="31" y="54" width="6" height="8" fill="#4a4a5a"/>
+    <path d="M30 48 L42 46" stroke="#ff8a3a" stroke-width="1.6" filter="url(#glow)"/>
+    <g fill="#ffb347">${[[36, 42], [40, 40], [33, 41], [44, 43]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".7"/>`).join('')}</g>
+    ${fig(18, 30, 1.1, k, `<path d="M21 34 L30 24" stroke="${k}" stroke-width="1.6" stroke-linecap="round"/><rect x="27" y="20" width="7" height="4" fill="#8a8a9a" stroke="${G}" stroke-width=".3" transform="rotate(-40 30 22)"/>`)}
+    ${txt(30, 10, '明年營收的刀刃', 3.2, GH)}`, [36, 44]),
+  peg_navigator: k => svg('fund', `<path d="M0 50 Q25 46 50 50 T100 50 V70 H0Z" fill="#0d3a4a"/><path d="M0 54 Q25 50 50 54 T100 54" fill="none" stroke="#7fd0e0" stroke-width=".5"/>
+    <g transform="translate(46 44)"><path d="M-18 0 H18 L13 7 H-13Z" fill="#6a4a1a" stroke="${G}" stroke-width=".5"/><path d="M0 0 V-30" stroke="${G}" stroke-width=".8"/>
+      <path d="M1 -28 Q16 -18 1 -4Z" fill="${W}" stroke="${k}" stroke-width=".4"/><path d="M-1 -26 Q-12 -16 -1 -6Z" fill="${W}" stroke="${k}" stroke-width=".4" opacity=".9"/>${txt(7, -14, 'PEG', 3.6, '#04281c')}</g>
+    <g stroke="#e9ecf6" stroke-width=".6" opacity=".7"><path d="M4 18 Q14 16 22 20"/><path d="M6 26 Q16 24 26 28"/></g>${txt(14, 12, '順風', 3.4, GH)}
+    <g transform="translate(82 22)"><circle r="9" fill="${k}" stroke="${G}" stroke-width=".7"/><path d="M0 -7 L2 0 L0 7 L-2 0Z" fill="${R}"/><path d="M-7 0 L0 2 L7 0 L0 -2Z" fill="${W}" opacity=".7"/></g>
+    ${txt(74, 40, '本益比 ÷ 成長率 &lt; 1', 3.2, GH)}`, [82, 22]),
 };
 
 const CACHE = {};
